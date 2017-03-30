@@ -1,0 +1,23 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, shrink-to-fit=no">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+		<title>{% block title %}{% endblock %}{{ site.name }}</title>
+
+		<link rel="stylesheet" href="{% static "base.css" %}" type='text/css'>
+
+		{% block head-extras-app %}{% endblock %}
+		{% block head-extras-page %}{% endblock %}
+	</head>
+	<body class="{% block body-classes %}{% endblock %}">
+		<div id="page-component"></div>
+		<script src="{% static 'potassium.js' %}"></script>
+		<script src="{% static 'base.js' %}"></script>
+		{% block script-extras-app %}{% endblock %}
+		{% block script-extras-page %}{% endblock %}
+	</body>
+</html>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block head-extras-app %}
+	<link rel="stylesheet" href="{% static "front/front.css" %}" type='text/css'>
+{% endblock %}
+
+{% block script-extras-app %}
+	<script src="{% static 'front/front.js' %}"></script>
+{% endblock %}

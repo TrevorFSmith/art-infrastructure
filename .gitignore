@@ -1,0 +1,9 @@
+*.pyc
+*.swp
+*.box
+*.log
+*.pid
+*.sqlite3
+django/ai/local_settings.py
+
+
