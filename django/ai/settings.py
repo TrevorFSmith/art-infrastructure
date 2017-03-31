@@ -24,6 +24,8 @@ INSTALLED_APPS = [
 
 	'front',
 	'account',
+	'artwork',
+	'heartbeat'
 ]
 
 MIDDLEWARE = [

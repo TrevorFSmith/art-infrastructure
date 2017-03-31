@@ -1,0 +1,5 @@
+/* styles for the /admin/ django app */
+
+.change-form #id_name, .change-form #id_email, .change-form #id_phone , .change-form #id_title, .change-form #id_provider  {
+	height: 18px;
+}
