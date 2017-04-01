@@ -1,5 +1,8 @@
 /* styles for the /admin/ django app */
 
-.change-form #id_name, .change-form #id_email, .change-form #id_phone , .change-form #id_title, .change-form #id_provider  {
+.change-form #id_name, .change-form #id_email, .change-form #id_phone , 
+.change-form #id_title, .change-form #id_provider, .change-form #id_airport_type,
+.change-form #id_iso_country, .change-form #id_iso_region, .change-form #id_municipality, 
+.change-form #id_gps_code, .change-form #id_iata_code, .change-form #id_local_code {
 	height: 18px;
 }

@@ -1,0 +1,31 @@
+{
+    "atmosphere": {
+        "pressure": "1006.0",
+        "rising": "0",
+        "visibility": "16.1",
+        "humidity": "57"
+    },
+    "item": {
+        "long": "2.3412",
+        "lat": "48.85693",
+        "condition": {
+            "text": "Cloudy",
+            "code": "26",
+            "temp": "60"
+        }
+    },
+    "location": {
+        "city": "Paris",
+        "region": " Ile-de-France",
+        "country": "France"
+    },
+    "astronomy": {
+        "sunset": "8:21 pm",
+        "sunrise": "7:29 am"
+    },
+    "wind": {
+        "direction": "195",
+        "speed": "14",
+        "chill": "59"
+    }
+}

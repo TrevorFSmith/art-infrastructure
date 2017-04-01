@@ -34,6 +34,10 @@ from heartbeat.models import (
 	Heartbeat
 )
 
+from weather.models import (
+	WeatherInfo
+)
+
 class Command(BaseCommand):
 	help = "Installs the demo data."
 	requires_system_checks = True
@@ -55,6 +59,7 @@ class Command(BaseCommand):
 		InstallationSite.objects.all().delete()
 		Heartbeat.objects.all().delete()
 		User.objects.all().delete()
+		WeatherInfo.objects.all().delete()
 		Token.objects.all().delete()
 
 		site = Site.objects.get_current()

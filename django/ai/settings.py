@@ -3,7 +3,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Los_Angeles'
 
 SITE_ID = 1
 
@@ -25,7 +25,8 @@ INSTALLED_APPS = [
 	'front',
 	'account',
 	'artwork',
-	'heartbeat'
+	'heartbeat',
+	'weather'
 ]
 
 MIDDLEWARE = [
@@ -78,12 +79,5 @@ PRODUCTION = False
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.sqlite3',
-		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-	}
-}
 
 from local_settings import *
