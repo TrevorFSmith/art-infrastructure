@@ -32,3 +32,4 @@ class Heartbeat(models.Model):
 		ordering = ['-created']
 	def __unicode__(self):
 		return "%s: %s" % (self.installation, self.created)
+

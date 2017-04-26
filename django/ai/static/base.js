@@ -89,6 +89,7 @@ base.ui.TopNavComponent = class extends k.Component {
 	}
 	_addStaffLinks(){
 		this.addLink('/admin/', 'admin', 'admin-nav')
+		this.addLink('/heartbeat/', 'heartbeats', 'heartbeats-nav')
 	}
 	addLink(href, anchorText, className) {
 		this.rightLinks.append(k.el.li(k.el.a({ 'href': href, 'class': className }, anchorText )))

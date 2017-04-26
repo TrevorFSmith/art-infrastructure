@@ -1,5 +1,5 @@
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 def index(request):
-	return render_to_response('front/index.html', {})
+	return render(request, 'front/index.html', {})
