@@ -1,1 +1,1 @@
-'''heartbeat tracks periodic notices from artworks'''
+'''The heartbeat Django app tracks periodic notices from artworks'''

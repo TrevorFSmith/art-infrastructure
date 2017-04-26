@@ -1,0 +1,1 @@
+'''The weather Django app provides an API so that artwork can query for weather at a given location.'''
