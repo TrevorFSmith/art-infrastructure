@@ -1,0 +1,53 @@
+{% extends "lighting/base.html" %}
+
+{% block subtitle %}Lighting | {% endblock %}
+
+{% block head-extras-page %}
+	<style>
+		.row ul { margin-bottom: 25px; }
+		.row li { margin: 10px 0; }
+		.row li a { color: blue; }
+	</style>
+{% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-12">
+			<h2>Quicklinks</h2>
+			<ul>
+				<li><a href="{% url 'lighting:creston' %}">creston controls</a></li>
+			</ul>
+
+			<h2>Lights</h2>
+			<ul>
+				{% for light in bacnet_lights %}
+					<li><a href="{% url 'lighting:bacnet_light' light.id %}">{{ light.name }}</a></li>
+				{% empty %}
+					<li>No known lights</li>
+				{% endfor %}
+			</ul>
+
+			<h2>Projectors</h2>
+			<ul>
+				{% for projector in projectors %}
+					<li><a href="{% url 'lighting:projector' projector.id %}">{{ projector.name }}</a></li>
+				{% empty %}
+					<li>No known projectors</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+{% endblock %}
+
+{% block script-extras-page %}
+	<script>
+		document.addEventListener('DOMContentLoaded', ()=>{
+			try {
+				window.pageView = new lighting.ui.IndexPageComponent()
+				document.getElementById('page-component').appendChild(window.pageView.el)
+			} catch (e) {
+				console.error(e)
+			}
+		})
+	</script>	
+{% endblock %}

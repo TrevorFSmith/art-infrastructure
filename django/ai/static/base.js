@@ -88,10 +88,29 @@ base.ui.TopNavComponent = class extends k.Component {
 		this.addLink('/admin/login/', 'login', 'login-nav')
 	}
 	_addStaffLinks(){
-		this.addLink('/admin/', 'admin', 'admin-nav')
 		this.addLink('/heartbeat/', 'heartbeats', 'heartbeats-nav')
+		this.addLink('/lighting/', 'lighting', 'lighting-nav')
+		this.addLink('/admin/', 'admin', 'admin-nav')
 	}
 	addLink(href, anchorText, className) {
 		this.rightLinks.append(k.el.li(k.el.a({ 'href': href, 'class': className }, anchorText )))
 	}
 }
+
+base.getCookie = function(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+base.getCSRFToken = function(){ return base.getCookie('csrftoken') }

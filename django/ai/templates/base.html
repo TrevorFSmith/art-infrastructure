@@ -18,6 +18,7 @@
 		<div id="page-component"></div>
 		<script src="{% static 'potassium.js' %}"></script>
 		<script src="{% static 'base.js' %}"></script>
+		<div id="content">{% block content%}{% endblock %}</div>
 		{% block script-extras-app %}{% endblock %}
 		{% block script-extras-page %}{% endblock %}
 	</body>
