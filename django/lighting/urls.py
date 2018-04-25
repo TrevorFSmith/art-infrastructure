@@ -1,11 +1,9 @@
 from django.conf.urls import url
-from django.contrib import admin
 
 import views
 
 urlpatterns = [
-    url(r'^bnlight/(?P<id>[\d]+)/$', views.bacnet_light, name='bacnet_light'),
-    url(r'^projector/(?P<id>[\d]+)/$', views.projector, name='projector'),
-    url(r'^creston/$', views.creston, name='creston'),
-    url(r'^$', views.index, name='index'),
+    url(r'^bacnet_lights/$', views.bacnet_lights, name='bacnet_lights'),
+    url(r'^projectors/$', views.projectors, name='projectors'),
+    url(r'^crestons/$', views.crestons, name='crestons'),
 ]
