@@ -1,21 +1,25 @@
 #!/usr/bin/python
 
 """These functions wrap the bacnet command line apps from http://bacnet.sourceforge.net/
-In your django settings you'll need a BACNET_BIN_DIR with the full path to the directory containing the compiled apps.
+In your env. vars. you'll need a BACNET_BIN_DIR with the full path to the directory containing the compiled apps.
 Like so (no slash on the end, please):
 BACNET_BIN_DIR = '/usr/local/src/bacnet-stack-0.5.3/bin'
+You can also set BACNET_EXECUTABLE_EXTENSION via env. variable as well.
 """
 
 import os, sys, subprocess
-from django.conf import settings
-import logging
+sys.path.insert(0, '../')
+
+BACNET_EXECUTABLE_EXTENSION = os.environ.get('BACNET_EXECUTABLE_EXTENSION', "")
 
 USAGE_MESSAGE = 'usage: bacnet_control <read-ao|write-ao> <device id> <property id> [<value>]'
 
 class BacnetControl:
+
     def __init__(self, bin_dir_path, bacnet_port=47809):
         self.bin_dir_path = bin_dir_path
         self.bacnet_port = bacnet_port
+
     def run_command(self, args):
         os.environ['BACNET_IP_PORT'] = '%s' % self.bacnet_port
         #args = ['/var/www/Art-Server/art_server/bacnet_bins/bacrp 77000 2 1 85'] #[' '.join(args)]
@@ -31,7 +35,7 @@ class BacnetControl:
         return (proc.returncode, output, err_output)
 
     def get_bin_path(self, bin_name):
-        bin_name = '%s%s' % (bin_name, settings.BACNET_EXECUTABLE_EXTENSION)
+        bin_name = '%s%s' % (bin_name, BACNET_EXECUTABLE_EXTENSION)
         bin_path = os.path.join(self.bin_dir_path, bin_name)
         if not os.path.exists(bin_path):
             raise IOError('Bacnet bin does not exist: %s' % bin_path)
@@ -63,7 +67,7 @@ def main():
         print USAGE_MESSAGE
         return
 
-    control = BacnetControl(settings.BACNET_BIN_DIR)
+    control = BacnetControl(os.environ['BACNET_BIN_DIR'])
     if action == 'read-ao':
         print control.read_analog_output(device_id, property_id)
     elif action == 'write-ao':

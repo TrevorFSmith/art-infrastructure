@@ -1,23 +1,7 @@
-import os
-import os.path
-from PIL import Image
 import datetime
-import re
 import traceback
 
-from django.utils.html import strip_tags
-from django.core.files import File
 from django.db import models
-from django.db.models import signals
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
-from django.dispatch import dispatcher
-from django.core.mail import send_mail
-from django.utils.encoding import force_unicode
-from django.db.models import Q
-from django.db.models.fields.files import ImageFieldFile
-from django.core.urlresolvers import reverse
 
 from front.models import EventModel
 from pjlink import PJLinkController

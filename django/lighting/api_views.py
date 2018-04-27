@@ -25,7 +25,6 @@ from django.template.loader import render_to_string
 from django.utils import feedgenerator
 
 from models import *
-from hydration import dehydrate_to_list_xml, dehydrate_to_xml
 from pjlink import PJLinkController, PJLinkProtocol
 from bacnet_control import BacnetControl
 
@@ -67,16 +66,16 @@ def projector(request, id):
 
 
 class LampInfo:
-    """Wraps the projector's lamp info for dehydration"""
     def __init__(self, lighting_hours, is_on):
         self.lighting_hours = lighting_hours
         self.is_on = is_on
-    class HydrationMeta:
-        attributes = ['lighting_hours', 'is_on']
+
+    # Fixme: this is no longer uses Hydration
+    # class HydrationMeta:
+    #     attributes = ['lighting_hours', 'is_on']
 
 
 class ProjectorInfo:
-    """Used to wrap the projector information for dehydration"""
     def __init__(self, power_state, projector_name, manufacture_name, product_name, other_info, audio_mute, video_mute):
         self.power_state = power_state
         self.projector_name = projector_name
@@ -86,9 +85,11 @@ class ProjectorInfo:
         self.video_mute = video_mute
         self.audio_mute = audio_mute
         self.lamps = []
-    class HydrationMeta:
-        attributes = ['power_state', 'projector_name', 'manufacture_name', 'product_name', 'other_info', 'audio_mute', 'video_mute']
-        nodes = ['lamps']
+
+    # Fixme: this is no longer uses Hydration
+    # class HydrationMeta:
+    #     attributes = ['power_state', 'projector_name', 'manufacture_name', 'product_name', 'other_info', 'audio_mute', 'video_mute']
+    #     nodes = ['lamps']
 
 
 def projector_info(request, id):
