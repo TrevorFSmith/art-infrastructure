@@ -1,20 +1,6 @@
 {% extends "front/base.html" %}
 {% load staticfiles %}
 
-{% block head-extras-page %}
-	<style>
-	</style>
-{% endblock %}
+{% block head-extras-page %}{% endblock %}
 
-{% block script-extras-page %}
-	<script>
-		document.addEventListener('DOMContentLoaded', ()=>{
-			try {
-				window.pageView = new front.ui.IndexPageComponent()
-				document.getElementById('page-component').appendChild(window.pageView.el)
-			} catch (e) {
-				console.error(e)
-			}
-		})
-	</script>	
-{% endblock %}
+{% block script-extras-page %}{% endblock %}

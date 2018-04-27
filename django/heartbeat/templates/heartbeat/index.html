@@ -4,19 +4,17 @@
 {% block subtitle %}Heartbeat | {% endblock %}
 
 {% block head-extras-page %}
-	<style>
-	</style>
 {% endblock %}
 
 {% block script-extras-page %}
-	<script>
-		document.addEventListener('DOMContentLoaded', ()=>{
-			try {
-				window.pageView = new heartbeat.ui.IndexPageComponent()
-				document.getElementById('page-component').appendChild(window.pageView.el)
-			} catch (e) {
-				console.error(e)
-			}
-		})
-	</script>	
+{% endblock %}
+
+{% block content %}
+<div class="ui container">
+
+  <h2 class="ui dividing header">System Status</h2>
+
+  <div id="root"></div>
+
+</div>
 {% endblock %}

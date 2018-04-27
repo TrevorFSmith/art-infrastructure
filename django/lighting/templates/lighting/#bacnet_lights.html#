@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block subtitle %}{{ light.name }} | {% endblock %}
+
+{% block style %}
+{% endblock %}
+
+{% block content%}
+
+<h1><a href="{% url lighting.views.index %}">Lighting</a>: {{ light.name }}</h1>
+<table>
+	<tr><th>Device ID:</th><td>{{ light.device_id }}</td></tr>
+	<tr><th>Property ID:</th><td>{{ light.property_id }}</td></tr>
+</table>
+
+{% endblock %}

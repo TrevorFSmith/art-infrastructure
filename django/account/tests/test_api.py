@@ -16,19 +16,19 @@ from ai.test_utils import ExtendedTestCase
 
 class ShareAPITest(ExtendedTestCase):
 
-	def setUp(self):
-		self.user1, self.client1 = create_user(username='alice', password='1234', first_name='Alice', last_name='Smith', email='alice@example.com', is_staff=True)
-		self.user2, self.client2 = create_user(username='bob', password='1234', first_name='Bob', last_name='Roberts', email='bob@example.com')
+    def setUp(self):
+        self.user1, self.client1 = create_user(username='alice', password='1234', first_name='Alice', last_name='Smith', email='alice@example.com', is_staff=True)
+        self.user2, self.client2 = create_user(username='bob', password='1234', first_name='Bob', last_name='Roberts', email='bob@example.com')
 
-	def test_current_user(self):
-		info1 = self.getJSON(reverse('account_api:current_user_api_0_1'), self.client)
-		self.assertEqual({}, info1)
+    def test_current_user(self):
+        info1 = self.getJSON(reverse('account_api:current_user_api_0_1'), self.client)
+        self.assertEqual({}, info1)
 
-		info2 = self.getJSON(reverse('account_api:current_user_api_0_1'), self.client1)
-		self.assertEqual('Alice', info2['first_name'])
-		self.assertEqual('Smith', info2['last_name'])
-		self.assertEqual('Alice Smith', info2['display_name'])
-		self.assertEqual(True, info2['staff'])
+        info2 = self.getJSON(reverse('account_api:current_user_api_0_1'), self.client1)
+        self.assertEqual('Alice', info2['first_name'])
+        self.assertEqual('Smith', info2['last_name'])
+        self.assertEqual('Alice Smith', info2['display_name'])
+        self.assertEqual(True, info2['staff'])
 
-		info3 = self.getJSON(reverse('account_api:current_user_api_0_1'), self.client2)
-		self.assertEqual(False, info3['staff'])
+        info3 = self.getJSON(reverse('account_api:current_user_api_0_1'), self.client2)
+        self.assertEqual(False, info3['staff'])
