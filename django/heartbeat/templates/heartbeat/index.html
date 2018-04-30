@@ -1,20 +1,21 @@
-{% extends "heartbeat/base.html" %}
-{% load staticfiles %}
+{% extends "base.html" %}
+{% load staticfiles compress %}
 
 {% block subtitle %}Heartbeat | {% endblock %}
 
-{% block head-extras-page %}
-{% endblock %}
-
-{% block script-extras-page %}
-{% endblock %}
-
 {% block content %}
+
 <div class="ui container">
-
   <h2 class="ui dividing header">System Status</h2>
-
-  <div id="root"></div>
-
+  <div id="root">React not loaded.</div>
 </div>
+
+{% compress js %}
+<script type="text/coffeescript" charset="utf-8" src="{% static 'heartbeat/js/heartbeat.coffee' %}"></script>
+{% endcompress %}
+
+{% compress css %}
+<script type="text/x-scss" charset="utf-8" src="{% static 'heartbeat/css/heartbeat.scss' %}"></script>
+{% endcompress %}
+
 {% endblock %}

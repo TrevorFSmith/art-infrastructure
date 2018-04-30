@@ -1,6 +1,9 @@
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
+
+DEBUG=False
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'America/Los_Angeles'
@@ -8,7 +11,17 @@ TIME_ZONE = 'America/Los_Angeles'
 SITE_ID = 1
 
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, 'static'), )
+
+COMPRESS_ROOT = STATIC_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'static'))
+COMPRESS_ENABLED = not DEBUG
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
 
 INSTALLED_APPS = [
     'django.contrib.sites',
@@ -18,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'compressor',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -72,6 +86,12 @@ REST_FRAMEWORK = {
 
 WSGI_APPLICATION = 'ai.wsgi.application'
 
+SASS_COMMAND = 'sass --scss {infile} {outfile}'
+COMPRESS_PRECOMPILERS = (
+    ('text/coffeescript', 'coffee --compile --stdio'),
+    ('text/x-scss', SASS_COMMAND),
+)
+
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -83,5 +103,3 @@ PRODUCTION = False
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-from local_settings import *

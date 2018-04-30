@@ -3,7 +3,8 @@ from settings import *
 SECRET_KEY = 'YOUR KEY GOES HERE'
 
 CRESTON_CONTROL_HOST = '1.1.1.1'
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+DEBUG=False
 
 #from scheduler import TestTask
 #SCHEDULED_TASKS = [TestTask(5, 0), ]
@@ -13,7 +14,7 @@ SCHEDULED_TASKS = []
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ai_test',
+        'NAME': 'ai',
         'USER': 'postgres',
         'PASSWORD': 'mooa',
         'HOST': '127.0.0.1',

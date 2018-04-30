@@ -1,4 +1,4 @@
-{% extends "lighting/base.html" %}
+{% extends "base.html" %}
 
 {% block subtitle %}Creston Control | {% endblock %}
 
@@ -33,7 +33,7 @@
 	<script src="/static/jquery-3.3.1-min.js"></script>
 	<script>
 		// TODO This is old jQuery cruft from art-server which should eventually be rewritten for Potassium
-		$(document).ready(function() { 
+		$(document).ready(function() {
 			$('button[name="high-up"]').click(function(){ changeCrestonSetting('high-up'); });
 			$('button[name="high-down"]').click(function(){ changeCrestonSetting('high-down'); });
 			$('button[name="low-up"]').click(function(){ changeCrestonSetting('low-up'); });
@@ -85,7 +85,7 @@
 				console.error(e)
 			}
 		})
-	</script>	
+	</script>
 {% endblock %}
 
 {% block content%}
