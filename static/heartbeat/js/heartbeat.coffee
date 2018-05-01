@@ -1,4 +1,3 @@
-
 do ->
 
   'use strict'
