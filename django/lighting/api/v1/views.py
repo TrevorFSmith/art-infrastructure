@@ -69,16 +69,20 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
 class ProjectorViewSet(api_helpers.GenericApiEndpoint):
 
     def get(self, request, format=None):
-        projectors = models.BACNetLight.objects.all()
-        serializer = serializers.BACNetLightSerializer(projectors, many=True)
-        return Response(serializer.data)
 
+        import time
+        time.sleep(1)
+
+        projectors = models.Projector.objects.all()
+        serializer = serializers.ProjectorSerializer(projectors, many=True)
+        return Response(serializer.data)
 
     def put(self, request, pk, format=None):
         return Response([])
 
     def delete(self, request, pk, format=None):
         return Response([])
+
 # def projector(request, id):
 
 #     projector = get_object_or_404(Projector, pk=id)

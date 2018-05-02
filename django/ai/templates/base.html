@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load staticfiles compress %}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -28,6 +28,10 @@
 
 		<script src="{% static 'vendor/js/semantic.min.js' %}"></script>
 		<script src="{% static 'js/base.js' %}"></script>
+
+    {% compress js %}
+    <script type="text/coffeescript" charset="utf-8" src="{% static 'instrument/adapter.coffee' %}"></script>
+    {% endcompress %}
 
 		<div id="content">
 
