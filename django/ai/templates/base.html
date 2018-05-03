@@ -1,39 +1,39 @@
 {% load staticfiles compress %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, shrink-to-fit=no">
-		<meta http-equiv="x-ua-compatible" content="ie=edge">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-		<title>{% block subtitle %}{% endblock %}{{ site.name }}</title>
+    <title>{% block subtitle %}{% endblock %}{{ site.name }}</title>
 
-		<link rel="stylesheet" href="{% static 'css/base.css' %}" type='text/css'>
-		<link rel="stylesheet" href="{% static 'css/admin.css' %}" type='text/css'>
-		<link rel="stylesheet" href="{% static 'vendor/css/semantic.min.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'vendor/css/semantic.min.css' %}" type='text/css'>
 
-		{% block head-extras-app %}{% endblock %}
-		{% block head-extras-page %}{% endblock %}
-	</head>
-	<body class="{% block body-classes %}{% endblock %}">
-		<div id="page-component"></div>
+    {% block head-extras-app %}{% endblock %}
+    {% block head-extras-page %}{% endblock %}
+  </head>
+  <body class="{% block body-classes %}{% endblock %}">
+    <div id="page-component"></div>
 
     <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 
     <script
-			src="http://code.jquery.com/jquery-2.2.4.min.js"
-			integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-			crossorigin="anonymous"></script>
+      src="http://code.jquery.com/jquery-2.2.4.min.js"
+      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+      crossorigin="anonymous"></script>
 
-		<script src="{% static 'vendor/js/semantic.min.js' %}"></script>
-		<script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'vendor/js/semantic.min.js' %}"></script>
+    <script src="{% static 'js/base.js' %}"></script>
 
     {% compress js %}
     <script type="text/coffeescript" charset="utf-8" src="{% static 'instrument/adapter.coffee' %}"></script>
     {% endcompress %}
 
-		<div id="content">
+    <div id="content">
 
       <div class="ui menu">
         <div class="header item">Art::Infrastructure</div>
@@ -44,11 +44,11 @@
           Lighting
           <i class="dropdown icon"></i>
           <div class="menu transition hidden" tabindex="-1">
-            <div class="item" href='{% url "lighting:bacnet_lights" %}'>BACnet light</div>
+            <a class="item" href='{% url "lighting:bacnet_lights" %}'>BACnet light</a>
             <div class="divider"></div>
-            <div class="item" href='{% url "lighting:projectors" %}'>Projectors</div>
+            <a class="item" href='{% url "lighting:projectors" %}'>Projectors</a>
             <div class="divider"></div>
-            <div class="item" href='{% url "lighting:crestons" %}'>Creston</div>
+            <a class="item" href='{% url "lighting:crestons" %}'>Creston</a>
           </div>
         </div>
 
@@ -70,7 +70,7 @@
 
     </div>
 
-		{% block script-extras-app %}{% endblock %}
-		{% block script-extras-page %}{% endblock %}
-	</body>
+    {% block script-extras-app %}{% endblock %}
+    {% block script-extras-page %}{% endblock %}
+  </body>
 </html>

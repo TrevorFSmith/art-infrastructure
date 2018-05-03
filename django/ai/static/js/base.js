@@ -54,3 +54,7 @@
   base.getCSRFToken = function(){ return base.getCookie('csrftoken') }
 
 }());
+
+$(function(){
+  $('.ui.dropdown').dropdown();
+});
