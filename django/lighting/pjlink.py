@@ -2,6 +2,7 @@
     Information on the PJLink protocol can be found here: http://pjlink.jbmia.or.jp/english/
 """
 import socket
+from socket import error as socket_error
 
 
 class PJLinkProtocol:
@@ -49,6 +50,9 @@ class PJLinkProtocol:
     CLASS_INFO = "CLSS"
     AUTHENTICATE = "PJLINK"
 
+    # Extra COMMANDS
+    DELETE = "delete"
+
     # RESPONSE
     OK = "OK"
     ERROR_1 = "ERR1"
@@ -65,6 +69,13 @@ class PJLinkProtocol:
     ERROR_STATUS_OK = "0"
     ERROR_STATUS_WARNING = "1"
     ERROR_STATUS_ERROR = "2"
+
+
+class SocketException(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
 
 
 class PJLinkAuthenticationException(Exception):
@@ -258,25 +269,28 @@ class PJLinkController:
     def query_class_info(self): return self._send_command_line(PJLinkCommandLine(PJLinkProtocol.CLASS_INFO, PJLinkProtocol.QUERY, self.version)).data
 
     def _send_command_line(self, command_line):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(15)
-        sock.connect((self.host, self.port))
-        encoded_auth_request = sock.recv(512)
-        auth_request = PJLinkAuthenticationRequest.decode(encoded_auth_request)
-        if auth_request.seed:
-            if self.password:
-                command_line.authentication_hash = PJLinkAuthenticationRequest.generate_hash(auth_request.seed, self.password)
-            else:
-                sock.close()
-                raise PJLinkAuthenticationException('The Projector requires a password, but we have none')
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(15)
+            sock.connect((self.host, self.port))
+            encoded_auth_request = sock.recv(512)
+            auth_request = PJLinkAuthenticationRequest.decode(encoded_auth_request)
+            if auth_request.seed:
+                if self.password:
+                    command_line.authentication_hash = PJLinkAuthenticationRequest.generate_hash(auth_request.seed, self.password)
+                else:
+                    sock.close()
+                    raise PJLinkAuthenticationException('The Projector requires a password, but we have none')
 
-        #print 'sending', command_line.encode()
-        sock.send(command_line.encode())
-        encoded_response = sock.recv(512)
-        #print 'received', encoded_response
-        sock.close()
-        if encoded_response == '': encoded_response = None
-        response = PJLinkResponse.decode(encoded_response)
-        if response.command == PJLinkProtocol.AUTHENTICATE and response.data == PJLinkProtocol.INVALID_PASSWORD_ERROR:
-            raise PJLinkAuthenticationException('The projector rejected our password')
-        return response
+            #print 'sending', command_line.encode()
+            sock.send(command_line.encode())
+            encoded_response = sock.recv(512)
+            #print 'received', encoded_response
+            sock.close()
+            if encoded_response == '': encoded_response = None
+            response = PJLinkResponse.decode(encoded_response)
+            if response.command == PJLinkProtocol.AUTHENTICATE and response.data == PJLinkProtocol.INVALID_PASSWORD_ERROR:
+                raise PJLinkAuthenticationException('The projector rejected our password')
+            return response
+        except socket_error as serr:
+            raise SocketException(serr)

@@ -15,6 +15,16 @@ class ProjectorSerializer(serializers.HyperlinkedModelSerializer):
             ]
 
 
+class ProjectorEventsSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.ProjectorEvent
+        fields = [
+            "id",
+            "command",
+            ]
+
+
 class BACNetLightSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:

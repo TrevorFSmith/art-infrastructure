@@ -1,7 +1,14 @@
 from lighting import serializers, models
 from lighting.api import api_helpers
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
+from rest_framework.exceptions import PermissionDenied
+from lighting.pjlink import PJLinkController, PJLinkProtocol, SocketException
+
+from lighting.forms import ProjectorEventForm
 
 from rest_framework.response import Response
+from rest_framework import status
 
 
 class CrestonViewSet(api_helpers.GenericApiEndpoint):
@@ -68,58 +75,85 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
 
 class ProjectorViewSet(api_helpers.GenericApiEndpoint):
 
+
     def get(self, request, format=None):
-
-        import time
-        time.sleep(1)
-
         projectors = models.Projector.objects.all()
         serializer = serializers.ProjectorSerializer(projectors, many=True)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        return Response([])
 
-    def delete(self, request, pk, format=None):
-        return Response([])
+    def put(self, request, *args, **kwargs):
 
-# def projector(request, id):
+        cmd      = request.data.get("cmd")
+        event_id = request.data.get("event_id")
 
-#     projector = get_object_or_404(Projector, pk=id)
-#     controller = PJLinkController(projector.pjlink_host, projector.pjlink_port, projector.pjlink_password)
+        if cmd and cmd not in [PJLinkProtocol.POWER_ON_STATUS, PJLinkProtocol.POWER_OFF_STATUS, PJLinkProtocol.DELETE]:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
-#     try:
-#         if request.method == 'POST':
-#             new_event_form = ProjectorEventForm(request.POST)
-#             if request.POST.get('power', None) == PJLinkProtocol.POWER_ON_STATUS:
-#                 controller.power_on()
-#                 new_event_form = ProjectorEventForm(initial={ 'device':projector.id })
-#             elif request.POST.get('power', None) == PJLinkProtocol.POWER_OFF_STATUS:
-#                 controller.power_off()
-#                 new_event_form = ProjectorEventForm(initial={ 'device':projector.id })
-#             elif request.POST.get('action', None) == 'delete' and request.POST.get('event_id', None):
-#                 event = ProjectorEvent.objects.get(pk=int(request.POST.get('event_id', None)))
-#                 event.delete()
-#                 new_event_form = ProjectorEventForm(initial={ 'device':projector.id })
-#             elif new_event_form.is_valid():
-#                 new_event_form.save()
-#                 new_event_form = ProjectorEventForm(initial={ 'device':projector.id })
-#         else:
-#             new_event_form = ProjectorEventForm(initial={ 'device':projector.id })
+        try:
+            projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
+            controller = PJLinkController(projector.pjlink_host, projector.pjlink_port, projector.pjlink_password)
 
-#         audio_mute, video_mute = controller.query_mute()
-#         info = ProjectorInfo(controller.query_power(), controller.query_name(), controller.query_manufacture_name(), controller.query_product_name(), controller.query_other_info(), audio_mute, video_mute)
-#         for lamp in controller.query_lamps(): info.lamps.append(LampInfo(lamp[0], lamp[1]))
-#     except:
-#         logging.exception('Could not communicate with the projector')
-#         info = None
+            #audio_mute, video_mute = controller.query_mute()
 
-#     return render_to_response('lighting/projector.html', {
-#         'events':ProjectorEvent.objects.filter(device=projector),
-#         'new_event_form':new_event_form,
-#         'projector':projector,
-#         'projector_info':info
-#     })
+            # info = ProjectorInfo(
+            #     controller.query_power(),
+            #     controller.query_name(),
+            #     controller.query_manufacture_name(),
+            #     controller.query_product_name(),
+            #     controller.query_other_info(),
+            #     audio_mute,
+            #     video_mute
+            #     )
+
+            # for lamp in controller.query_lamps():
+            #     info.lamps.append(LampInfo(lamp[0], lamp[1]))
+
+            event_form = ProjectorEventForm(request.data)
+            event_form.device = projector
+
+            if cmd:
+
+                if cmd == PJLinkProtocol.POWER_ON_STATUS:
+                    controller.power_on()
+                    event_form = ProjectorEventForm(initial={"device": projector.id})
+
+                elif cmd == PJLinkProtocol.POWER_OFF_STATUS:
+                    controller.power_off()
+                    event_form = ProjectorEventForm(initial={"device": projector.id})
+
+                elif cmd == PJLinkProtocol.DELETE and event_id:
+                    try:
+                        event = models.ProjectorEvent.objects.get(pk=int(event_id))
+                        event.delete()
+                    except ObjectDoesNotExist:
+                        raise Http404
+
+                    event_form = ProjectorEventForm(initial={"device": projector.id})
+
+                # TODO:
+                # This seems like invalid command and an event should not be persisted?
+                #
+                # elif event_form.is_valid():
+                #     event_form.save()
+
+        except ObjectDoesNotExist:
+            raise Http404
+        except SocketException:
+            return Response({"message": "Not able to connect to projector."}, status=status.HTTP_502_BAD_GATEWAY)
+
+        projector_serializer = serializers.ProjectorSerializer(projector)
+        projector_events_serializer = serializers.ProjectorEventsSerializer(
+            models.ProjectorEvent.objects.filter(device=projector), many=True)
+
+        return Response({
+            "projector": projector_serializer.data,
+            "events": projector_events_serializer.data,
+
+            # FIXME: serialize info
+            "projector_info": {}
+
+            }, status=status.HTTP_200_OK)
 
 
 class BACNetViewSet(api_helpers.GenericApiEndpoint):
