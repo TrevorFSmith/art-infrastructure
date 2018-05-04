@@ -14,19 +14,21 @@
     <div class="column">
 
       <div id="root" data-url="{% url 'lighting_api:projectors' %}">
+
         <div class="ui segment">
           <div class="ui active inverted dimmer">
             <div class="ui large text loader">Loading. Please wait.</div>
           </div><br /><br /><br /><br /><br />
         </div>
       </div>
+
     </div>
   </div>
 
 </div>
 
 <script data-object="error" type="text/template-x">
-  OOps
+  We encounter an error procissing your request. Please try again later.
 </script>
 
 {% compress js %}
