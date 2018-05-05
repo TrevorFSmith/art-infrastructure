@@ -4,6 +4,8 @@ from lighting import models
 
 class ProjectorSerializer(serializers.HyperlinkedModelSerializer):
 
+    commands = serializers.SerializerMethodField()
+
     class Meta:
         model = models.Projector
         fields = [
@@ -11,8 +13,12 @@ class ProjectorSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "pjlink_host",
             "pjlink_port",
-            "pjlink_password"
+            "pjlink_password",
+            "commands",
             ]
+
+    def get_commands(self, obj):
+        return [{"title": tup[1], "command": tup[0]} for tup in models.ProjectorEvent.COMMAND_CHOICES]
 
 
 class ProjectorEventsSerializer(serializers.HyperlinkedModelSerializer):

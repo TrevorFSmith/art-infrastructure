@@ -36,10 +36,6 @@ class Projector(models.Model):
     pjlink_port = models.IntegerField(null=False, blank=False, default=4352)
     pjlink_password = models.CharField(max_length=512, blank=True, null=True)
 
-    @models.permalink
-    def get_absolute_url(self):
-        return ('lighting.views.projector', (), { 'id':self.id })
-
     def __unicode__(self):
         return '%s' % self.name
 

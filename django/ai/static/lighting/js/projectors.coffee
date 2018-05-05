@@ -2,15 +2,12 @@ do ->
 
   "use strict"
 
-  class ProjectorControll extends React.Component
+  class ProjectorCommand extends React.Component
 
-    displayName: "Projector Controll Block"
+    displayName: "Projector Control Block"
 
     constructor: (props) ->
       super(props)
-
-    componentDidMount: ->
-      $("div.projector-#{this.props.obj.id}").dropdown()
 
     sendCommand: (event) ->
       cmd = $(event.target).data('cmd')
@@ -18,28 +15,39 @@ do ->
       alert("Sending cmd #{cmd} to projector with ID #{id}");
 
     render: ->
-      React.createElement("div", {className: "projector-#{this.props.obj.id} ui icon top left pointing dropdown button"},
+      React.createElement("div", {
+        className: "item",
+        "data-cmd": this.props.command.command,
+        "data-id": this.props.projector.id,
+        onClick: this.sendCommand,
+        }, this.props.command.title)
+
+
+  class ProjectorControll extends React.Component
+
+    displayName: "Projector Controll Block"
+
+    constructor: (props) ->
+      super(props)
+      this.state = this.state || {}
+      this.state.commands = this.buildCommands();
+
+    buildCommands: ->
+      this.props.projector.commands.map((command) =>
+        React.createElement(ProjectorCommand, {
+          command: command,
+          projector: this.props.projector
+        })
+      )
+
+    componentDidMount: ->
+      $("div.projector-#{this.props.projector.id}").dropdown()
+
+    render: ->
+      React.createElement("div", {className: "projector-#{this.props.projector.id} ui icon top left pointing dropdown button"},
       React.createElement("i", {className: "wrench icon"}),
       React.createElement("div", {className: "menu"},
-        React.createElement("div", {className: "header"}, "Projector Details"),
-        React.createElement("div", {
-          className: "item",
-          "data-cmd": "poweroff",
-          "data-id": this.props.obj.id,
-          onClick: this.sendCommand,
-          }, "Power Off"),
-        React.createElement("div", {
-          className: "item",
-          "data-cmd": "poweron",
-          "data-id": this.props.obj.id,
-          onClick: this.sendCommand,
-          }, "Power On"),
-        React.createElement("div", {
-          className: "item",
-          "data-cmd": "delete",
-          "data-id": this.props.obj.id,
-          onClick: this.sendCommand,
-          }, "Delete"),
+        React.createElement("div", {className: "header"}, "Projector Details"), this.state.commands,
         React.createElement("div", {className: "ui divider"}),
         React.createElement("div", {className: "item"}, "Edit"),
         )
@@ -58,9 +66,9 @@ do ->
       }, React.createElement("h3", {
         className: "left floated"
       }, React.createElement("i", {className: "ui icon check circle"}),
-        React.createElement('span', null, this.props.obj.name)), React.createElement("span", {
+        React.createElement('span', null, this.props.projector.name)), React.createElement("span", {
         className: "right floated"
-      }, React.createElement(ProjectorControll, {obj: this.props.obj}))
+      }, React.createElement(ProjectorControll, {projector: this.props.projector}))
       )
 
 
@@ -75,7 +83,7 @@ do ->
       React.createElement("div", {
         className: "content"
       }, React.createElement("p", {
-      }, "Host: #{this.props.obj.pjlink_host} | Port: #{this.props.obj.pjlink_port}")
+      }, "Host: #{this.props.projector.pjlink_host} | Port: #{this.props.projector.pjlink_port}")
       )
 
 
@@ -90,9 +98,9 @@ do ->
       React.createElement("div", {
         className: "ui card"
       }, React.createElement(ProjectorUnitHeader, {
-        obj: this.props.obj
+        projector: this.props.projector
       }), React.createElement(ProjectorUnitBody, {
-        obj: this.props.obj
+        projector: this.props.projector
       }))
 
 
@@ -108,12 +116,9 @@ do ->
     buildProjectors: ->
       this.props.collection.map((projector) =>
         React.createElement(ProjectorUnit, {
-          obj: projector
+          projector: projector
         })
       )
-
-    componentDidMount: ->
-      # console.log("composer mounted")
 
     render: ->
       React.createElement("div", {
