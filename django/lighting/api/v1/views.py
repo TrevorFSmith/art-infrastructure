@@ -94,20 +94,20 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
             projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
             controller = PJLinkController(projector.pjlink_host, projector.pjlink_port, projector.pjlink_password)
 
-            #audio_mute, video_mute = controller.query_mute()
+            audio_mute, video_mute = controller.query_mute()
 
-            # info = ProjectorInfo(
-            #     controller.query_power(),
-            #     controller.query_name(),
-            #     controller.query_manufacture_name(),
-            #     controller.query_product_name(),
-            #     controller.query_other_info(),
-            #     audio_mute,
-            #     video_mute
-            #     )
+            info = ProjectorInfo(
+                controller.query_power(),
+                controller.query_name(),
+                controller.query_manufacture_name(),
+                controller.query_product_name(),
+                controller.query_other_info(),
+                audio_mute,
+                video_mute
+                )
 
-            # for lamp in controller.query_lamps():
-            #     info.lamps.append(LampInfo(lamp[0], lamp[1]))
+            for lamp in controller.query_lamps():
+                info.lamps.append(LampInfo(lamp[0], lamp[1]))
 
             event_form = ProjectorEventForm(request.data)
             event_form.device = projector
@@ -130,12 +130,6 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
                         raise Http404
 
                     event_form = ProjectorEventForm(initial={"device": projector.id})
-
-                # TODO:
-                # This seems like invalid command and an event should not be persisted?
-                #
-                # elif event_form.is_valid():
-                #     event_form.save()
 
         except ObjectDoesNotExist:
             raise Http404

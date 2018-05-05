@@ -11,6 +11,7 @@ class @Adapter
       if data
         ok(data) if ok
     ).error( (data, status) ->
-      alert 'Error loading page. Please try again later.'
+      console.log(data)
+      console.log(status)
       failed(data, status) if failed
     )

@@ -8,30 +8,26 @@
 
     <title>{% block subtitle %}{% endblock %}{{ site.name }}</title>
 
-    <link rel="stylesheet" href="{% static 'css/base.css' %}" type='text/css'>
-    <link rel="stylesheet" href="{% static 'css/admin.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'shared/css/base.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'shared/css/admin.css' %}" type='text/css'>
     <link rel="stylesheet" href="{% static 'vendor/css/semantic.min.css' %}" type='text/css'>
 
-    {% block head-extras-app %}{% endblock %}
-    {% block head-extras-page %}{% endblock %}
-  </head>
-  <body class="{% block body-classes %}{% endblock %}">
-    <div id="page-component"></div>
-
-    <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
-
-    <script
-      src="http://code.jquery.com/jquery-2.2.4.min.js"
-      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-      crossorigin="anonymous"></script>
-
+    <script src="{% static 'vendor/js/react.production.min.js' %}"></script>
+    <script src="{% static 'vendor/js/react-dom.production.min.js' %}"></script>
+    <script src="{% static 'vendor/js/jquery-2.2.4.min.js' %}"></script>
     <script src="{% static 'vendor/js/semantic.min.js' %}"></script>
-    <script src="{% static 'js/base.js' %}"></script>
+
+    <script src="{% static 'shared/js/base.js' %}"></script>
 
     {% compress js %}
     <script type="text/coffeescript" charset="utf-8" src="{% static 'instrument/adapter.coffee' %}"></script>
     {% endcompress %}
+
+    {% block head-extras-app %}{% endblock %}
+    {% block head-extras-page %}{% endblock %}
+  </head>
+  <body>
+    <div id="page-component"></div>
 
     <div id="content">
 
@@ -72,5 +68,6 @@
 
     {% block script-extras-app %}{% endblock %}
     {% block script-extras-page %}{% endblock %}
+
   </body>
 </html>
