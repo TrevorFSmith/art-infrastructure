@@ -10,22 +10,22 @@ do ->
       super(props)
 
     sendCommand: (event) ->
-      cmd = $(event.target).data('cmd')
-      id = $(event.target).data('id')
-      alert("Sending cmd #{cmd} to projector with ID #{id}");
+      command = $(event.target).data('command')
+      projector_id = $(event.target).data('projector_id')
+      console.log("Sending cmd '#{command}' " + " to projector #{command} with ID #{projector_id}")
 
     render: ->
       React.createElement("div", {
         className: "item",
-        "data-cmd": this.props.command.command,
-        "data-id": this.props.projector.id,
+        "data-command": this.props.command.command,
+        "data-projector_id": this.props.projector.id,
         onClick: this.sendCommand,
         }, this.props.command.title)
 
 
-  class ProjectorControll extends React.Component
+  class ProjectorControl extends React.Component
 
-    displayName: "Projector Controll Block"
+    displayName: "Projector Control Block"
 
     constructor: (props) ->
       super(props)
@@ -41,10 +41,13 @@ do ->
       )
 
     componentDidMount: ->
-      $("div.projector-#{this.props.projector.id}").dropdown()
+      $("[data-object='projector-#{this.props.projector.id}']").dropdown()
 
     render: ->
-      React.createElement("div", {className: "projector-#{this.props.projector.id} ui icon top left pointing dropdown button"},
+      React.createElement("div", {
+        "data-object": "projector-#{this.props.projector.id}",
+        className: "ui icon top left pointing dropdown button"
+        },
       React.createElement("i", {className: "wrench icon"}),
       React.createElement("div", {className: "menu"},
         React.createElement("div", {className: "header"}, "Projector Details"), this.state.commands,
@@ -52,6 +55,7 @@ do ->
         React.createElement("div", {className: "item"}, "Edit"),
         )
       )
+
 
   class ProjectorUnitHeader extends React.Component
 
@@ -68,7 +72,7 @@ do ->
       }, React.createElement("i", {className: "ui icon check circle"}),
         React.createElement('span', null, this.props.projector.name)), React.createElement("span", {
         className: "right floated"
-      }, React.createElement(ProjectorControll, {projector: this.props.projector}))
+      }, React.createElement(ProjectorControl, {projector: this.props.projector}))
       )
 
 
