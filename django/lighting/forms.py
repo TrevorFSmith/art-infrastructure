@@ -1,6 +1,6 @@
 from django import forms
 
-from models import ProjectorEvent
+from lighting import models
 
 DAY_CHOICES = (("0", "Monday"), ("1", "Tuesday"), ("2", "Wednesday"), ("3", "Thursday"), ("4", "Friday"), ("5", "Saturday"), ("6", "Sunday"))
 HOUR_CHOICES = list([(str(i), str(i)) for i in range(0,24)])
@@ -38,4 +38,4 @@ class LightControlForm(forms.Form):
 class ProjectorEventForm(BaseEventForm):
     class Meta:
         fields = ['command', 'device']
-        model = ProjectorEvent
+        model = models.ProjectorEvent

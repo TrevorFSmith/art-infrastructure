@@ -82,6 +82,15 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
         return Response(serializer.data)
 
 
+    def post(self, request, format=None):
+        serializer = serializers.ProjectorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
     def put(self, request, *args, **kwargs):
 
         cmd      = request.data.get("cmd")
@@ -134,7 +143,7 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
         except ObjectDoesNotExist:
             raise Http404
         except SocketException:
-            return Response({"message": "Not able to connect to projector."}, status=status.HTTP_502_BAD_GATEWAY)
+            return Response({"details": "Not able to connect to projector."}, status=status.HTTP_502_BAD_GATEWAY)
 
         projector_serializer = serializers.ProjectorSerializer(projector)
         projector_events_serializer = serializers.ProjectorEventsSerializer(
@@ -148,6 +157,16 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
             "projector_info": {}
 
             }, status=status.HTTP_200_OK)
+
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
+            projector.delete()
+        except (ObjectDoesNotExist, TypeError):
+            raise Http404
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class BACNetViewSet(api_helpers.GenericApiEndpoint):

@@ -12,7 +12,7 @@
   <div class="ui one column relaxed grid">
     <div class="column">
 
-      <div id="root" data-url="{% url 'lighting_api:projectors' %}">
+      <div id="root" data-url="{% url 'lighting_api:projectors' %}" data-csrf_token="{{ csrf_token }}">
 
         <div class="ui segment">
           <div class="ui active inverted dimmer">

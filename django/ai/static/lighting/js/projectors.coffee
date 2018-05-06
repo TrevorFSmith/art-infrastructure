@@ -10,17 +10,34 @@ do ->
       super(props)
 
     sendCommand: (event) ->
-      command = $(event.target).data('command')
-      projector_id = $(event.target).data('projector_id')
-      console.log("Sending cmd '#{command}' " + " to projector #{command} with ID #{projector_id}")
+      data       = event.target.dataset
+      url        = $("#root").data("url")
+      csrf_token = $("#root").data("csrf_token")
+
+      $("[data-object ='projector-#{data.projector_id}']").toggleClass("loading")
+
+      adapter  = new Adapter(url)
+      postData =
+        id: data.projector_id
+        command: data.command
+
+      adapter.pushData csrf_token, postData, ( (data, status) ->
+        # request ok
+        # console.log(data, status)
+      ), ( (data, status) ->
+        # request failed
+        alert(data.responseJSON.details)
+      ), () ->
+        # request finished
+        $("[data-object='projector-#{data.projector_id}']").toggleClass("loading")
 
     render: ->
       React.createElement("div", {
         className: "item",
-        "data-command": this.props.command.command,
-        "data-projector_id": this.props.projector.id,
-        onClick: this.sendCommand,
-        }, this.props.command.title)
+        "data-command": @props.command.command,
+        "data-projector_id": @props.projector.id,
+        onClick: @sendCommand,
+        }, React.createElement("i", {className: "cog icon"}), @props.command.title)
 
 
   class ProjectorControl extends React.Component
@@ -29,30 +46,57 @@ do ->
 
     constructor: (props) ->
       super(props)
-      this.state = this.state || {}
-      this.state.commands = this.buildCommands();
+      @state = @state || {}
+      @state.commands = @buildCommands();
 
     buildCommands: ->
-      this.props.projector.commands.map((command) =>
+      @props.data.projector.commands.map((command) =>
         React.createElement(ProjectorCommand, {
           command: command,
-          projector: this.props.projector
+          projector: @props.data.projector,
         })
       )
 
     componentDidMount: ->
-      $("[data-object='projector-#{this.props.projector.id}']").dropdown()
+      $("[data-object='projector-#{@props.data.projector.id}']").dropdown()
+
+    removeProjector: (event) ->
+
+      data       = event.target.dataset
+      url        = $("#root").data("url")
+      csrf_token = $("#root").data("csrf_token")
+
+      $("[data-object ='projector-#{data.projector_id}']").toggleClass("loading")
+
+      adapter  = new Adapter(url)
+      postData =
+        id: data.projector_id
+
+      adapter.delete csrf_token, postData, ( (data, status) ->
+        # request ok
+        # console.log(data, status)
+      ), ( (data, status) ->
+        # request failed
+        alert(data.responseJSON.details)
+      ), () ->
+        # request finished
+        $("[data-object='projector-#{data.projector_id}']").toggleClass("loading")
 
     render: ->
       React.createElement("div", {
-        "data-object": "projector-#{this.props.projector.id}",
+        "data-object": "projector-#{@props.data.projector.id}",
         className: "ui icon top left pointing dropdown button"
         },
       React.createElement("i", {className: "wrench icon"}),
       React.createElement("div", {className: "menu"},
-        React.createElement("div", {className: "header"}, "Projector Details"), this.state.commands,
+        React.createElement("div", {className: "header"}, "Projector Details"), @state.commands,
         React.createElement("div", {className: "ui divider"}),
-        React.createElement("div", {className: "item"}, "Edit"),
+        React.createElement("div", {className: "item"}, React.createElement("i", {className: "pencil icon"}), "Edit"),
+        React.createElement("div", {
+          className: "item"
+          onClick: @removeProjector
+          "data-projector_id": @props.data.projector.id
+          }, React.createElement("i", {className: "trash icon"}), "Delete"),
         )
       )
 
@@ -70,9 +114,11 @@ do ->
       }, React.createElement("h3", {
         className: "left floated"
       }, React.createElement("i", {className: "ui icon check circle"}),
-        React.createElement('span', null, this.props.projector.name)), React.createElement("span", {
+        React.createElement('span', null, @props.projector.name)), React.createElement("span", {
         className: "right floated"
-      }, React.createElement(ProjectorControl, {projector: this.props.projector}))
+      }, React.createElement(ProjectorControl, {
+        data: @props,
+        }))
       )
 
 
@@ -87,7 +133,7 @@ do ->
       React.createElement("div", {
         className: "content"
       }, React.createElement("p", {
-      }, "Host: #{this.props.projector.pjlink_host} | Port: #{this.props.projector.pjlink_port}")
+      }, "Host: #{@props.projector.pjlink_host} | Port: #{@props.projector.pjlink_port}")
       )
 
 
@@ -102,9 +148,9 @@ do ->
       React.createElement("div", {
         className: "ui card"
       }, React.createElement(ProjectorUnitHeader, {
-        projector: this.props.projector
+        projector: @props.projector,
       }), React.createElement(ProjectorUnitBody, {
-        projector: this.props.projector
+        projector: @props.projector,
       }))
 
 
@@ -114,37 +160,38 @@ do ->
 
     constructor: (props) ->
       super(props)
-      this.state = this.state || {}
-      this.state.projectors = this.buildProjectors();
+      @state = @state || {}
+      @state.projectors = @buildProjectors();
 
     buildProjectors: ->
-      this.props.collection.map((projector) =>
+      scope = this
+      @props.collection.map((projector) =>
         React.createElement(ProjectorUnit, {
-          projector: projector
+          projector: projector,
         })
       )
 
     render: ->
       React.createElement("div", {
         className: "ui four cards"
-      }, this.state.projectors)
+      }, @state.projectors)
 
 
   class Visualizer
 
     constructor: () ->
       @placeholder = $("#root")
-      @url         = @placeholder.data("url")
-      @adapter     = new Adapter(this.url)
+      @adapter     = new Adapter(@placeholder.data("url"))
 
     visualize: () =>
 
-      if this.placeholder.length
+      scope = this
+      if @placeholder.length
 
-        this.adapter.loadData (data) =>
+        @adapter.loadData (data) =>
           if data.length > 0
             ReactDOM.render(React.createElement(Composer, {
-              collection: data
+              collection: data,
             }), document.getElementById("root"))
           else
             $("#root").html($("[data-object='no-records']").html())
