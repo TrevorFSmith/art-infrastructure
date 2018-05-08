@@ -1,5 +1,14 @@
 do ->
 
+  dom = {}
+
+  dom.i    = React.createFactory "i"
+  dom.p    = React.createFactory "p"
+  dom.h3   = React.createFactory "h3"
+  dom.div  = React.createFactory "div"
+  dom.span = React.createFactory "span"
+
+
   "use strict"
 
   class ProjectorCommand extends React.Component
@@ -9,35 +18,38 @@ do ->
     constructor: (props) ->
       super(props)
 
-    sendCommand: (event) ->
-      data       = event.target.dataset
+    sendCommand: (cmd) ->
+
       url        = $("#root").data("url")
       csrf_token = $("#root").data("csrf_token")
+      projector_id = @props.data.projector.id
 
-      $("[data-object ='projector-#{data.projector_id}']").toggleClass("loading")
+      $("[data-object ='projector-#{projector_id}']").toggleClass("loading")
 
       adapter  = new Adapter(url)
       postData =
-        id: data.projector_id
-        command: data.command
+        id: @props.data.projector.id
+        command: cmd
 
+      props = @props
       adapter.pushData csrf_token, postData, ( (data, status) ->
         # request ok
         # console.log(data, status)
       ), ( (data, status) ->
         # request failed
-        alert(data.responseJSON.details)
+        $('html').trigger('show-dialog', {message: data.responseJSON.details})
       ), () ->
         # request finished
-        $("[data-object='projector-#{data.projector_id}']").toggleClass("loading")
+        $("[data-object ='projector-#{projector_id}']").toggleClass("loading")
 
     render: ->
-      React.createElement("div", {
+      dom.div
         className: "item",
         "data-command": @props.command.command,
-        "data-projector_id": @props.projector.id,
-        onClick: @sendCommand,
-        }, React.createElement("i", {className: "cog icon"}), @props.command.title)
+        onClick: @sendCommand.bind(this, @props.command.command),
+      ,
+        dom.i {className: "cog icon"}
+        @props.command.title
 
 
   class ProjectorControl extends React.Component
@@ -47,58 +59,71 @@ do ->
     constructor: (props) ->
       super(props)
       @state = @state || {}
-      @state.commands = @buildCommands();
+      @state.commands = @buildCommands()
 
     buildCommands: ->
-      @props.data.projector.commands.map((command) =>
-        React.createElement(ProjectorCommand, {
+      @props.data.projector.commands.map (command) =>
+        React.createElement ProjectorCommand, {
           command: command,
-          projector: @props.data.projector,
-        })
-      )
+          data: @props.data,
+        }
 
     componentDidMount: ->
       $("[data-object='projector-#{@props.data.projector.id}']").dropdown()
 
-    removeProjector: (event) ->
+    editProjector: (data) ->
+      console.log(this)
+      console.log(data)
+      $('html').trigger('edit-projector-dialog', {message: "Test"})
 
-      data       = event.target.dataset
+
+    removeProjector: (projector_id) ->
+
       url        = $("#root").data("url")
       csrf_token = $("#root").data("csrf_token")
 
-      $("[data-object ='projector-#{data.projector_id}']").toggleClass("loading")
+      $("[data-object ='projector-#{projector_id}']").toggleClass("loading")
 
       adapter  = new Adapter(url)
       postData =
-        id: data.projector_id
+        id: projector_id
 
+      scope = this
       adapter.delete csrf_token, postData, ( (data, status) ->
         # request ok
-        # console.log(data, status)
       ), ( (data, status) ->
         # request failed
-        alert(data.responseJSON.details)
       ), () ->
         # request finished
-        $("[data-object='projector-#{data.projector_id}']").toggleClass("loading")
+        $('html').trigger('projector-deleted', scope)
+        $("[data-object='projector-#{projector_id}']").toggleClass("loading")
 
     render: ->
-      React.createElement("div", {
-        "data-object": "projector-#{@props.data.projector.id}",
+      dom.div
         className: "ui icon top left pointing dropdown button"
-        },
-      React.createElement("i", {className: "wrench icon"}),
-      React.createElement("div", {className: "menu"},
-        React.createElement("div", {className: "header"}, "Projector Details"), @state.commands,
-        React.createElement("div", {className: "ui divider"}),
-        React.createElement("div", {className: "item"}, React.createElement("i", {className: "pencil icon"}), "Edit"),
-        React.createElement("div", {
+        "data-object": "projector-#{@props.data.projector.id}"
+      ,
+        dom.i {className: "wrench icon"}
+      ,
+      dom.div {className: "menu"},
+        dom.div {className: "header"}, "Projector Details"
+        @state.commands
+        dom.div {className: "ui divider"}
+
+        dom.div
           className: "item"
-          onClick: @removeProjector
+          onClick: @editProjector.bind(this, @props.data)
+        , "",
+          dom.i {className: "pencil icon"}, ""
+          "Edit"
+
+        dom.div
+          className: "item"
+          onClick: @removeProjector.bind(this, @props.data.projector.id)
           "data-projector_id": @props.data.projector.id
-          }, React.createElement("i", {className: "trash icon"}), "Delete"),
-        )
-      )
+        , "",
+          dom.i {className: "trash icon"}, ""
+          "Delete"
 
 
   class ProjectorUnitHeader extends React.Component
@@ -109,17 +134,12 @@ do ->
       super(props)
 
     render: ->
-      React.createElement("div", {
-        className: "extra content"
-      }, React.createElement("h3", {
-        className: "left floated"
-      }, React.createElement("i", {className: "ui icon check circle"}),
-        React.createElement('span', null, @props.projector.name)), React.createElement("span", {
-        className: "right floated"
-      }, React.createElement(ProjectorControl, {
-        data: @props,
-        }))
-      )
+      dom.div {className: "extra content"},
+        dom.h3 {className: "left floated"},
+          dom.i {className: "ui icon check circle"}, ""
+          dom.span null, @props.data.projector.name
+        dom.span {className: "right floated"},
+          React.createElement(ProjectorControl, {data: @props.data})
 
 
   class ProjectorUnitBody extends React.Component
@@ -130,11 +150,10 @@ do ->
       super(props)
 
     render: ->
-      React.createElement("div", {
-        className: "content"
-      }, React.createElement("p", {
-      }, "Host: #{@props.projector.pjlink_host} | Port: #{@props.projector.pjlink_port}")
-      )
+      dom.div {className: "content"},
+        if @props.data.projector.error
+          dom.div {className: "ui red label"}, "Projector error"
+        dom.p null, "Host: #{@props.data.projector.pjlink_host} | Port: #{@props.data.projector.pjlink_port}"
 
 
   class ProjectorUnit extends React.Component
@@ -145,13 +164,9 @@ do ->
       super(props)
 
     render: ->
-      React.createElement("div", {
-        className: "ui card"
-      }, React.createElement(ProjectorUnitHeader, {
-        projector: @props.projector,
-      }), React.createElement(ProjectorUnitBody, {
-        projector: @props.projector,
-      }))
+      dom.div {className: "ui card"},
+        React.createElement(ProjectorUnitHeader, {data: @props})
+        React.createElement(ProjectorUnitBody, {data: @props})
 
 
   class Composer extends React.Component
@@ -165,16 +180,17 @@ do ->
 
     buildProjectors: ->
       scope = this
-      @props.collection.map((projector) =>
-        React.createElement(ProjectorUnit, {
-          projector: projector,
-        })
-      )
+      @props.collection.map (projector) =>
+        React.createElement(ProjectorUnit, {projector: projector})
+
+    componentDidMount: ->
+      $('html').on 'projector-deleted', (event, scope) =>
+        page = new Visualizer()
+        page.visualize()
 
     render: ->
-      React.createElement("div", {
-        className: "ui four cards"
-      }, @state.projectors)
+      dom.div {className: "ui two cards"},
+        @state.projectors
 
 
   class Visualizer
@@ -202,3 +218,19 @@ do ->
   $(document).ready ->
     page = new Visualizer()
     page.visualize()
+
+
+  $('html').on 'show-dialog', (event, scope) =>
+    dialog = $("[data-object='simple-dialog']")
+    dialog.find(".content").html(scope.message)
+    dialog.modal("show")
+
+
+  $('html').on 'edit-projector-dialog', (event, scope) =>
+    dialog = $("[data-object='edit-dialog']")
+    # dialog.find(".content").html(scope.message)
+    dialog.modal("show")
+
+
+  $('html').on 'click', "[data-action='close-dialog']", (event) =>
+    $("[data-object='simple-dialog'], [data-object='edit-dialog']").modal("hide")

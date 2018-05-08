@@ -159,7 +159,7 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
             }, status=status.HTTP_200_OK)
 
 
-    def delete(self, request, *args, **kwargs):
+    def delete(self, request, format=None):
         try:
             projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
             projector.delete()
