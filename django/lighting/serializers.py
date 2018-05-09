@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from lighting import models
+import pjlink
 
 
 class ProjectorSerializer(serializers.HyperlinkedModelSerializer):
@@ -7,6 +8,7 @@ class ProjectorSerializer(serializers.HyperlinkedModelSerializer):
     commands = serializers.SerializerMethodField()
 
     class Meta:
+        ordering = ['name']
         model = models.Projector
         fields = [
             "id",
@@ -18,7 +20,15 @@ class ProjectorSerializer(serializers.HyperlinkedModelSerializer):
             ]
 
     def get_commands(self, obj):
-        return [{"title": tup[1], "command": tup[0]} for tup in models.ProjectorEvent.COMMAND_CHOICES]
+        return [
+            {
+                "title": "Power Off",
+                "command": pjlink.PJLinkProtocol.POWER_OFF_STATUS,
+            },
+            {
+                "title": "Power On",
+                "command": pjlink.PJLinkProtocol.POWER_ON_STATUS,
+            }]
 
 
 class ProjectorEventsSerializer(serializers.HyperlinkedModelSerializer):

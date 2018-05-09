@@ -7,12 +7,12 @@
 
 <div class="ui container">
 
-  <h2 class="ui dividing header">Lighting::Projectors</h2>
 
   <div class="ui one column relaxed grid">
     <div class="column">
 
-      <div id="root" data-url="{% url 'lighting_api:projectors' %}" data-csrf_token="{{ csrf_token }}">
+      <div id="root" data-url="{% url 'lighting_api:projectors' %}" data-command-url="{% url 'lighting_api:projectors_command' %}"
+           data-csrf_token="{{ csrf_token }}">
         <div class="ui segment">
           <div class="ui active inverted dimmer">
             <div class="ui large text loader">Loading. Please wait.</div>

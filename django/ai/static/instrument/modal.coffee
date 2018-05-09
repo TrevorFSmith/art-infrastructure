@@ -11,33 +11,38 @@ class @EditProjectorModal extends React.Component
 
   constructor: (props, context) ->
     super(props, context);
-    @state =
+    this.state =
+      id: @props.projector.id
       name: @props.projector.name
+      pjlink_host: @props.projector.pjlink_host
+      pjlink_port: @props.projector.pjlink_port
+      pjlink_password: @props.projector.pjlink_password
 
 
   saveProjector: ->
-    console.log(@props)
 
+    url        = $("#root").data("url")
+    csrf_token = $("#root").data("csrf_token")
+    adapter    = new Adapter(url)
+
+    adapter.pushData csrf_token, @state, ( (data, status) ->
+      # request ok
+      # noop
+    ), ( (data, status) ->
+      # request failed
+      $('html').trigger('show-dialog', {message: data.responseJSON.details})
+    )
 
   closeDialog: ->
     $("[data-object='projector-#{@props.projector.id}']").modal("hide")
 
-
-  handleChange: (event) ->
-    value = $(event.target).prop('value')
-    field = $(event.target).prop('name')
-
-    console.log(value)
-    console.log($(event).prop("name"))
-
-    # @state.setState
-    #   name: "fooooo"
-
+  handleChange: (field, event) ->
+    @setState
+      "#{$(event.target).prop('name')}": $(event.target).val()
 
   componentDidMount: ->
     $('html').on "edit-projector-dialog-#{@props.projector.id}", (event, scope) =>
       $("[data-object='projector-#{@props.projector.id}']").modal("show")
-
 
   render: ->
     dom.div className: "ui modal", 'data-object': "projector-#{@props.projector.id}",
@@ -51,19 +56,19 @@ class @EditProjectorModal extends React.Component
 
           dom.div className: "field",
             dom.label null, "Name"
-            dom.input className: "", value: @state.name, onChange: @handleChange.bind(this), name: 'name'
+            dom.input value: @state.name, onChange: @handleChange.bind(this, 'name'), name: 'name'
 
           dom.div className: "field",
             dom.label null, "Host"
-            dom.input className: "", value: @props.projector.pjlink_host, name: 'pjlink_host'
+            dom.input value: @state.pjlink_host, onChange: @handleChange.bind(this, 'name'), name: 'pjlink_host'
 
           dom.div className: "field",
             dom.label null, "Port"
-            dom.input className: "", value: @props.projector.pjlink_port, name: 'pjlink_port'
+            dom.input value: @state.pjlink_port, onChange: @handleChange.bind(this, 'name'), name: 'pjlink_port'
 
           dom.div className: "field",
             dom.label null, "Password"
-            dom.input className: "", value: @props.projector.pjlink_password, name: 'pjlink_password'
+            dom.input value: @state.pjlink_password, onChange: @handleChange.bind(this, 'name'), name: 'pjlink_password'
 
       dom.div className: "actions",
         dom.div {className: "ui button", onClick: @closeDialog.bind(this)}, "Cancel"

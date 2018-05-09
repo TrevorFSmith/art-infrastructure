@@ -73,33 +73,19 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
 #         traceback.print_exc()
 
 
-class ProjectorViewSet(api_helpers.GenericApiEndpoint):
-
-
-    def get(self, request, format=None):
-        projectors = models.Projector.objects.all()
-        serializer = serializers.ProjectorSerializer(projectors, many=True)
-        return Response(serializer.data)
-
-
-    def post(self, request, format=None):
-        serializer = serializers.ProjectorSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
 
 
     def put(self, request, *args, **kwargs):
 
-        cmd      = request.data.get("cmd")
+        cmd      = request.data.get("command")
         event_id = request.data.get("event_id")
 
-        if cmd and cmd not in [PJLinkProtocol.POWER_ON_STATUS, PJLinkProtocol.POWER_OFF_STATUS, PJLinkProtocol.DELETE]:
-            return Response({}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
+
+            if cmd not in [PJLinkProtocol.POWER_ON_STATUS, PJLinkProtocol.POWER_OFF_STATUS]:
+                return Response({"details": "Command '%s' not supported." % cmd}, status=status.HTTP_400_BAD_REQUEST)
+
             projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
             controller = PJLinkController(projector.pjlink_host, projector.pjlink_port, projector.pjlink_password)
 
@@ -121,35 +107,76 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
             event_form = ProjectorEventForm(request.data)
             event_form.device = projector
 
-            if cmd:
+            if cmd == PJLinkProtocol.POWER_ON_STATUS:
+                controller.power_on()
+                event_form = ProjectorEventForm(initial={"device": projector.id})
 
-                if cmd == PJLinkProtocol.POWER_ON_STATUS:
-                    controller.power_on()
-                    event_form = ProjectorEventForm(initial={"device": projector.id})
+            elif cmd == PJLinkProtocol.POWER_OFF_STATUS:
+                controller.power_off()
+                event_form = ProjectorEventForm(initial={"device": projector.id})
 
-                elif cmd == PJLinkProtocol.POWER_OFF_STATUS:
-                    controller.power_off()
-                    event_form = ProjectorEventForm(initial={"device": projector.id})
+            elif cmd == PJLinkProtocol.DELETE and event_id:
+                try:
+                    event = models.ProjectorEvent.objects.get(pk=int(event_id))
+                    event.delete()
+                except ObjectDoesNotExist:
+                    raise Http404
 
-                elif cmd == PJLinkProtocol.DELETE and event_id:
-                    try:
-                        event = models.ProjectorEvent.objects.get(pk=int(event_id))
-                        event.delete()
-                    except ObjectDoesNotExist:
-                        raise Http404
+                event_form = ProjectorEventForm(initial={"device": projector.id})
 
-                    event_form = ProjectorEventForm(initial={"device": projector.id})
 
         except ObjectDoesNotExist:
             raise Http404
         except SocketException:
             return Response({"details": "Not able to connect to projector."}, status=status.HTTP_502_BAD_GATEWAY)
 
+
+        projector_serializer = serializers.ProjectorSerializer(projector)
+        projector_events_serializer = serializers.ProjectorEventsSerializer(
+            models.ProjectorEvent.objects.filter(device=projector), many=True)
+
+        return Response({"details": "Command sent."}, status=status.HTTP_200_OK)
+
+
+class ProjectorViewSet(api_helpers.GenericApiEndpoint):
+
+
+    def get(self, request, format=None):
+        projectors = models.Projector.objects.all()
+        serializer = serializers.ProjectorSerializer(projectors, many=True)
+        return Response(serializer.data)
+
+
+    def post(self, request, format=None):
+        serializer = serializers.ProjectorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def put(self, request, *args, **kwargs):
+
+        try:
+            projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
+            serializer = serializers.ProjectorSerializer(projector, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ObjectDoesNotExist:
+            raise Http404
+
+
         projector_serializer = serializers.ProjectorSerializer(projector)
         projector_events_serializer = serializers.ProjectorEventsSerializer(
             models.ProjectorEvent.objects.filter(device=projector), many=True)
 
         return Response({
+
             "projector": projector_serializer.data,
             "events": projector_events_serializer.data,
 
@@ -162,11 +189,12 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
     def delete(self, request, format=None):
         try:
             projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
+            projector_id = projector.id
             projector.delete()
         except (ObjectDoesNotExist, TypeError):
             raise Http404
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"id": projector_id}, status=status.HTTP_200_OK)
 
 
 class BACNetViewSet(api_helpers.GenericApiEndpoint):

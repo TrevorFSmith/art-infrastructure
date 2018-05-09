@@ -5,6 +5,7 @@ do ->
   dom.i      = React.createFactory "i"
   dom.p      = React.createFactory "p"
   dom.h3     = React.createFactory "h3"
+  dom.h2     = React.createFactory "h2"
   dom.div    = React.createFactory "div"
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
@@ -40,7 +41,7 @@ do ->
 
     sendCommand: (cmd) ->
 
-      url        = $("#root").data("url")
+      url        = $("#root").data("command-url")
       csrf_token = $("#root").data("csrf_token")
       projector_id = @props.data.projector.id
 
@@ -64,24 +65,26 @@ do ->
 
     removeProjector: (projector_id) ->
 
-      url        = $("#root").data("url")
-      csrf_token = $("#root").data("csrf_token")
+      if confirm "Are you sure?"
 
-      $("[data-object ='projector-#{projector_id}']").toggleClass("loading")
+        url        = $("#root").data("url")
+        csrf_token = $("#root").data("csrf_token")
 
-      adapter  = new Adapter(url)
-      postData =
-        id: projector_id
+        $("[data-object ='projector-#{projector_id}']").toggleClass("loading")
 
-      scope = this
-      adapter.delete csrf_token, postData, ( (data, status) ->
-        # request ok
-      ), ( (data, status) ->
-        # request failed
-      ), () ->
-        # request finished
-        $('html').trigger('projector-deleted', scope)
-        $("[data-object='projector-#{projector_id}']").toggleClass("loading")
+        adapter  = new Adapter(url)
+        postData =
+          id: projector_id
+
+        scope = this
+        adapter.delete csrf_token, postData, ( (data, status) ->
+          # request ok
+          $('html').trigger('projector-deleted', data)
+        ), ( (data, status) ->
+          # request failed
+        ), () ->
+          # request finished
+          $("[data-object='projector-#{projector_id}']").toggleClass("loading")
 
 
     render: ->
@@ -118,6 +121,8 @@ do ->
             dom.i {className: "trash icon"}, ""
             "Delete"
 
+        React.createElement(EditProjectorModal, {projector: @props.data.projector})
+
 
 
 
@@ -129,10 +134,9 @@ do ->
       super(props)
 
     render: ->
-      dom.div {className: "ui card"},
-        React.createElement(ProjectorUnitHeader, {data: @props})
-        React.createElement(ProjectorUnitBody, {data: @props})
-        React.createElement(EditProjectorModal, {projector: @props.projector})
+        dom.div {className: "ui card"},
+          React.createElement(ProjectorUnitHeader, {data: @props})
+          React.createElement(ProjectorUnitBody, {data: @props})
 
 
   class Composer extends React.Component
@@ -141,20 +145,27 @@ do ->
 
     constructor: (props) ->
       super(props)
-      @state = @state || {}
-      @state.projectors = @buildProjectors();
+      @state =
+        collection: @props.collection
 
     buildProjectors: ->
-      @props.collection.map (projector) =>
+      @state.collection.map (projector) =>
         React.createElement(ProjectorUnit, {projector: projector})
 
     componentDidMount: ->
-      $('html').on 'projector-deleted', (event) =>
-        # TODO: implement delete
+      $('html').on 'projector-deleted', (event, data) =>
+
+        filtered_projectors = _.filter @state.collection, (projector) =>
+          projector.id != data.id
+
+        @setState
+          collection: filtered_projectors
 
     render: ->
-      dom.div {className: "ui two cards"},
-        @state.projectors
+      dom.div null,
+        dom.h2 className: "ui dividing header", "Lighting::Projectors"
+        dom.div {className: "ui three cards"},
+          @buildProjectors()
 
 
   class Visualizer
