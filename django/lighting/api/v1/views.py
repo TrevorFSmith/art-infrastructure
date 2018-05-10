@@ -171,21 +171,6 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
             raise Http404
 
 
-        projector_serializer = serializers.ProjectorSerializer(projector)
-        projector_events_serializer = serializers.ProjectorEventsSerializer(
-            models.ProjectorEvent.objects.filter(device=projector), many=True)
-
-        return Response({
-
-            "projector": projector_serializer.data,
-            "events": projector_events_serializer.data,
-
-            # FIXME: serialize info
-            "projector_info": {}
-
-            }, status=status.HTTP_200_OK)
-
-
     def delete(self, request, format=None):
         try:
             projector  = models.Projector.objects.get(pk=int(request.data.get("id")))

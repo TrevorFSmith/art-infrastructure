@@ -53,7 +53,7 @@ do ->
         command: cmd
 
       props = @props
-      adapter.pushData csrf_token, postData, ( (data, status) ->
+      adapter.pushData "PUT", csrf_token, postData, ( (data, status) ->
         # request ok
       ), ( (data, status) ->
         # request failed
@@ -121,9 +121,7 @@ do ->
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(EditProjectorModal, {projector: @props.data.projector})
-
-
+        React.createElement(ProjectorModal, {projector: @props.data.projector})
 
 
   class ProjectorUnit extends React.Component
@@ -153,6 +151,20 @@ do ->
         React.createElement(ProjectorUnit, {projector: projector})
 
     componentDidMount: ->
+
+      $('html').on 'update-projectors', (event, data) =>
+        index          = _.findIndex @state.collection, {id: data.id}
+        new_collection = @state.collection
+
+        if index >= 0
+          new_collection[index] = data
+        else
+          new_collection.push(data)
+
+        @setState
+          collection: new_collection
+
+
       $('html').on 'projector-deleted', (event, data) =>
 
         filtered_projectors = _.filter @state.collection, (projector) =>
@@ -161,11 +173,22 @@ do ->
         @setState
           collection: filtered_projectors
 
+    newProjector: ->
+      $('html').trigger("edit-projector-dialog-new")
+
     render: ->
       dom.div null,
-        dom.h2 className: "ui dividing header", "Lighting::Projectors"
+        dom.h2 className: "ui dividing header",
+          "Lighting::Projectors"
+          dom.button
+            className: "button ui mini right floated positive"
+            onClick: @newProjector.bind(this)
+          , "",
+            dom.i {className: "plus icon"}, ""
+            "New Projector"
         dom.div {className: "ui three cards"},
           @buildProjectors()
+        React.createElement(ProjectorModal, {projector: {}})
 
 
   class Visualizer
@@ -177,16 +200,18 @@ do ->
     visualize: () =>
 
       if @placeholder.length
+        @render()
 
-        @adapter.loadData (data) =>
-          if data.length > 0
-            ReactDOM.render(React.createElement(Composer, {
-              collection: data,
-            }), document.getElementById("root"))
-          else
-            $("#root").html($("[data-object='no-records']").html())
-        , (data, status) =>
-          $("#root").html("#{$("[data-object='error']").html()} #{data.statusText}")
+    render: ->
+      @adapter.loadData (data) =>
+        if data.length > 0
+          ReactDOM.render(React.createElement(Composer, {
+            collection: data,
+          }), document.getElementById("root"))
+        else
+          $("#root").html($("[data-object='no-records']").html())
+      , (data, status) =>
+        $("#root").html("#{$("[data-object='error']").html()} #{data.statusText}")
 
 
   # page etrypoint

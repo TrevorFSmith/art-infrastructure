@@ -15,12 +15,12 @@ class @Adapter
       failed(data, status) if failed
     )
 
-  pushData: (token, data, ok, failed, finished) =>
+  pushData: (type, token, data, ok, failed, finished) =>
     $.ajax({
       url: @url
       dataType: 'json'
       data: data
-      type: 'PUT'
+      type: type
       headers: {"X-CSRFToken": token}
     }).error( (data, status) ->
       console.log(data)
