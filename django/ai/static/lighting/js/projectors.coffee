@@ -137,18 +137,35 @@ do ->
           React.createElement(ProjectorUnitBody, {data: @props})
 
 
+  class ProjectorNoRecords extends React.Component
+
+    displayName: "Projector no records"
+
+    constructor: (props) ->
+      super(props)
+
+    render: ->
+      if @props.output
+        dom.h3 {className: ""}, "No records found."
+      else
+        dom.h3 {className: ""}, ""
+
+
   class Composer extends React.Component
 
     displayName: "Page Composer"
 
     constructor: (props) ->
       super(props)
+      collection = @props.collection || []
       @state =
-        collection: @props.collection
+        collection: collection
+        no_records: if collection.length > 0 then false else true
 
     buildProjectors: ->
       @state.collection.map (projector) =>
         React.createElement(ProjectorUnit, {projector: projector})
+
 
     componentDidMount: ->
 
@@ -163,6 +180,7 @@ do ->
 
         @setState
           collection: new_collection
+          no_records: false
 
 
       $('html').on 'projector-deleted', (event, data) =>
@@ -172,6 +190,7 @@ do ->
 
         @setState
           collection: filtered_projectors
+          no_records: if filtered_projectors.length > 0 then false else true
 
     newProjector: ->
       $('html').trigger("edit-projector-dialog-new")
@@ -188,6 +207,7 @@ do ->
             "New Projector"
         dom.div {className: "ui three cards"},
           @buildProjectors()
+        React.createElement(ProjectorNoRecords, {output: @state.no_records})
         React.createElement(ProjectorModal, {projector: {}})
 
 
@@ -209,7 +229,7 @@ do ->
             collection: data,
           }), document.getElementById("root"))
         else
-          $("#root").html($("[data-object='no-records']").html())
+          ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))
       , (data, status) =>
         $("#root").html("#{$("[data-object='error']").html()} #{data.statusText}")
 

@@ -96,7 +96,7 @@ do ->
         dom.h3 null, "Device ID: #{@props.data.bacnet_light.device_id} | Property ID: #{@props.data.bacnet_light.property_id}"
 
         dom.p
-          className: "ui input"
+          className: "ui input margin-right"
           , "",
             dom.input placeholder: "Enter command ...", "data-object": "command-#{scope.props.data.bacnet_light.id}"
         dom.div
@@ -143,7 +143,7 @@ do ->
 
   class BACNetLightNoRecords extends React.Component
 
-    displayName: "BACNet Light no reords"
+    displayName: "BACNet Light no records"
 
     constructor: (props) ->
       super(props)
@@ -163,7 +163,7 @@ do ->
       super(props)
       collection = @props.collection || []
       @state =
-        collection: collection,
+        collection: collection
         no_records: if collection.length > 0 then false else true
 
     buildBACNetLights: ->
@@ -182,7 +182,7 @@ do ->
           new_collection.push(data)
 
         @setState
-          collection: new_collection,
+          collection: new_collection
           no_records: false
 
       $('html').on 'bacnet-light-deleted', (event, data) =>
@@ -191,8 +191,8 @@ do ->
           bacnet_light.id != data.id
 
         @setState
-          collection: filtered_bacnet_lights,
-          no_records: if filtered_bacnet_lights.length > 0 then false else  true
+          collection: filtered_bacnet_lights
+          no_records: if filtered_bacnet_lights.length > 0 then false else true
 
     newBACNetLight: ->
       $('html').trigger("edit-bacnet-light-dialog-new")
@@ -231,7 +231,6 @@ do ->
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))
-          #$("#root").html($("[data-object='no-records']").html())
       , (data, status) =>
         $("#root").html("#{$("[data-object='error']").html()} #{data.statusText}")
 

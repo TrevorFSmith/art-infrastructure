@@ -136,3 +136,7 @@ button:active {
 .col-10 { flex: 1 83.33%; }
 .col-11 { flex: 1 91.66%; }
 .col-12 { flex: 1 100%;   }
+
+.margin-right{
+  margin-right: 5px !important;
+}
