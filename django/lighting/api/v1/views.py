@@ -198,7 +198,7 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-    def put(self, request, *args, **kwargs):
+    def put(self, request, format=None):
 
         try:
             bacnet_light = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
@@ -227,7 +227,7 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
 class BACNetCommandViewSet(api_helpers.GenericApiEndpoint):
 
 
-    def put(self, request, *args, **kwargs):
+    def put(self, request, format=None):
         return Response([])
 
 # def bacnet_light(request, id):
