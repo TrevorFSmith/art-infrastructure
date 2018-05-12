@@ -76,7 +76,7 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
 class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
 
 
-    def put(self, request, *args, **kwargs):
+    def put(self, request, format=None):
 
         cmd      = request.data.get("command")
         event_id = request.data.get("event_id")
@@ -156,8 +156,7 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-    def put(self, request, *args, **kwargs):
-
+    def put(self, request, format=None):
         try:
             projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
             serializer = serializers.ProjectorSerializer(projector, data=request.data)
