@@ -185,15 +185,50 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
 class BACNetViewSet(api_helpers.GenericApiEndpoint):
 
     def get(self, request, format=None):
-        projectors = models.BACNetLight.objects.all()
-        serializer = serializers.BACNetLightSerializer(projectors, many=True)
+        bacnet_lights = models.BACNetLight.objects.all()
+        serializer = serializers.BACNetLightSerializer(bacnet_lights, many=True)
         return Response(serializer.data)
 
 
-    def put(self, request, pk, format=None):
-        return Response([])
+    def post(self, request, format=None):
+        serializer = serializers.BACNetLightSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
+
+    def put(self, request, *args, **kwargs):
+
+        try:
+            bacnet_light = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
+            serializer = serializers.BACNetLightSerializer(bacnet_light, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ObjectDoesNotExist:
+            raise Http404
+
+
+    def delete(self, request, format=None):
+        try:
+            bacnet_light  = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
+            bacnet_light_id = bacnet_light.id
+            bacnet_light.delete()
+        except (ObjectDoesNotExist, TypeError):
+            raise Http404
+
+        return Response({"id": bacnet_light_id}, status=status.HTTP_200_OK)
+
+
+class BACNetCommandViewSet(api_helpers.GenericApiEndpoint):
+
+
+    def put(self, request, *args, **kwargs):
         return Response([])
 
 # def bacnet_light(request, id):

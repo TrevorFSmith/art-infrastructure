@@ -1,4 +1,4 @@
-class @ProjectorModal extends React.Component
+class @BACNetLightModal extends React.Component
 
   dom       = {}
   dom.i     = React.createFactory "i"
@@ -6,31 +6,28 @@ class @ProjectorModal extends React.Component
   dom.label = React.createFactory "label"
   dom.input = React.createFactory "input"
 
-  displayName: "Edit/New Projector Modal Dialog"
+  displayName: "Edit/New BACNet Light Modal Dialog"
 
   constructor: (props, context) ->
     super(props, context);
-    if @props.projector
-      this.state =
-        id: @props.projector.id
-        name: @props.projector.name
-        pjlink_host: @props.projector.pjlink_host
-        pjlink_port: @props.projector.pjlink_port
-        pjlink_password: @props.projector.pjlink_password
+    if @props.bacnet_light
+      @state =
+        id: @props.bacnet_light.id
+        name: @props.bacnet_light.name
+        device_id: @props.bacnet_light.device_id
+        property_id: @props.bacnet_light.property_id
     else
-      this.state =
+      @state =
         name: ""
-        pjlink_host: ""
-        pjlink_port: ""
-        pjlink_password: ""
+        device_id: ""
+        property_id: ""
 
   resetForm: =>
     if not @state.id
       @setState
         name: ""
-        pjlink_host: ""
-        pjlink_port: ""
-        pjlink_password: ""
+        device_id: ""
+        property_id: ""
 
   domNode: ->
     if @state.id
@@ -44,7 +41,7 @@ class @ProjectorModal extends React.Component
     else
       "POST"
 
-  saveProjector: ->
+  saveBacNetLight: ->
 
     url        = $("#root").data("url")
     csrf_token = $("#root").data("csrf_token")
@@ -53,7 +50,7 @@ class @ProjectorModal extends React.Component
     scope = this
     adapter.pushData @action(), csrf_token, @state, ( (data) =>
       # request ok
-      $('html').trigger('update-projectors', data)
+      $('html').trigger('update-bacnet-lights', data)
       scope.resetForm()
     ), ( (data) ->
       # request failed
@@ -63,7 +60,7 @@ class @ProjectorModal extends React.Component
     )
 
   closeDialog: ->
-    $("[data-object='projector-#{@domNode()}']").modal("hide")
+    $("[data-object='bacnet-light-#{@domNode()}']").modal("hide")
 
   handleChange: (event) ->
     @setState
@@ -71,16 +68,16 @@ class @ProjectorModal extends React.Component
 
   title: ->
     if @state.id
-      "Edit Projector"
+      "Edit BACNet Light"
     else
-      "Add New Projector"
+      "Add New BACNet Light"
 
   componentDidMount: ->
-    $('html').on "edit-projector-dialog-#{@domNode()}", (event, scope) =>
-      $("[data-object='projector-#{@domNode()}']").modal("show")
+    $('html').on "edit-bacnet-light-dialog-#{@domNode()}", (event, scope) =>
+      $("[data-object='bacnet-light-#{@domNode()}']").modal("show")
 
   render: ->
-    dom.div className: "ui modal", 'data-object': "projector-#{@domNode()}",
+    dom.div className: "ui modal", 'data-object': "bacnet-light-#{@domNode()}",
 
       dom.div className: "header",
         dom.i className: "pencil icon"
@@ -94,17 +91,13 @@ class @ProjectorModal extends React.Component
             dom.input value: @state.name, onChange: @handleChange.bind(this), name: 'name'
 
           dom.div className: "field",
-            dom.label null, "Host"
-            dom.input value: @state.pjlink_host, onChange: @handleChange.bind(this), name: 'pjlink_host'
+            dom.label null, "Device ID"
+            dom.input value: @state.device_id, onChange: @handleChange.bind(this), name: 'device_id'
 
           dom.div className: "field",
-            dom.label null, "Port"
-            dom.input value: @state.pjlink_port, onChange: @handleChange.bind(this), name: 'pjlink_port'
-
-          dom.div className: "field",
-            dom.label null, "Password"
-            dom.input value: @state.pjlink_password, onChange: @handleChange.bind(this), name: 'pjlink_password'
+            dom.label null, "Property ID"
+            dom.input value: @state.property_id, onChange: @handleChange.bind(this), name: 'property_id'
 
       dom.div className: "actions",
         dom.div {className: "ui button", onClick: @closeDialog.bind(this)}, "Cancel"
-        dom.div {className: "ui button positive", onClick: @saveProjector.bind(this)}, "Save"
+        dom.div {className: "ui button positive", onClick: @saveBacNetLight.bind(this)}, "Save"
