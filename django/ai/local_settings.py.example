@@ -19,3 +19,5 @@ DATABASES = {
         'PORT': '5432'
     }
 }
+
+BACNET_BIN_DIR = '/usr/local/src/bacnet-stack-0.5.3/bin'

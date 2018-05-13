@@ -4,11 +4,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied
 from lighting.pjlink import PJLinkController, PJLinkProtocol, SocketException
+from lighting.bacnet import BacnetControl
 
 from lighting.forms import ProjectorEventForm
 
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.conf import settings
 
 
 class CrestonViewSet(api_helpers.GenericApiEndpoint):
@@ -183,6 +186,7 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
 
 class BACNetViewSet(api_helpers.GenericApiEndpoint):
 
+
     def get(self, request, format=None):
         bacnet_lights = models.BACNetLight.objects.all()
         serializer = serializers.BACNetLightSerializer(bacnet_lights, many=True)
@@ -227,31 +231,30 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
 class BACNetCommandViewSet(api_helpers.GenericApiEndpoint):
 
 
-    def put(self, request, format=None):
-        return Response([])
+    def get(self, request, format=None):
+        try:
+            light = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
+            control = BacnetControl(settings.BACNET_BIN_DIR)
+            light_value = control.read_analog_output(light.device_id, light.property_id)[1]
+        except ObjectDoesNotExist:
+            raise Http404
+        except IOError:
+            light_value = None
 
-# def bacnet_light(request, id):
-#     light = get_object_or_404(BACNetLight, pk=id)
-#     control = BacnetControl(settings.BACNET_BIN_DIR)
-#     if request.method == 'POST':
-#         light_control_form = LightControlForm(request.POST)
-#         if light_control_form.is_valid():
-#             new_value = light_control_form.cleaned_data['light_value']
-#             try:
-#                 control.write_analog_output_int(light.device_id, light.property_id, new_value)
-#             except:
-#                 logging.exception('Could not write the posted value (%s) for bacnet device %s property %s' % (new_value, light.device_id, light.property_id))
-#                 return HttpResponseServerError('Could not write the posted value (%s) for bacnet device %s property %s\n\n%s' %
-#                                                (new_value, light.device_id, light.property_id, sys.exc_info()[1]))
-#     try:
-#         light_value = control.read_analog_output(light.device_id, light.property_id)[1]
-#         light_control_form = LightControlForm(data={'light_value':light_value})
-#     except:
-#         logging.exception('Could not read the analog output for bacnet device %s property %s' % (light.device_id, light.property_id))
-#         light_value = None
-#         light_control_form = LightControlForm()
-#     return render_to_response('lighting/bacnet_light.html', {
-#         'light_value':light_value,
-#         'light_control_form':light_control_form,
-#         'light':light
-#     })
+        return Response({'cmd':light_value})
+
+
+    def put(self, request, format=None):
+        cmd = request.data.get("command")
+        id  = int(request.data.get("id"))
+        try:
+            light = models.BACNetLight.objects.get(pk=id)
+            control = BacnetControl(settings.BACNET_BIN_DIR)
+            control.write_analog_output_int(light.device_id, light.property_id, cmd)
+        except ObjectDoesNotExist:
+            raise Http404
+        except IOError:
+            details = "Could not write the posted value (%s) for bacnet device %s property %s" % (cmd, light.device_id, light.property_id)
+            return Response({"details": details}, status=status.HTTP_502_BAD_GATEWAY)
+
+        return Response({"details": "Command sent."}, status=status.HTTP_200_OK)
