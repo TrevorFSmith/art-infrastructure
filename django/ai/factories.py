@@ -12,3 +12,12 @@ class ProjectorFactory(factory.django.DjangoModelFactory):
     pjlink_host = factory.Sequence(lambda n: '10.0.{}.{}'.format(n, n))
     pjlink_port = factory.Sequence(lambda n: '{}'.format(n))
     pjlink_password = "mooo"
+
+class BACNetLightFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = lighting_models.BACNetLight
+
+    name = factory.Sequence(lambda n: 'BACNetLight {}'.format(n))
+    device_id = factory.Sequence(lambda n: '{}'.format(n))
+    property_id = factory.Sequence(lambda n: '{}'.format(n))
