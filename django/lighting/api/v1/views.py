@@ -15,64 +15,82 @@ from django.conf import settings
 
 class CrestonViewSet(api_helpers.GenericApiEndpoint):
 
+
     def get(self, request, format=None):
-        projectors = models.BACNetLight.objects.all()
-        serializer = serializers.BACNetLightSerializer(projectors, many=True)
+        crestons = models.Creston.objects.all()
+        serializer = serializers.CrestonSerializer(crestons, many=True)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        return Response([])
 
-    def delete(self, request, pk, format=None):
-        return Response([])
+    def post(self, request, format=None):
+        serializer = serializers.CrestonSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-# def creston(request):
-#     control = CrestonControl(settings.CRESTON_CONTROL_HOST)
-#     message = None
-#     control_info = None
-#     return_json = False
-#     try:
-#         if request.method == 'POST':
-#             command_form = CrestonCommandForm(request.POST)
-#             if request.POST.get('action', None):
-#                 action = request.POST.get('action')
-#                 if action == 'high-up':
-#                     control.raise_high()
-#                 elif action == 'high-down':
-#                     control.lower_high()
-#                 elif action == 'low-up':
-#                     control.raise_low()
-#                 elif action == 'low-down':
-#                     control.lower_low()
-#                 else:
-#                     print "Error: unknown action: %s" % action
-#                     raise HttpResponseServeError('unknown action: %s' % action)
-#                 return_json = True
-#             elif request.POST.get('command', None):
-#                 if command_form.is_valid():
-#                     command = command_form.cleaned_data['command']
-#                     if command == 'Update':
-#                         lines = 9
-#                     else:
-#                         lines = 1
-#                     result = control.send_command(command, lines)
-#                     return HttpResponse(str(result or "Error"), mimetype='text/plain')
-#                 else:
-#                     print 'is not valid', command_form
-#             else:
-#                 print 'no POST', request.POST
-#         else:
-#             command_form = CrestonCommandForm()
 
-#         try:
-#             control_info = control.query_status()
-#             #control_info = {'High': '55000', 'Current': '63098', 'Wake': '5:00 AM', 'Low': '63098', 'Lamp1': '2-1468', 'Sleep': '1:00 AM', 'Lamp2': '2-1469'}
-#         except:
-#             message = 'Could not communicate with the controller.'
-#         if return_json: return HttpResponse(json.dumps(control_info), mimetype='application/json')
-#         return render(request, 'lighting/creston.html', {'command_form':command_form, 'control_info':control_info})
-#     except:
-#         traceback.print_exc()
+    def put(self, request, format=None):
+        try:
+            creston  = models.Creston.objects.get(pk=int(request.data.get("id")))
+            serializer = serializers.CrestonSerializer(creston, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ObjectDoesNotExist:
+            raise Http404
+
+
+    def delete(self, request, format=None):
+        try:
+            creston  = models.Creston.objects.get(pk=int(request.data.get("id")))
+            creston_id = creston.id
+            creston.delete()
+        except (ObjectDoesNotExist, TypeError):
+            raise Http404
+
+        return Response({"id": creston_id}, status=status.HTTP_200_OK)
+
+
+class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
+
+
+    def get(self, request, format=None):
+        try:
+            creston = models.BACNetLight.objects.get(pk=id)
+            control = CrestonControl(creston.host, creston.port)
+            control_info = control.query_status()
+            #control_info = {'High': '55000', 'Current': '63098', 'Wake': '5:00 AM', 'Low': '63098', 'Lamp1': '2-1468', 'Sleep': '1:00 AM', 'Lamp2': '2-1469'}
+        except ObjectDoesNotExist:
+            raise Http404
+        except IOError:
+            control_info = None
+
+        return Response({'control_info':control_info})
+
+
+    def put(self, request, format=None):
+        cmd = request.data.get("command")
+        id  = int(request.data.get("id"))
+        try:
+            creston = models.Creston.objects.get(pk=id)
+            control = CrestonControl(creston.host, creston.port)
+            if command == 'Update':
+                lines = 9
+            else:
+                lines = 1
+            result = control.send_command(command, lines)
+            #todo maybe need show result
+        except ObjectDoesNotExist:
+            raise Http404
+        except: #SocketException:
+            return Response({"details": "Not able to connect to creston."}, status=status.HTTP_502_BAD_GATEWAY)
+
+        return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)
 
 
 class ProjectorInfo:
@@ -263,4 +281,4 @@ class BACNetCommandViewSet(api_helpers.GenericApiEndpoint):
             details = "Could not write the posted value (%s) for bacnet device %s property %s" % (cmd, light.device_id, light.property_id)
             return Response({"details": details}, status=status.HTTP_502_BAD_GATEWAY)
 
-        return Response({"details": "Command sent."}, status=status.HTTP_200_OK)
+        return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)

@@ -51,3 +51,29 @@ class BACNetLightSerializer(serializers.HyperlinkedModelSerializer):
             "device_id",
             "property_id",
             ]
+
+class CrestonSerializer(serializers.HyperlinkedModelSerializer):
+
+    commands = serializers.SerializerMethodField()
+
+    class Meta:
+        ordering = ['name']
+        model = models.Creston
+        fields = [
+            "id",
+            "name",
+            "host",
+            "port",
+            "commands",
+            ]
+
+    def get_commands(self, obj):
+        return [
+            {
+                "title": "To check communication",
+                "command": "Ping",
+            },
+            {
+                "title": "To view the status of the system",
+                "command": "Update",
+            }]

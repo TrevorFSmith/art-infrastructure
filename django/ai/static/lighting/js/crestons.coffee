@@ -9,15 +9,14 @@ do ->
   dom.div    = React.createFactory "div"
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
-  dom.input  = React.createFactory "input"
 
 
   "use strict"
 
 
-  class BACNetLightUnitHeader extends React.Component
+  class CrestonUnitHeader extends React.Component
 
-    displayName: "BACNet Light Header"
+    displayName: "Creston Header"
 
     constructor: (props) ->
       super(props)
@@ -26,32 +25,31 @@ do ->
       dom.div {className: "extra content"},
         dom.h3 {className: "left floated"},
           dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.bacnet_light.name
+          dom.span null, @props.data.creston.name
 
 
-  class BACNetLightUnitBody extends React.Component
+  class CrestonUnitBody extends React.Component
 
-    displayName: "BACNet Light Body"
+    displayName: "Creston Body"
 
     constructor: (props) ->
       super(props)
       @state = @state || {}
 
-    editBACNetLight: (data) ->
-      $('html').trigger("edit-bacnet-light-dialog-#{data.bacnet_light.id}", data)
+    editCreston: (data) ->
+      $('html').trigger("edit-creston-dialog-#{data.creston.id}", data)
 
-    sendCommand: ->
+    sendCommand: (cmd) ->
 
-      url             = $("#root").data("command-url")
-      csrf_token      = $("#root").data("csrf_token")
-      bacnet_light_id = @props.data.bacnet_light.id
-      cmd             = $("[data-object='command-#{bacnet_light_id}']").val()
+      url        = $("#root").data("command-url")
+      csrf_token = $("#root").data("csrf_token")
+      creston_id = @props.data.creston.id
 
-      $("[data-object='command-send-#{bacnet_light_id}']").toggleClass("loading")
+      $("[data-object='command-#{creston_id}-#{cmd}']").toggleClass("loading")
 
       adapter  = new Adapter(url)
       postData =
-        id: bacnet_light_id
+        id: creston_id
         command: cmd
 
       props = @props
@@ -63,56 +61,54 @@ do ->
         $('html').trigger('show-dialog', {message: data.responseJSON.details})
       ), () ->
         # request finished
-        $("[data-object='command-send-#{bacnet_light_id}']").toggleClass("loading")
-        $input_command = $("[data-object='command-#{bacnet_light_id}']")
-        $input_command.val($input_command.placeholder)
+        $("[data-object='command-#{creston_id}-#{cmd}']").toggleClass("loading")
 
-    removeBACNetLight: (bacnet_light_id) ->
+
+    removeCreston: (creston_id) ->
 
       if confirm "Are you sure?"
 
         url        = $("#root").data("url")
         csrf_token = $("#root").data("csrf_token")
 
-        $("[data-object ='bacnet-light-#{bacnet_light_id}']").toggleClass("loading")
+        $("[data-object ='creston-#{creston_id}']").toggleClass("loading")
 
         adapter  = new Adapter(url)
         postData =
-          id: bacnet_light_id
+          id: creston_id
 
         scope = this
         adapter.delete csrf_token, postData, ( (data, status) ->
           # request ok
-          $('html').trigger('bacnet-light-deleted', data)
+          $('html').trigger('creston-deleted', data)
         ), ( (data, status) ->
           # request failed
         ), () ->
           # request finished
-          $("[data-object='bacnet-light-#{bacnet_light_id}']").toggleClass("loading")
+          $("[data-object='creston-#{creston_id}']").toggleClass("loading")
 
 
     render: ->
       scope = this
       dom.div {className: "content"},
-        dom.h3 null, "Device ID: #{@props.data.bacnet_light.device_id} | Property ID: #{@props.data.bacnet_light.property_id}"
 
-        dom.p
-          className: "ui input margin-right"
+        dom.h3 null, "Host: #{@props.data.creston.host} | Port: #{@props.data.creston.port}"
+
+        @props.data.creston.commands.map (cmd) ->
+          dom.div
+            className: "button ui mini"
+            "data-object": "command-#{scope.props.data.creston.id}-#{cmd.command}"
+            onClick: scope.sendCommand.bind(scope, cmd.command)
           , "",
-            dom.input placeholder: "Enter command ...", "data-object": "command-#{scope.props.data.bacnet_light.id}"
-        dom.div
-          className: "button ui mini"
-          "data-object": "command-send-#{scope.props.data.bacnet_light.id}"
-          onClick: scope.sendCommand.bind(scope)
-        , "",
-          dom.i {className: "cog icon"}, ""
-          "Send command"
+            dom.i {className: "cog icon"}, ""
+            cmd.title
 
-        dom.h3 null, "Actions:"
+        dom.h3 null, ""
+
         dom.div {className: "ui buttons mini"},
           dom.button
             className: "ui button"
-            onClick: @editBACNetLight.bind(this, @props.data)
+            onClick: @editCreston.bind(this, @props.data)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
@@ -121,30 +117,30 @@ do ->
 
           dom.button
             className: "ui button negative"
-            onClick: @removeBACNetLight.bind(this, @props.data.bacnet_light.id)
+            onClick: @removeCreston.bind(this, @props.data.creston.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(BACNetLightModal, {bacnet_light: @props.data.bacnet_light})
+        React.createElement(CrestonModal, {creston: @props.data.creston})
 
 
-  class BACNetLightUnit extends React.Component
+  class CrestonUnit extends React.Component
 
-    displayName: "BACNetLight Unit"
+    displayName: "Creston Unit"
 
     constructor: (props) ->
       super(props)
 
     render: ->
         dom.div {className: "ui card"},
-          React.createElement(BACNetLightUnitHeader, {data: @props})
-          React.createElement(BACNetLightUnitBody, {data: @props})
+          React.createElement(CrestonUnitHeader, {data: @props})
+          React.createElement(CrestonUnitBody, {data: @props})
 
 
-  class BACNetLightNoRecords extends React.Component
+  class CrestonNoRecords extends React.Component
 
-    displayName: "BACNet Light no records"
+    displayName: "Creston no records"
 
     constructor: (props) ->
       super(props)
@@ -167,15 +163,16 @@ do ->
         collection: collection
         no_records: if collection.length > 0 then false else true
 
-    buildBACNetLights: ->
-      @state.collection.map (bacnet_light) =>
-        React.createElement(BACNetLightUnit, {bacnet_light: bacnet_light})
+    buildCrestons: ->
+      @state.collection.map (creston) =>
+        React.createElement(CrestonUnit, {creston: creston})
+
 
     componentDidMount: ->
 
-      $('html').on 'update-bacnet-lights', (event, data) =>
-        new_collection = @state.collection
+      $('html').on 'update-crestons', (event, data) =>
         index          = _.findIndex @state.collection, {id: data.id}
+        new_collection = @state.collection
 
         if index >= 0
           new_collection[index] = data
@@ -186,32 +183,34 @@ do ->
           collection: new_collection
           no_records: false
 
-      $('html').on 'bacnet-light-deleted', (event, data) =>
 
-        filtered_bacnet_lights = _.filter @state.collection, (bacnet_light) =>
-          bacnet_light.id != data.id
+      $('html').on 'creston-deleted', (event, data) =>
+
+        filtered_crestons = _.filter @state.collection, (creston) =>
+          creston.id != data.id
 
         @setState
-          collection: filtered_bacnet_lights
-          no_records: if filtered_bacnet_lights.length > 0 then false else true
+          collection: filtered_crestons
+          no_records: if filtered_crestons.length > 0 then false else true
 
-    newBACNetLight: ->
-      $('html').trigger("edit-bacnet-light-dialog-new")
+    newCreston: ->
+      $('html').trigger("edit-creston-dialog-new")
 
     render: ->
       dom.div null,
         dom.h2 className: "ui dividing header",
-          "Lighting::BACNet Lights"
+          "Lighting::Crestons"
           dom.button
             className: "button ui mini right floated positive"
-            onClick: @newBACNetLight.bind(this)
+            onClick: @newCreston.bind(this)
           , "",
             dom.i {className: "plus icon"}, ""
-            "New BACNet Light"
+            "New Creston"
         dom.div {className: "ui three cards"},
-          @buildBACNetLights()
-        React.createElement(BACNetLightNoRecords, {output: @state.no_records})
-        React.createElement(BACNetLightModal, {bacnet_light: {}})
+          @buildCrestons()
+        React.createElement(CrestonNoRecords, {output: @state.no_records})
+        React.createElement(CrestonModal, {creston: {}})
+
 
   class Visualizer
 

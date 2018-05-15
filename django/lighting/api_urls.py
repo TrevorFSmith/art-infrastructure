@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'^v1/projectors/$', views_v1.ProjectorViewSet.as_view(), name='projectors'),
     url(r'^v1/projectors/command/$', views_v1.ProjectorCommandViewSet.as_view(), name='projectors_command'),
     url(r'^v1/crestons/$', views_v1.CrestonViewSet.as_view(), name='crestons'),
+    url(r'^v1/crestons/command/$', views_v1.CrestonCommandViewSet.as_view(), name='crestons_command'),
 
 ]

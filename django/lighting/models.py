@@ -75,3 +75,16 @@ class ProjectorEvent(EventModel):
 
     def __unicode__(self):
         return 'Projector Event: [%s],[%s],[%s]' % (self.days, self.hours, self.minutes)
+
+
+class Creston(models.Model):
+
+    name = models.CharField(max_length=1024, null=False, blank=False)
+    host = models.CharField(max_length=1024, null=False, blank=False)
+    port = models.IntegerField(null=False, blank=False, default=1313)
+
+    def __unicode__(self):
+        return '%s' % self.name
+
+    class Meta:
+        ordering = ['name']
