@@ -8,7 +8,7 @@ MINUTE_CHOICES = list([(str(i), str(i)) for i in range(0,60,15)])
 
 
 class BaseEventForm(forms.ModelForm):
-    """A form used as the base for iBoot and Projector event forms"""
+    """A form used as the base for iBoot event form"""
 
     days = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=DAY_CHOICES, required=False)
     hours = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=HOUR_CHOICES, required=False)
@@ -33,9 +33,3 @@ class CrestonCommandForm(forms.Form):
 
 class LightControlForm(forms.Form):
     light_value = forms.CharField()
-
-
-class ProjectorEventForm(BaseEventForm):
-    class Meta:
-        fields = ['command', 'device']
-        model = models.ProjectorEvent

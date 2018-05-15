@@ -274,7 +274,9 @@ class PJLinkController:
             sock.settimeout(15)
             sock.connect((self.host, self.port))
             encoded_auth_request = sock.recv(512)
+
             auth_request = PJLinkAuthenticationRequest.decode(encoded_auth_request)
+
             if auth_request.seed:
                 if self.password:
                     command_line.authentication_hash = PJLinkAuthenticationRequest.generate_hash(auth_request.seed, self.password)
@@ -286,11 +288,16 @@ class PJLinkController:
             sock.send(command_line.encode())
             encoded_response = sock.recv(512)
             #print 'received', encoded_response
+
             sock.close()
+
             if encoded_response == '': encoded_response = None
             response = PJLinkResponse.decode(encoded_response)
+
             if response.command == PJLinkProtocol.AUTHENTICATE and response.data == PJLinkProtocol.INVALID_PASSWORD_ERROR:
                 raise PJLinkAuthenticationException('The projector rejected our password')
+
             return response
+
         except socket_error as serr:
             raise SocketException(serr)

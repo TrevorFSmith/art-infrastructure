@@ -53,8 +53,9 @@ do ->
         command: cmd
 
       props = @props
-      adapter.pushData "PUT", csrf_token, postData, ( (data, status) ->
+      adapter.pushData "PUT", csrf_token, postData, ( (data) ->
         # request ok
+        $('html').trigger('show-dialog', {message: data.details})
       ), ( (data, status) ->
         # request failed
         $('html').trigger('show-dialog', {message: data.responseJSON.details})
@@ -102,7 +103,7 @@ do ->
             dom.i {className: "cog icon"}, ""
             cmd.title
 
-        dom.h3 null, "Last activity:"
+        dom.h3 null, ""
 
         dom.div {className: "ui buttons mini"},
           dom.button

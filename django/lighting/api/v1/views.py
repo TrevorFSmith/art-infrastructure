@@ -3,10 +3,9 @@ from lighting.api import api_helpers
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied
-from lighting.pjlink import PJLinkController, PJLinkProtocol, SocketException
-from lighting.bacnet import BacnetControl
 
-from lighting.forms import ProjectorEventForm
+from lighting.pjlink import PJLinkController, PJLinkProtocol, SocketException
+from lighting.connectors.bacnet import BacnetControl
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -76,6 +75,25 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
 #         traceback.print_exc()
 
 
+class ProjectorInfo:
+
+    def __init__(self, power_state, projector_name, manufacture_name, product_name, other_info, audio_mute, video_mute):
+        self.power_state = power_state
+        self.projector_name = projector_name
+        self.manufacture_name = manufacture_name
+        self.product_name = product_name
+        self.other_info = other_info
+        self.video_mute = video_mute
+        self.audio_mute = audio_mute
+        self.lamps = []
+
+
+class LampInfo:
+    def __init__(self, lighting_hours, is_on):
+        self.lighting_hours = lighting_hours
+        self.is_on = is_on
+
+
 class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
 
 
@@ -92,53 +110,41 @@ class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
             projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
             controller = PJLinkController(projector.pjlink_host, projector.pjlink_port, projector.pjlink_password)
 
-            audio_mute, video_mute = controller.query_mute()
+            # FIXME:
+            # This is to be decided what to do with it. Probably makes sense to move it to Scheduler a.k.a. Heartbeat.
+            #
+            # audio_mute, video_mute = controller.query_mute()
 
-            info = ProjectorInfo(
-                controller.query_power(),
-                controller.query_name(),
-                controller.query_manufacture_name(),
-                controller.query_product_name(),
-                controller.query_other_info(),
-                audio_mute,
-                video_mute
-                )
-
-            for lamp in controller.query_lamps():
-                info.lamps.append(LampInfo(lamp[0], lamp[1]))
-
-            event_form = ProjectorEventForm(request.data)
-            event_form.device = projector
+            # info = ProjectorInfo(
+            #     controller.query_power(),
+            #     controller.query_name(),
+            #     controller.query_manufacture_name(),
+            #     controller.query_product_name(),
+            #     controller.query_other_info(),
+            #     audio_mute,
+            #     video_mute
+            #     )
+            # See note above
+            #
+            # for lamp in controller.query_lamps():
+            #     info.lamps.append(LampInfo(lamp[0], lamp[1]))
 
             if cmd == PJLinkProtocol.POWER_ON_STATUS:
                 controller.power_on()
-                event_form = ProjectorEventForm(initial={"device": projector.id})
 
             elif cmd == PJLinkProtocol.POWER_OFF_STATUS:
                 controller.power_off()
-                event_form = ProjectorEventForm(initial={"device": projector.id})
-
-            elif cmd == PJLinkProtocol.DELETE and event_id:
-                try:
-                    event = models.ProjectorEvent.objects.get(pk=int(event_id))
-                    event.delete()
-                except ObjectDoesNotExist:
-                    raise Http404
-
-                event_form = ProjectorEventForm(initial={"device": projector.id})
-
 
         except ObjectDoesNotExist:
             raise Http404
         except SocketException:
             return Response({"details": "Not able to connect to projector."}, status=status.HTTP_502_BAD_GATEWAY)
 
-
         projector_serializer = serializers.ProjectorSerializer(projector)
         projector_events_serializer = serializers.ProjectorEventsSerializer(
             models.ProjectorEvent.objects.filter(device=projector), many=True)
 
-        return Response({"details": "Command sent."}, status=status.HTTP_200_OK)
+        return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)
 
 
 class ProjectorViewSet(api_helpers.GenericApiEndpoint):
