@@ -70,10 +70,10 @@ class CrestonSerializer(serializers.HyperlinkedModelSerializer):
     def get_commands(self, obj):
         return [
             {
-                "title": "To check communication",
+                "title": "Ping",
                 "command": "Ping",
             },
             {
-                "title": "To view the status of the system",
+                "title": "Query system",
                 "command": "Update",
             }]

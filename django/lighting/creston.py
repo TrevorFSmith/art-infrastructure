@@ -3,6 +3,9 @@ import socket
 import traceback
 
 
+BUFF = 1024
+
+
 class CrestonControl(object):
     """The Crestron controller class.
     NOTE: This is not thread safe so use a controller in each thread."""
@@ -61,13 +64,12 @@ class CrestonControl(object):
         self.sock.settimeout(self.timeout)
         try:
             self.sock.connect((self.host, self.port))
-            welcome = self.sock.recv(1024)
             msg = self.format_command(command)
             self.sock.send(msg)
             results = []
 
             for i in range(lines):
-                value = self.sock.recv(2048)
+                value = self.sock.recv(BUFF)
                 if len(value.strip()) == 0: continue
                 results.append(value.strip())
 
@@ -75,10 +77,12 @@ class CrestonControl(object):
                 self.close()
                 return None
 
-            self.close()
-            if lines == 1: return results[0]
+            if lines == 1:
+                self.close()
+                return results[0]
+
             return results
         except:
+            self.close()
             traceback.print_exc()
-        self.close()
         return None

@@ -6,6 +6,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from lighting.pjlink import PJLinkController, PJLinkProtocol, SocketException
 from lighting.connectors.bacnet import BacnetControl
+from lighting.creston import CrestonControl
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -74,7 +75,7 @@ class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
 
 
     def put(self, request, format=None):
-        cmd = request.data.get("command")
+        command = request.data.get("command")
         id  = int(request.data.get("id"))
         try:
             creston = models.Creston.objects.get(pk=id)
@@ -84,10 +85,11 @@ class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
             else:
                 lines = 1
             result = control.send_command(command, lines)
-            #todo maybe need show result
+            print(result)
+            # Please use result and pass it to the UI and render it there.
         except ObjectDoesNotExist:
             raise Http404
-        except: #SocketException:
+        except SocketException:
             return Response({"details": "Not able to connect to creston."}, status=status.HTTP_502_BAD_GATEWAY)
 
         return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)

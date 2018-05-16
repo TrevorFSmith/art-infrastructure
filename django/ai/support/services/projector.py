@@ -64,10 +64,10 @@ thread.start_new_thread(push, ())
 
 while True:
     try:
-        print "Server is listening for connections\n"
+        print "Projector server is listening for connections on port %s host %h\n" % (port, host)
         clientsocket, clientaddr = serversocket.accept()
         clients.append(clientsocket)
         thread.start_new_thread(handler, (clientsocket, clientaddr))
     except KeyboardInterrupt:
-        print "Closing server socket..."
+        print "Closing Projector server socket..."
         serversocket.close()
