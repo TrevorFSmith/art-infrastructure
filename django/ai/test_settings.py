@@ -2,7 +2,6 @@ from settings import *
 
 SECRET_KEY = 'YOUR KEY GOES HERE'
 
-CRESTON_CONTROL_HOST = '1.1.1.1'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 REST_FRAMEWORK = {

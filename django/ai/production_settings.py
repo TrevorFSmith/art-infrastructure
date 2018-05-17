@@ -2,8 +2,6 @@ from settings import *
 
 SECRET_KEY = 'YOUR KEY GOES HERE'
 
-CRESTON_CONTROL_HOST = '1.1.1.1'
-
 DEBUG=False
 
 #from scheduler import TestTask

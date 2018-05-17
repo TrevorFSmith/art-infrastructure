@@ -2,8 +2,6 @@ from common_settings import *
 
 SECRET_KEY = 'YOUR KEY GOES HERE'
 
-CRESTON_CONTROL_HOST = '1.1.1.1'
-
 #from scheduler import TestTask
 #SCHEDULED_TASKS = [TestTask(5, 0), ]
 SCHEDULED_TASKS = []

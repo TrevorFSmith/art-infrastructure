@@ -5,7 +5,7 @@ from django.http import Http404
 from rest_framework.exceptions import PermissionDenied
 
 from lighting.pjlink import PJLinkController, PJLinkProtocol, SocketException
-from lighting.connectors.bacnet import BacnetControl
+from lighting.bacnet import BacnetControl
 from lighting.creston import CrestonControl
 
 from rest_framework.response import Response
@@ -168,7 +168,6 @@ class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
 
 
 class ProjectorViewSet(api_helpers.GenericApiEndpoint):
-
 
     def get(self, request, format=None):
         projectors = models.Projector.objects.all()

@@ -8,6 +8,8 @@ DEBUG=False
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'America/Los_Angeles'
 
+BACNET_BIN_DIR = "./"
+
 SITE_ID = 1
 
 STATIC_URL = '/static/'
@@ -43,7 +45,9 @@ INSTALLED_APPS = [
     'artwork',
     'heartbeat',
     'lighting',
-    'weather'
+    'weather',
+    'iboot',
+    'flock'
 ]
 
 MIDDLEWARE = [
@@ -76,17 +80,26 @@ TEMPLATES = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+
+    'DEFAULT_PAGINATION_CLASS': 'ai.pagination.APILimitOffsetPagination',
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 500
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+
+    'PAGE_SIZE': 2,
+    'DEFAULT_CHARSET': 'utf-8',
 }
 
 WSGI_APPLICATION = 'ai.wsgi.application'
 
 SASS_COMMAND = 'sass --scss {infile} {outfile}'
+
 COMPRESS_PRECOMPILERS = (
     ('text/coffeescript', 'coffee --compile --stdio'),
     ('text/x-scss', SASS_COMMAND),
