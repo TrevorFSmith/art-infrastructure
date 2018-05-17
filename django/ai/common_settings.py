@@ -79,23 +79,6 @@ TEMPLATES = [
     },
 ]
 
-REST_FRAMEWORK = {
-
-    'DEFAULT_PAGINATION_CLASS': 'ai.pagination.APILimitOffsetPagination',
-
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-
-    'PAGE_SIZE': 2,
-    'DEFAULT_CHARSET': 'utf-8',
-}
-
 WSGI_APPLICATION = 'ai.wsgi.application'
 
 SASS_COMMAND = 'sass --scss {infile} {outfile}'

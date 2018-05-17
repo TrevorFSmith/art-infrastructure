@@ -167,13 +167,11 @@ class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
         return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)
 
 
+
 class ProjectorViewSet(api_helpers.GenericApiEndpoint):
 
-    def get(self, request, format=None):
-        projectors = models.Projector.objects.all()
-        serializer = serializers.ProjectorSerializer(projectors, many=True)
-        return Response(serializer.data)
-
+    get_queryset_class            = models.Projector
+    get_queryset_serializer_class = serializers.ProjectorSerializer
 
     def post(self, request, format=None):
         serializer = serializers.ProjectorSerializer(data=request.data)

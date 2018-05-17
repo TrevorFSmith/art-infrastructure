@@ -225,9 +225,9 @@ do ->
 
     render: ->
       @adapter.loadData (data) =>
-        if data.length > 0
+        if data.results.length > 0
           ReactDOM.render(React.createElement(Composer, {
-            collection: data,
+            collection: data.results,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))
