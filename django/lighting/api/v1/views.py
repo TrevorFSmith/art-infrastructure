@@ -16,12 +16,8 @@ from django.conf import settings
 
 class CrestonViewSet(api_helpers.GenericApiEndpoint):
 
-
-    def get(self, request, format=None):
-        crestons = models.Creston.objects.all()
-        serializer = serializers.CrestonSerializer(crestons, many=True)
-        return Response(serializer.data)
-
+    get_queryset_class            = models.Creston
+    get_queryset_serializer_class = serializers.CrestonSerializer
 
     def post(self, request, format=None):
         serializer = serializers.CrestonSerializer(data=request.data)
@@ -89,7 +85,7 @@ class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
             # Please use result and pass it to the UI and render it there.
         except ObjectDoesNotExist:
             raise Http404
-        except SocketException:
+        except: #SocketException:
             return Response({"details": "Not able to connect to creston."}, status=status.HTTP_502_BAD_GATEWAY)
 
         return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)
@@ -209,12 +205,8 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
 
 class BACNetViewSet(api_helpers.GenericApiEndpoint):
 
-
-    def get(self, request, format=None):
-        bacnet_lights = models.BACNetLight.objects.all()
-        serializer = serializers.BACNetLightSerializer(bacnet_lights, many=True)
-        return Response(serializer.data)
-
+    get_queryset_class            = models.BACNetLight
+    get_queryset_serializer_class = serializers.BACNetLightSerializer
 
     def post(self, request, format=None):
         serializer = serializers.BACNetLightSerializer(data=request.data)

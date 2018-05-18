@@ -9,6 +9,8 @@ do ->
   dom.div    = React.createFactory "div"
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
+  dom.select = React.createFactory "select"
+  dom.option = React.createFactory "option"
 
 
   "use strict"
@@ -39,31 +41,6 @@ do ->
     editCreston: (data) ->
       $('html').trigger("edit-creston-dialog-#{data.creston.id}", data)
 
-    sendCommand: (cmd) ->
-
-      url        = $("#root").data("command-url")
-      csrf_token = $("#root").data("csrf_token")
-      creston_id = @props.data.creston.id
-
-      $("[data-object='command-#{creston_id}-#{cmd}']").toggleClass("loading")
-
-      adapter  = new Adapter(url)
-      postData =
-        id: creston_id
-        command: cmd
-
-      props = @props
-      adapter.pushData "PUT", csrf_token, postData, ( (data) ->
-        # request ok
-        $('html').trigger('show-dialog', {message: data.details})
-      ), ( (data, status) ->
-        # request failed
-        $('html').trigger('show-dialog', {message: data.responseJSON.details})
-      ), () ->
-        # request finished
-        $("[data-object='command-#{creston_id}-#{cmd}']").toggleClass("loading")
-
-
     removeCreston: (creston_id) ->
 
       if confirm "Are you sure?"
@@ -93,18 +70,8 @@ do ->
       dom.div {className: "content"},
 
         dom.h3 null, "Host: #{@props.data.creston.host} | Port: #{@props.data.creston.port}"
-
-        @props.data.creston.commands.map (cmd) ->
-          dom.div
-            className: "button ui mini"
-            "data-object": "command-#{scope.props.data.creston.id}-#{cmd.command}"
-            onClick: scope.sendCommand.bind(scope, cmd.command)
-          , "",
-            dom.i {className: "cog icon"}, ""
-            cmd.title
-
-        dom.h3 null, ""
-
+        React.createElement(CrestonSelectCommand, {creston: @props.data.creston})
+        dom.h3 null, "Actions:"
         dom.div {className: "ui buttons mini"},
           dom.button
             className: "ui button"
@@ -147,9 +114,84 @@ do ->
 
     render: ->
       if @props.output
-        dom.h3 {className: ""}, "No records found."
+        dom.h3 null, "No records found."
       else
-        dom.h3 {className: ""}, ""
+        dom.h3 null, ""
+
+
+  class CrestonOptionCommand extends React.Component
+
+      displayName: "Creston option command"
+
+      constructor: (props) ->
+        super(props)
+
+      render: ->
+        if @props.command
+          dom.option null, @props.command.command
+        else
+          dom.option null, ""
+
+
+  class CrestonSelectCommand extends React.Component
+
+    displayName: "Creston select command"
+
+    constructor: (props) ->
+      super(props)
+      @state =
+        commands: @props.creston.commands
+        select_command: @props.creston.commands[0]
+
+    selectCommand: (creston_id) ->
+      command = $("[data-object ='command-#{creston_id}'] option:selected").val()
+      command = $.grep(@state.commands, (e) -> e.command == command)
+      console.log(command[0])
+      @setState
+        select_command: command[0]
+
+    sendCommand: (creston_id) ->
+      url        = $("#root").data("command-url")
+      csrf_token = $("#root").data("csrf_token")
+      command    = @state.select_command.command
+
+      $("[data-object='command-#{creston_id}-#{command}']").toggleClass("loading")
+
+      adapter  = new Adapter(url)
+      postData =
+        id: creston_id
+        command: command
+
+      console.log(postData)
+
+      props = @props
+      adapter.pushData "PUT", csrf_token, postData, ( (data) ->
+        # request ok
+        $('html').trigger('show-dialog', {message: data.details})
+      ), ( (data, status) ->
+        # request failed
+        $('html').trigger('show-dialog', {message: data.responseJSON.details})
+      ), () ->
+        # request finished
+        $("[data-object='command-#{creston_id}-#{command}']").toggleClass("loading")
+
+    render: ->
+      dom.div null, "",
+        dom.select
+          className: "ui dropdown margin-right"
+          "data-object": "command-#{@props.creston.id}"
+          onChange: @selectCommand.bind(this, @props.creston.id)
+          , "",
+            @props.creston.commands.map (cmd) ->
+              React.createElement(CrestonOptionCommand, {command: cmd})
+        dom.p null, @state.select_command.title
+        dom.div
+          className: "button ui mini"
+          "data-object": "command-#{@props.creston.id}-#{@state.select_command.command}"
+          onClick: this.sendCommand.bind(this, @props.creston.id)
+        , "",
+          dom.i {className: "cog icon"}, ""
+          "Send command"
 
 
   class Composer extends React.Component
@@ -225,9 +267,9 @@ do ->
 
     render: ->
       @adapter.loadData (data) =>
-        if data.length > 0
+        if data.results.length > 0
           ReactDOM.render(React.createElement(Composer, {
-            collection: data,
+            collection: data.results,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))

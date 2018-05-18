@@ -201,7 +201,7 @@ do ->
     render: ->
       dom.div null,
         dom.h2 className: "ui dividing header",
-          "Lighting::BACNet Lights"
+          "Lighting::BACNet Service"
           dom.button
             className: "button ui mini right floated positive"
             onClick: @newBACNetLight.bind(this)
@@ -226,9 +226,9 @@ do ->
 
     render: ->
       @adapter.loadData (data) =>
-        if data.length > 0
+        if data.results.length > 0
           ReactDOM.render(React.createElement(Composer, {
-            collection: data,
+            collection: data.results,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))
