@@ -158,24 +158,18 @@ do ->
 
     constructor: (props) ->
       super(props)
-      @state =
-        currentPage: 1
 
     clickNextPage: ->
       $('html').trigger("projector-next-page")
-      @setState
-        currentPage: @state.currentPage + 1
 
     clickPrevPage: ->
       $('html').trigger("projector-prev-page")
-      @setState
-        currentPage: @state.currentPage - 1
 
     render: ->
       dom.div {className: "ui center aligned segment"},
         if @props.prev
           dom.button {className: "ui button margin-right", onClick: @clickPrevPage.bind(this)}, "Prev"
-        dom.span {className: "margin-right"}, "#{@state.currentPage}(#{Math.ceil(@props.count / 9)})"
+        dom.span {className: "margin-right"}, "#{@props.page}(#{@props.pages})"
         if @props.next
           dom.button {className: "ui button", onClick: @clickNextPage.bind(this)}, "Next"
 
@@ -191,8 +185,9 @@ do ->
         collection: collection
         no_records: if collection.length > 0 then false else true
         count: @props.count
-        next: @props.next
-        prev: @props.prev
+        current_page: @getCurrentPage(@props.next, @props.prev)
+        next_page: @props.next
+        prev_page: @props.prev
 
     buildProjectors: ->
       @state.collection.map (projector) =>
@@ -205,39 +200,70 @@ do ->
           @setState
             collection: data.results
             count: data.count
-            next: data.next
-            prev: data.previous
+            current_page: @getCurrentPage(data.next, data.previous)
+            next_page: data.next
+            prev_page: data.previous
+
+    getCurrentPage: (next_page, prev_page) ->
+      if next_page
+        return next_page.substr(next_page.length - 1) - 1
+      if prev_page
+        if prev_page.indexOf("?page=") != -1
+          return +prev_page.substr(prev_page.length - 1) + 1
+        else
+          return 2
+      return 1
+
+    getUrlCurrentPage: ->
+      return $('#root').data('url') + "?page=" + @state.current_page
 
     componentDidMount: ->
-
       $('html').on 'update-projectors', (event, data) =>
-        index          = _.findIndex @state.collection, {id: data.id}
-        new_collection = @state.collection
-
-        if index >= 0
-          new_collection[index] = data
+        if @state.next_page
+          $('html').trigger("projector-current-page")
         else
-          new_collection.push(data)
+          index          = _.findIndex @state.collection, {id: data.id}
+          new_collection = @state.collection
+          count          = @state.count
 
-        @setState
-          collection: new_collection
-          no_records: false
+          if index >= 0
+            new_collection[index] = data
+          else
+            count += 1
+            if (@state.count % 9) == 0
+              $('html').trigger("projector-current-page")
+              return
+            new_collection.push(data)
+
+          @setState
+            collection: new_collection
+            no_records: false
+            count: count
 
 
       $('html').on 'projector-deleted', (event, data) =>
+        count = @state.count - 1
+        if @state.next_page
+          $('html').trigger("projector-current-page")
+        else if @state.prev_page and (count % 9) == 0
+          $('html').trigger("projector-prev-page")
+        else
+          filtered_projectors = _.filter @state.collection, (projector) =>
+            projector.id != data.id
 
-        filtered_projectors = _.filter @state.collection, (projector) =>
-          projector.id != data.id
-
-        @setState
-          collection: filtered_projectors
-          no_records: if filtered_projectors.length > 0 then false else true
+          @setState
+            collection: filtered_projectors
+            no_records: if filtered_projectors.length > 0 then false else true
+            count: count
 
       $('html').on 'projector-next-page', (event, data) =>
-        @loadProjectors(@state.next)
+        @loadProjectors(@state.next_page)
 
       $('html').on 'projector-prev-page', (event, data) =>
-        @loadProjectors(@state.prev)
+        @loadProjectors(@state.prev_page)
+
+      $('html').on 'projector-current-page', (event, data) =>
+        @loadProjectors(@getUrlCurrentPage())
 
     newProjector: ->
       $('html').trigger("edit-projector-dialog-new")
@@ -255,7 +281,9 @@ do ->
         dom.div {className: "ui three cards"},
           @buildProjectors()
         React.createElement(ProjectorNoRecords, {output: @state.no_records})
-        React.createElement(ProjectorPagination, {count: @state.count, next: @state.next, prev: @state.prev})
+        React.createElement(ProjectorPagination, {
+          page: @state.current_page, pages: Math.ceil(@state.count / 9), 
+          next: @state.next_page, prev: @state.prev_page})
         React.createElement(ProjectorModal, {projector: {}})
 
 
