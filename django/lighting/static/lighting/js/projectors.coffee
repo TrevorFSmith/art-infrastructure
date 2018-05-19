@@ -152,6 +152,34 @@ do ->
         dom.h3 {className: ""}, ""
 
 
+  class ProjectorPagination extends React.Component
+
+    displayName: "Projector pagination"
+
+    constructor: (props) ->
+      super(props)
+      @state =
+        currentPage: 1
+
+    clickNextPage: ->
+      $('html').trigger("projector-next-page")
+      @setState
+        currentPage: @state.currentPage + 1
+
+    clickPrevPage: ->
+      $('html').trigger("projector-prev-page")
+      @setState
+        currentPage: @state.currentPage - 1
+
+    render: ->
+      dom.div {className: "ui center aligned segment"},
+        if @props.prev
+          dom.button {className: "ui button margin-right", onClick: @clickPrevPage.bind(this)}, "Prev"
+        dom.span {className: "margin-right"}, "#{@state.currentPage}(#{Math.ceil(@props.count / 9)})"
+        if @props.next
+          dom.button {className: "ui button", onClick: @clickNextPage.bind(this)}, "Next"
+
+
   class Composer extends React.Component
 
     displayName: "Page Composer"
@@ -162,11 +190,23 @@ do ->
       @state =
         collection: collection
         no_records: if collection.length > 0 then false else true
+        count: @props.count
+        next: @props.next
+        prev: @props.prev
 
     buildProjectors: ->
       @state.collection.map (projector) =>
         React.createElement(ProjectorUnit, {projector: projector})
 
+    loadProjectors: (url) ->
+      @adapter = new Adapter(url)
+      @adapter.loadData (data) =>
+        if data.results.length > 0
+          @setState
+            collection: data.results
+            count: data.count
+            next: data.next
+            prev: data.previous
 
     componentDidMount: ->
 
@@ -193,6 +233,12 @@ do ->
           collection: filtered_projectors
           no_records: if filtered_projectors.length > 0 then false else true
 
+      $('html').on 'projector-next-page', (event, data) =>
+        @loadProjectors(@state.next)
+
+      $('html').on 'projector-prev-page', (event, data) =>
+        @loadProjectors(@state.prev)
+
     newProjector: ->
       $('html').trigger("edit-projector-dialog-new")
 
@@ -209,6 +255,7 @@ do ->
         dom.div {className: "ui three cards"},
           @buildProjectors()
         React.createElement(ProjectorNoRecords, {output: @state.no_records})
+        React.createElement(ProjectorPagination, {count: @state.count, next: @state.next, prev: @state.prev})
         React.createElement(ProjectorModal, {projector: {}})
 
 
@@ -228,6 +275,9 @@ do ->
         if data.results.length > 0
           ReactDOM.render(React.createElement(Composer, {
             collection: data.results,
+            count: data.count,
+            next: data.next,
+            prev: data.previous,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))
