@@ -261,15 +261,15 @@ class BACNetCommandViewSet(api_helpers.GenericApiEndpoint):
 
     def put(self, request, format=None):
         cmd = request.data.get("command")
-        id  = int(request.data.get("id"))
         try:
-            light = models.BACNetLight.objects.get(pk=id)
+            light = models.BACNetLight.objects.get(pk=request.data.get("id"))
             control = BacnetControl(settings.BACNET_BIN_DIR)
             control.write_analog_output_int(light.device_id, light.property_id, cmd)
         except ObjectDoesNotExist:
             raise Http404
-        except IOError:
-            details = "Could not write the posted value (%s) for bacnet device %s property %s" % (cmd, light.device_id, light.property_id)
-            return Response({"details": details}, status=status.HTTP_502_BAD_GATEWAY)
+        except IOError, e:
+            return Response({"details": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+        except Exception, e:
+            return Response({"details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)
