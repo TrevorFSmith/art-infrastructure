@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'lighting',
     'weather',
     'iboot',
-    'flock'
 ]
 
 MIDDLEWARE = [
