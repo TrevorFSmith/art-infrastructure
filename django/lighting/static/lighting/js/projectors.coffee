@@ -147,9 +147,9 @@ do ->
 
     render: ->
       if @props.output
-        dom.h3 {className: ""}, "No records found."
+        dom.h3 null, "No records found."
       else
-        dom.h3 {className: ""}, ""
+        dom.h3 null, ""
 
 
   class ProjectorPagination extends React.Component
@@ -166,12 +166,15 @@ do ->
       $('html').trigger("projector-prev-page")
 
     render: ->
-      dom.div {className: "ui center aligned segment"},
-        if @props.prev
-          dom.button {className: "ui button margin-right", onClick: @clickPrevPage.bind(this)}, "Prev"
-        dom.span {className: "margin-right"}, "#{@props.page}(#{@props.pages})"
-        if @props.next
-          dom.button {className: "ui button", onClick: @clickNextPage.bind(this)}, "Next"
+      if @props.pages
+        dom.div {className: "ui center aligned segment"},
+          if @props.prev
+            dom.button {className: "ui button margin-right", onClick: @clickPrevPage.bind(this)}, "Prev"
+          dom.span {className: "margin-right"}, "Page #{@props.page} of #{@props.pages}"
+          if @props.next
+            dom.button {className: "ui button", onClick: @clickNextPage.bind(this)}, "Next"
+      else
+        dom.div null, ""
 
 
   class Composer extends React.Component
@@ -229,11 +232,11 @@ do ->
           if index >= 0
             new_collection[index] = data
           else
-            count += 1
-            if (@state.count % 9) == 0
+            if not @state.count or (@state.count % 9) == 0
               $('html').trigger("projector-current-page")
-              return
-            new_collection.push(data)
+            else
+              count += 1
+              new_collection.push(data)
 
           @setState
             collection: new_collection

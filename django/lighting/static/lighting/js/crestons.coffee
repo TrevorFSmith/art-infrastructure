@@ -194,6 +194,31 @@ do ->
           "Send command"
 
 
+  class CrestonPagination extends React.Component
+
+    displayName: "Creston pagination"
+
+    constructor: (props) ->
+      super(props)
+
+    clickNextPage: ->
+      $('html').trigger("creston-next-page")
+
+    clickPrevPage: ->
+      $('html').trigger("creston-prev-page")
+
+    render: ->
+      if @props.pages
+        dom.div {className: "ui center aligned segment"},
+          if @props.prev
+            dom.button {className: "ui button margin-right", onClick: @clickPrevPage.bind(this)}, "Prev"
+          dom.span {className: "margin-right"}, "Page #{@props.page} of #{@props.pages}"
+          if @props.next
+            dom.button {className: "ui button", onClick: @clickNextPage.bind(this)}, "Next"
+      else
+        dom.div null, ""
+
+
   class Composer extends React.Component
 
     displayName: "Page Composer"
@@ -204,36 +229,86 @@ do ->
       @state =
         collection: collection
         no_records: if collection.length > 0 then false else true
+        count: @props.count
+        current_page: @getCurrentPage(@props.next, @props.prev)
+        next_page: @props.next
+        prev_page: @props.prev
 
     buildCrestons: ->
       @state.collection.map (creston) =>
         React.createElement(CrestonUnit, {creston: creston})
 
+    loadCrestons: (url) ->
+      @adapter = new Adapter(url)
+      @adapter.loadData (data) =>
+        if data.results.length > 0
+          @setState
+            collection: data.results
+            count: data.count
+            current_page: @getCurrentPage(data.next, data.previous)
+            next_page: data.next
+            prev_page: data.previous
+
+    getCurrentPage: (next_page, prev_page) ->
+      if next_page
+        return next_page.substr(next_page.length - 1) - 1
+      if prev_page
+        if prev_page.indexOf("?page=") != -1
+          return +prev_page.substr(prev_page.length - 1) + 1
+        else
+          return 2
+      return 1
+
+    getUrlCurrentPage: ->
+      return $('#root').data('url') + "?page=" + @state.current_page
 
     componentDidMount: ->
 
       $('html').on 'update-crestons', (event, data) =>
-        index          = _.findIndex @state.collection, {id: data.id}
-        new_collection = @state.collection
-
-        if index >= 0
-          new_collection[index] = data
+        if @state.next_page
+          $('html').trigger("creston-current-page")
         else
-          new_collection.push(data)
+          index          = _.findIndex @state.collection, {id: data.id}
+          new_collection = @state.collection
+          count          = @state.count
 
-        @setState
-          collection: new_collection
-          no_records: false
+          if index >= 0
+            new_collection[index] = data
+          else
+            if not @state.count or (@state.count % 9) == 0
+              $('html').trigger("creston-current-page")
+            else
+              count += 1
+              new_collection.push(data)
 
+          @setState
+            collection: new_collection
+            no_records: false
+            count: count
 
       $('html').on 'creston-deleted', (event, data) =>
+        count = @state.count - 1
+        if @state.next_page
+          $('html').trigger("creston-current-page")
+        else if @state.prev_page and (count % 9) == 0
+          $('html').trigger("creston-prev-page")
+        else
+          filtered_crestons = _.filter @state.collection, (creston) =>
+            creston.id != data.id
 
-        filtered_crestons = _.filter @state.collection, (creston) =>
-          creston.id != data.id
+          @setState
+            collection: filtered_crestons
+            no_records: if filtered_crestons.length > 0 then false else true
+            count: count
 
-        @setState
-          collection: filtered_crestons
-          no_records: if filtered_crestons.length > 0 then false else true
+      $('html').on 'creston-next-page', (event, data) =>
+        @loadCrestons(@state.next_page)
+
+      $('html').on 'creston-prev-page', (event, data) =>
+        @loadCrestons(@state.prev_page)
+
+      $('html').on 'creston-current-page', (event, data) =>
+        @loadCrestons(@getUrlCurrentPage())
 
     newCreston: ->
       $('html').trigger("edit-creston-dialog-new")
@@ -251,6 +326,9 @@ do ->
         dom.div {className: "ui three cards"},
           @buildCrestons()
         React.createElement(CrestonNoRecords, {output: @state.no_records})
+        React.createElement(CrestonPagination, {
+          page: @state.current_page, pages: Math.ceil(@state.count / 9), 
+          next: @state.next_page, prev: @state.prev_page})
         React.createElement(CrestonModal, {creston: {}})
 
 
@@ -270,6 +348,9 @@ do ->
         if data.results.length > 0
           ReactDOM.render(React.createElement(Composer, {
             collection: data.results,
+            count: data.count,
+            next: data.next,
+            prev: data.previous,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))
