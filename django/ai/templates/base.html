@@ -33,7 +33,7 @@
     <div id="content">
 
       <div class="ui menu">
-        <div class="header item">Art::Infrastructure</div>
+        <div class="header item">ArtManager</div>
         <a class="item" href="/">Dashboard</a>
         <a class="item" href="/">Artwork</a>
 
@@ -53,14 +53,8 @@
         <a class="item" href="/">Weather</a>
         <a class="item" href='{% url "heartbeat:index" %}'>System Status</a>
         <div class="right menu">
-          <div class="item">
-            <div class="ui action left icon input">
-              <input placeholder="Search" type="text">
-              <button class="ui button">Search</button>
-            </div>
-          </div>
+          <a class="item" href="/admin/">Admin</a>
         </div>
-        <a class="item" href="/admin/">Admin</a>
       </div>
 
       {% block content%}{% endblock %}
