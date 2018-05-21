@@ -146,7 +146,6 @@ do ->
     selectCommand: (creston_id) ->
       command = $("[data-object ='command-#{creston_id}'] option:selected").val()
       command = $.grep(@state.commands, (e) -> e.command == command)
-      console.log(command[0])
       @setState
         select_command: command[0]
 
@@ -161,8 +160,6 @@ do ->
       postData =
         id: creston_id
         command: command
-
-      console.log(postData)
 
       props = @props
       adapter.pushData "PUT", csrf_token, postData, ( (data) ->

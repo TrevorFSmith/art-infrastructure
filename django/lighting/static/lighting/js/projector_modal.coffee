@@ -75,6 +75,18 @@ class @ProjectorModal extends React.Component
     else
       "Add New Projector"
 
+  componentWillReceiveProps: (nextProps) ->
+    if(@props.projector.id != nextProps.projector.id)
+      @setState
+        id: nextProps.projector.id
+        name: nextProps.projector.name
+        pjlink_host: nextProps.projector.pjlink_host
+        pjlink_port: nextProps.projector.pjlink_port
+        pjlink_password: nextProps.projector.pjlink_password
+
+      $('html').on "edit-projector-dialog-#{nextProps.projector.id}", (event, scope) =>
+        $("[data-object='projector-#{nextProps.projector.id}']").modal("show")
+
   componentDidMount: ->
     $('html').on "edit-projector-dialog-#{@domNode()}", (event, scope) =>
       $("[data-object='projector-#{@domNode()}']").modal("show")
