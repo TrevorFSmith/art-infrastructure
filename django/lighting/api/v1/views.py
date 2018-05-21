@@ -58,7 +58,7 @@ class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
 
     def get(self, request, format=None):
         try:
-            creston = models.BACNetLight.objects.get(pk=id)
+            creston = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
             control = CrestonControl(creston.host, creston.port)
             control_info = control.query_status()
             #control_info = {'High': '55000', 'Current': '63098', 'Wake': '5:00 AM', 'Low': '63098', 'Lamp1': '2-1468', 'Sleep': '1:00 AM', 'Lamp2': '2-1469'}
