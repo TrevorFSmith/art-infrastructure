@@ -66,25 +66,23 @@ class IBootCommandViewSet(api_helpers.GenericApiEndpoint):
 
     def put(self, request, format=None):
         command = request.data.get("command")
-        id  = int(request.data.get("id"))
         try:
             if command not in ["cycle", "on", "off", "toggle"]:
                 return Response({"details": "Command '%s' not supported." % command}, status=status.HTTP_400_BAD_REQUEST)
 
-            iboot = models.IBootDevice.objects.get(pk=id)
+            iboot = models.IBootDevice.objects.get(pk=int(request.data.get("id")))
             control = IBootControl(settings.IBOOT_POWER_PASSWORD, iboot.ip)
             if command == 'cycle':
-                controller.cycle_power()
+                control.cycle_power()
             elif command == 'on':
-                controller.turn_on()
+                control.turn_on()
             elif command == 'off':
-                controller.turn_off()
+                control.turn_off()
             elif command == 'toggle':
-                controller.toggle()
+                control.toggle()
         except ObjectDoesNotExist:
             raise Http404
-        except: #SocketException:
+        except SocketException:
             return Response({"details": "Not able to connect to iBoot."}, status=status.HTTP_502_BAD_GATEWAY)
 
         return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)
-

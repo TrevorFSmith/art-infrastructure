@@ -43,16 +43,15 @@ class IBootControl:
 			msg = self.format_command(command)
 			sock.send(msg)
 			value = sock.recv(1024)
-			if value == '': 
+			if value == '':
 				sock.close()
 				return None
 			sock.close()
 			return value
 		except:
-			print pprint.pformat(traceback.format_exc()) 
+			print pprint.pformat(traceback.format_exc())
 		sock.close()
 		return None
 
 	def format_command(self, action):
 		return '\x1b%s\x1b%s\x0d' % (self.password, action)
-
