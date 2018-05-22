@@ -6,7 +6,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework import status
 
-from iboot.iboot_control import IBootControl
+from iboot.iboot_control import IBootControl, SocketException
 from django.conf import settings
 
 
