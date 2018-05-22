@@ -14,31 +14,38 @@ from lighting import models as lighting_models
 
 class ProjectorPriviligedEndpointTestCase(APITestCase):
 
+
     def setUp(self):
         admin_login(self)
+
 
     def test_get_200_for_privileged_user(self):
         response = self.client.get(reverse('lighting_api:projectors'))
         self.assertEqual(response.status_code, 200)
 
+
     def test_get_collection_of_projectors(self):
         ProjectorFactory()
         ProjectorFactory()
         response = self.client.get(reverse('lighting_api:projectors'))
+        response_content = json.loads(response.content)
 
-        self.assertEqual(len(json.loads(response.content)), 2)
+        self.assertEqual(response_content['count'], 2)
+        self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        object_keys = ["id", "name", "pjlink_host", "pjlink_port", "pjlink_password"].sort()
-        response_keys = json.loads(response.content)[0].keys().sort()
-        self.assertEqual(object_keys, response_keys)
+        all_keys = ["count", "next", "previous", "results"]
+        object_keys = ["id", "name", "pjlink_host", "pjlink_port", "pjlink_password", "commands"]
+        response_all_keys = response_content.keys()
+        response_object_keys = response_content['results'][0].keys()
+        self.assertEqual(sorted(all_keys), sorted(response_all_keys))
+        self.assertEqual(sorted(object_keys), sorted(response_object_keys))
 
 
     def test_delete_projector(self):
         projector = ProjectorFactory()
         count = lighting_models.Projector.objects.count()
-        response = self.client.delete(reverse('lighting_api:projectors'),
-                                   {"id": projector.pk})
+        response = self.client.delete(reverse('lighting_api:projectors'), {"id": projector.pk})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -85,18 +92,22 @@ class ProjectorPriviligedEndpointTestCase(APITestCase):
 
 class ProjectorUnpriviligedEndpointTestCase(APITestCase):
 
+
     def setUp(self):
         nonadmin_login(self)
+
 
     def test_get_403_for_unprivileged_user(self):
         response = self.client.get(reverse('lighting_api:projectors'))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(json.loads(response.content), {'detail':'You do not have permission to perform this action.'})
 
+
     def test_get_200_for_unprivileged_user(self):
         response = self.client.get(reverse('lighting_api:projectors'))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(json.loads(response.content), {'detail':'You do not have permission to perform this action.'})
+
 
     def test_get_collection_of_projectors(self):
         response = self.client.get(reverse('lighting_api:projectors'))
@@ -142,24 +153,32 @@ class ProjectorUnpriviligedEndpointTestCase(APITestCase):
 
 class BACNetLightPriviligedEndpointTestCase(APITestCase):
 
+
     def setUp(self):
         admin_login(self)
+
 
     def test_get_200_for_privileged_user(self):
         response = self.client.get(reverse('lighting_api:bacnet_lights'))
         self.assertEqual(response.status_code, 200)
 
+
     def test_get_collection_of_bacnet_lights(self):
         BACNetLightFactory()
         BACNetLightFactory()
         response = self.client.get(reverse('lighting_api:bacnet_lights'))
+        response_content = json.loads(response.content)
 
-        self.assertEqual(len(json.loads(response.content)), 2)
+        self.assertEqual(response_content['count'], 2)
+        self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        object_keys = ["id", "name", "device_id", "property_id"].sort()
-        response_keys = json.loads(response.content)[0].keys().sort()
-        self.assertEqual(object_keys, response_keys)
+        all_keys = ["count", "next", "previous", "results"]
+        object_keys = ["id", "name", "device_id", "property_id"]
+        response_all_keys = response_content.keys()
+        response_object_keys = response_content['results'][0].keys()
+        self.assertEqual(sorted(all_keys), sorted(response_all_keys))
+        self.assertEqual(sorted(object_keys), sorted(response_object_keys))
 
 
     def test_delete_bacnet_light(self):
@@ -209,18 +228,22 @@ class BACNetLightPriviligedEndpointTestCase(APITestCase):
 
 class BACNetLightUnpriviligedEndpointTestCase(APITestCase):
 
+
     def setUp(self):
         nonadmin_login(self)
+
 
     def test_get_403_for_unprivileged_user(self):
         response = self.client.get(reverse('lighting_api:bacnet_lights'))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(json.loads(response.content), {'detail':'You do not have permission to perform this action.'})
 
+
     def test_get_200_for_unprivileged_user(self):
         response = self.client.get(reverse('lighting_api:bacnet_lights'))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(json.loads(response.content), {'detail':'You do not have permission to perform this action.'})
+
 
     def test_get_collection_of_bacnet_lights(self):
         response = self.client.get(reverse('lighting_api:bacnet_lights'))
@@ -264,24 +287,32 @@ class BACNetLightUnpriviligedEndpointTestCase(APITestCase):
 
 class CrestonPriviligedEndpointTestCase(APITestCase):
 
+
     def setUp(self):
         admin_login(self)
+
 
     def test_get_200_for_privileged_user(self):
         response = self.client.get(reverse('lighting_api:crestons'))
         self.assertEqual(response.status_code, 200)
 
+
     def test_get_collection_of_crestons(self):
         CrestonFactory()
         CrestonFactory()
         response = self.client.get(reverse('lighting_api:crestons'))
+        response_content = json.loads(response.content)
 
-        self.assertEqual(len(json.loads(response.content)), 2)
+        self.assertEqual(response_content['count'], 2)
+        self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        object_keys = ["id", "name", "pjlink_host", "pjlink_port", "pjlink_password"].sort()
-        response_keys = json.loads(response.content)[0].keys().sort()
-        self.assertEqual(object_keys, response_keys)
+        all_keys = ["count", "next", "previous", "results"]
+        object_keys = ["id", "name", "host", "port", "commands"]
+        response_all_keys = response_content.keys()
+        response_object_keys = response_content['results'][0].keys()
+        self.assertEqual(sorted(all_keys), sorted(response_all_keys))
+        self.assertEqual(sorted(object_keys), sorted(response_object_keys))
 
 
     def test_delete_creston(self):
@@ -331,18 +362,22 @@ class CrestonPriviligedEndpointTestCase(APITestCase):
 
 class CrestonUnpriviligedEndpointTestCase(APITestCase):
 
+
     def setUp(self):
         nonadmin_login(self)
+
 
     def test_get_403_for_unprivileged_user(self):
         response = self.client.get(reverse('lighting_api:crestons'))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(json.loads(response.content), {'detail':'You do not have permission to perform this action.'})
 
+
     def test_get_200_for_unprivileged_user(self):
         response = self.client.get(reverse('lighting_api:crestons'))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(json.loads(response.content), {'detail':'You do not have permission to perform this action.'})
+
 
     def test_get_collection_of_crestons(self):
         response = self.client.get(reverse('lighting_api:crestons'))

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 import factory
 from lighting import models as lighting_models
+from iboot import models as iboot_models
 
 
 class ProjectorFactory(factory.django.DjangoModelFactory):
@@ -32,3 +33,13 @@ class CrestonFactory(factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: 'Creston {}'.format(n))
     host = factory.Sequence(lambda n: '10.0.{}.{}'.format(n, n))
     port = factory.Sequence(lambda n: '{}'.format(n))
+
+
+class IBootFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = iboot_models.IBootDevice
+
+    name = factory.Sequence(lambda n: 'iBoot {}'.format(n))
+    mac_address = factory.Sequence(lambda n: '00-0D-AD-01-94-6{}'.format(n))
+    ip = '127.0.0.1'

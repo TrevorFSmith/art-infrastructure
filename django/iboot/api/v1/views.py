@@ -58,7 +58,7 @@ class IBootCommandViewSet(api_helpers.GenericApiEndpoint):
             control_status = control.query_iboot_state()
         except ObjectDoesNotExist:
             raise Http404
-        except: #SocketException:
+        except SocketException:
             control_status = None
 
         return Response({'control_status':control_status})
