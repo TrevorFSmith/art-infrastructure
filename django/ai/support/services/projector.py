@@ -3,7 +3,7 @@ import thread
 import time
 import datetime
 
-host = '127.0.0.1'
+host = "127.0.0.1"
 port = 4352
 buff = 512
 addr = (host, port)
@@ -64,10 +64,11 @@ thread.start_new_thread(push, ())
 
 while True:
     try:
-        print "Projector server is listening for connections on port %s host %h\n" % (port, host)
+        print("Projector server is listening for connections on port %s host %s\n" % (port, host))
         clientsocket, clientaddr = serversocket.accept()
         clients.append(clientsocket)
         thread.start_new_thread(handler, (clientsocket, clientaddr))
     except KeyboardInterrupt:
         print "Closing Projector server socket..."
         serversocket.close()
+
