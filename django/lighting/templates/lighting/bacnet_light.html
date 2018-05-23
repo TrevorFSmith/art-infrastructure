@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block subtitle %}{{ light.name }} | {% endblock %}
+
+{% block style %}
+#content th { padding-right: 10px }
+.error-message { color: #F22; }
+{% endblock %}
+
+{% block content%}
+<h1><a href="{% url lighting.views.index %}">Lighting</a>: {{ light.name }}</h1>
+<table>
+	<tr><th>Device ID:</th><td>{{ light.device_id }}</td></tr>
+	<tr><th>Property ID:</th><td>{{ light.property_id }}</td></tr>
+</table>
+
+<h3>Set the level:</h3>
+{% ifequal light_value None %}
+   <p class="error-message">
+      Could not read the current value!
+      <a href="{% url lighting.api_views.bacnet_light_value light.id %}">see output</a>
+   </p>
+{% endifequal %}
+<form action="." method="post">
+   {{ light_control_form }}
+	<input type="submit" value="set value" />
+	{% csrf_token %}
+</form>
+
+{% endblock %}
+
+/* Copyright 2009 GORBET + BANERJEE (http://www.gorbetbanerjee.com/) Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. */

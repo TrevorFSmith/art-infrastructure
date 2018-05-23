@@ -1,6 +1,10 @@
-
+from common_settings import *
 
 SECRET_KEY = 'YOUR KEY GOES HERE'
+
+#from scheduler import TestTask
+#SCHEDULED_TASKS = [TestTask(5, 0), ]
+SCHEDULED_TASKS = []
 
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 DATABASES = {
@@ -8,8 +12,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'ai',
         'USER': 'postgres',
-        'password': 'moo',
+        'PASSWORD': 'moo',
         'HOST': '127.0.0.1',
         'PORT': '5432'
     }
 }
+
+BACNET_BIN_DIR = '/usr/local/src/bacnet-stack-0.5.3/bin'

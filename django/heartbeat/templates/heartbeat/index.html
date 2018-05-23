@@ -1,22 +1,10 @@
-{% extends "heartbeat/base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
 
-{% block subtitle %}Heartbeat | {% endblock %}
+{% block subtitle %} Heartbeat {% endblock %}
 
-{% block head-extras-page %}
-	<style>
-	</style>
-{% endblock %}
+{% block content %}
 
-{% block script-extras-page %}
-	<script>
-		document.addEventListener('DOMContentLoaded', ()=>{
-			try {
-				window.pageView = new heartbeat.ui.IndexPageComponent()
-				document.getElementById('page-component').appendChild(window.pageView.el)
-			} catch (e) {
-				console.error(e)
-			}
-		})
-	</script>	
+This view will be removed since this module will be merged with the Art module.
+
 {% endblock %}
