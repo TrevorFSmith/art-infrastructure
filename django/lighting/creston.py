@@ -1,9 +1,17 @@
 """This sets the values of the projector dimming control panel via the network"""
 import socket
 import traceback
+from socket import error as socket_error
 
 
 BUFF = 1024
+
+
+class SocketException(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
 
 
 class CrestonControl(object):
@@ -13,17 +21,31 @@ class CrestonControl(object):
         self.host = host
         self.port = port
         self.timeout = timeout
-        self.sock = None
 
-    def can_connect(self): return self.ping() == 'Pong'
 
-    def ping(self): return self.send_command('Ping')
+    def can_connect(self):
+        return self.ping() == 'Pong'
 
-    def raise_high(self): return self.send_command('HighLvlUp')
-    def lower_high(self): return self.send_command('HighLvlDown')
 
-    def raise_low(self): return self.send_command('DimLvlUp')
-    def lower_low(self): return self.send_command('DimLvlDown')
+    def ping(self): 
+        return self.send_command('Ping')
+
+
+    def raise_high(self):
+        return self.send_command('HighLvlUp')
+
+
+    def lower_high(self):
+        return self.send_command('HighLvlDown')
+
+
+    def raise_low(self):
+        return self.send_command('DimLvlUp')
+
+
+    def lower_low(self): 
+        return self.send_command('DimLvlDown')
+
 
     def query_status(self):
         """
@@ -44,13 +66,17 @@ class CrestonControl(object):
         if result == None: return None
         return result == 'DimEnabled'
 
+
     def close(self):
         if self.sock:
             self.sock.shutdown(socket.SHUT_RDWR)
             self.sock.close()
             self.sock = None
 
-    def format_command(self, command): return '%s%s' % (command, '\r\n')
+
+    def format_command(self, command): 
+        return '%s%s' % (command, '\r\n')
+
 
     def send_command(self, command, lines=1):
         """
@@ -59,30 +85,29 @@ class CrestonControl(object):
         if lines > 1: it returns an array of strings
         Returns None if it can't control the device.
         """
-
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(self.timeout)
         try:
-            self.sock.connect((self.host, self.port))
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(self.timeout)
+            sock.connect((self.host, self.port))
             msg = self.format_command(command)
-            self.sock.send(msg)
+            sock.send(msg)
             results = []
 
             for i in range(lines):
-                value = self.sock.recv(BUFF)
-                if len(value.strip()) == 0: continue
+                value = sock.recv(BUFF)
+                if len(value.strip()) == 0:
+                    continue
                 results.append(value.strip())
 
             if len(results) == 0:
-                self.close()
+                sock.close()
                 return None
 
             if lines == 1:
-                self.close()
+                sock.close()
                 return results[0]
 
             return results
-        except:
-            self.close()
-            traceback.print_exc()
-        return None
+        except socket_error as serr:
+            sock.close()
+            raise SocketException(serr)

@@ -4,9 +4,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from rest_framework.exceptions import PermissionDenied
 
-from lighting.pjlink import PJLinkController, PJLinkProtocol, SocketException
+from lighting.pjlink import PJLinkController, PJLinkProtocol, SocketException as PJLinkSocketException
 from lighting.bacnet import BacnetControl
-from lighting.creston import CrestonControl
+from lighting.creston import CrestonControl, SocketException as CrestonSocketException
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -85,7 +85,7 @@ class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
             # Please use result and pass it to the UI and render it there.
         except ObjectDoesNotExist:
             raise Http404
-        except: #SocketException:
+        except CrestonSocketException:
             return Response({"details": "Not able to connect to creston."}, status=status.HTTP_502_BAD_GATEWAY)
 
         return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)
@@ -153,7 +153,7 @@ class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
 
         except ObjectDoesNotExist:
             raise Http404
-        except SocketException:
+        except PJLinkSocketException:
             return Response({"details": "Not able to connect to projector."}, status=status.HTTP_502_BAD_GATEWAY)
 
         projector_serializer = serializers.ProjectorSerializer(projector)

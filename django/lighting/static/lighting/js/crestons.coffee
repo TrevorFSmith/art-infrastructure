@@ -155,6 +155,7 @@ do ->
       command    = @state.select_command.command
 
       $("[data-object='command-#{creston_id}-#{command}']").toggleClass("loading")
+      $("[data-object ='command-#{creston_id}']").prop("disabled", true)
 
       adapter  = new Adapter(url)
       postData =
@@ -171,6 +172,7 @@ do ->
       ), () ->
         # request finished
         $("[data-object='command-#{creston_id}-#{command}']").toggleClass("loading")
+        $("[data-object ='command-#{creston_id}']").prop("disabled", false)
 
     render: ->
       dom.div null, "",

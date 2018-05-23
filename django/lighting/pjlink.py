@@ -300,4 +300,5 @@ class PJLinkController:
             return response
 
         except socket_error as serr:
+            sock.close()
             raise SocketException(serr)
