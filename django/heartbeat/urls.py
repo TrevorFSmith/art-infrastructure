@@ -2,8 +2,11 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.conf.urls import include
 
-import heartbeat.views as heartbeat_views
+from heartbeat import views
 
 urlpatterns = [
-    url(r'^$', heartbeat_views.index, name='index'),
+    #
+    # TODO: use class based view
+    #
+    url(r'^$', views.index, name='index'),
 ]

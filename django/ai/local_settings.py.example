@@ -1,6 +1,6 @@
-SECRET_KEY = 'YOUR KEY GOES HERE'
+from common_settings import *
 
-CRESTON_CONTROL_HOST = '1.1.1.1'
+SECRET_KEY = 'YOUR KEY GOES HERE'
 
 #from scheduler import TestTask
 #SCHEDULED_TASKS = [TestTask(5, 0), ]
@@ -17,3 +17,5 @@ DATABASES = {
         'PORT': '5432'
     }
 }
+
+BACNET_BIN_DIR = '/usr/local/src/bacnet-stack-0.5.3/bin'

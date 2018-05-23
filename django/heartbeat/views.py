@@ -20,21 +20,30 @@ CLEAN_HEARTBEATS_PARAMETER = 'clean_heartbeats'
 
 
 def index(request):
+    # this should be removed
+    return render(request, "heartbeat/index.html", {})
 
-    if request.GET.has_key(INSTALLATION_ID_PARAMETER):
-        id = int(request.GET[INSTALLATION_ID_PARAMETER])
-        info = request.GET.get(INFO_PARAMETER, None)
-        try:
-            installation = Installation.objects.get(pk=id)
-            heartbeat = Heartbeat(installation=installation, info=info)
-            heartbeat.save()
-        except:
-            logger.exception("Received heartbeat for unknown installation id: %s from IP# %s" % (id, request.META['REMOTE_ADDR']))
 
-    if request.GET.has_key(CLEAN_HEARTBEATS_PARAMETER):
-        Heartbeat.objects.delete_old_heartbeats()
+#
+# TODO: move to API view
+# this is going to be a part of Art module.
+#
+# def index(request):
 
-    return render(request, 'heartbeat/index.html', {
-        'installations':Installation.objects.all_open(),
-        'heartbeats':Heartbeat.objects.all()
-    })
+#     if request.GET.has_key(INSTALLATION_ID_PARAMETER):
+#         id = int(request.GET[INSTALLATION_ID_PARAMETER])
+#         info = request.GET.get(INFO_PARAMETER, None)
+#         try:
+#             installation = Installation.objects.get(pk=id)
+#             heartbeat = Heartbeat(installation=installation, info=info)
+#             heartbeat.save()
+#         except:
+#             logger.exception("Received heartbeat for unknown installation id: %s from IP# %s" % (id, request.META['REMOTE_ADDR']))
+
+#     if request.GET.has_key(CLEAN_HEARTBEATS_PARAMETER):
+#         Heartbeat.objects.delete_old_heartbeats()
+
+#     return render(request, 'heartbeat/index.html', {
+#         'installations':Installation.objects.all_open(),
+#         'heartbeats':Heartbeat.objects.all()
+#     })

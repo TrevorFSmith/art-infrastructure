@@ -1,38 +1,39 @@
-{% load staticfiles %}
+{% load staticfiles compress %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, shrink-to-fit=no">
-		<meta http-equiv="x-ua-compatible" content="ie=edge">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-		<title>{% block subtitle %}{% endblock %}{{ site.name }}</title>
+    <title>{% block subtitle %}{% endblock %}{{ site.name }}</title>
 
-		<link rel="stylesheet" href="{% static 'css/base.css' %}" type='text/css'>
-		<link rel="stylesheet" href="{% static 'css/admin.css' %}" type='text/css'>
-		<link rel="stylesheet" href="{% static 'vendor/css/semantic.min.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'shared/css/base.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'shared/css/admin.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'vendor/css/semantic.min.css' %}" type='text/css'>
 
-		{% block head-extras-app %}{% endblock %}
-		{% block head-extras-page %}{% endblock %}
-	</head>
-	<body class="{% block body-classes %}{% endblock %}">
-		<div id="page-component"></div>
+    <script src="{% static 'vendor/js/react.production.min.js' %}"></script>
+    <script src="{% static 'vendor/js/react-dom.production.min.js' %}"></script>
+    <script src="{% static 'vendor/js/jquery-2.2.4.min.js' %}"></script>
+    <script src="{% static 'vendor/js/semantic.min.js' %}"></script>
+    <script src="{% static 'vendor/js/lodash.js' %}"></script>
 
-    <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+    <script src="{% static 'shared/js/base.js' %}"></script>
 
-    <script
-			src="http://code.jquery.com/jquery-2.2.4.min.js"
-			integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-			crossorigin="anonymous"></script>
+    {% compress js %}
+    <script type="text/coffeescript" charset="utf-8" src="{% static 'instrument/adapter.coffee' %}"></script>
+    {% endcompress %}
 
-		<script src="{% static 'vendor/js/semantic.min.js' %}"></script>
-		<script src="{% static 'js/base.js' %}"></script>
+    {% block head-extras-app %}{% endblock %}
+    {% block head-extras-page %}{% endblock %}
+  </head>
+  <body>
+    <div id="page-component"></div>
 
-		<div id="content">
+    <div id="content">
 
       <div class="ui menu">
-        <div class="header item">Art::Infrastructure</div>
+        <div class="header item">ArtManager</div>
         <a class="item" href="/">Dashboard</a>
         <a class="item" href="/">Artwork</a>
 
@@ -40,33 +41,28 @@
           Lighting
           <i class="dropdown icon"></i>
           <div class="menu transition hidden" tabindex="-1">
-            <div class="item" href='{% url "lighting:bacnet_lights" %}'>BACnet light</div>
+            <a class="item" href='{% url "lighting:bacnet_lights" %}'>BACNet Service</a>
             <div class="divider"></div>
-            <div class="item" href='{% url "lighting:projectors" %}'>Projectors</div>
+            <a class="item" href='{% url "lighting:projectors" %}'>Projectors</a>
             <div class="divider"></div>
-            <div class="item" href='{% url "lighting:crestons" %}'>Creston</div>
+            <a class="item" href='{% url "lighting:crestons" %}'>Creston</a>
           </div>
         </div>
 
-        <a class="item" href="/">Scheduler</a>
+        <a class="item" href='{% url "iboot:iboots" %}'>iBoot</a>
         <a class="item" href="/">Weather</a>
         <a class="item" href='{% url "heartbeat:index" %}'>System Status</a>
         <div class="right menu">
-          <div class="item">
-            <div class="ui action left icon input">
-              <input placeholder="Search" type="text">
-              <button class="ui button">Search</button>
-            </div>
-          </div>
+          <a class="item" href="/admin/">Admin</a>
         </div>
-        <a class="item" href="/admin/">Admin</a>
       </div>
 
       {% block content%}{% endblock %}
 
     </div>
 
-		{% block script-extras-app %}{% endblock %}
-		{% block script-extras-page %}{% endblock %}
-	</body>
+    {% block script-extras-app %}{% endblock %}
+    {% block script-extras-page %}{% endblock %}
+
+  </body>
 </html>

@@ -1,10 +1,9 @@
-#!/usr/bin/python
 """Classes which are useful when controlling projectors using the PJLink protocol.
     Information on the PJLink protocol can be found here: http://pjlink.jbmia.or.jp/english/
 """
 import socket
-import pprint, traceback
-import sys, time
+from socket import error as socket_error
+
 
 class PJLinkProtocol:
     """Holds the constants for the PJLink protocol"""
@@ -51,6 +50,9 @@ class PJLinkProtocol:
     CLASS_INFO = "CLSS"
     AUTHENTICATE = "PJLINK"
 
+    # Extra COMMANDS
+    DELETE = "delete"
+
     # RESPONSE
     OK = "OK"
     ERROR_1 = "ERR1"
@@ -68,11 +70,20 @@ class PJLinkProtocol:
     ERROR_STATUS_WARNING = "1"
     ERROR_STATUS_ERROR = "2"
 
+
+class SocketException(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+
 class PJLinkAuthenticationException(Exception):
     def __init__(self, value):
         self.value = value
     def __str__(self):
         return repr(self.value)
+
 
 class PJLinkAuthenticationRequest:
     """A codec for the PJLink request from the projector for authentication or an indicator that no authentication is required."""
@@ -114,6 +125,7 @@ class PJLinkAuthenticationRequest:
         """Generate a random seed string which is four numbers, each in two character ASCII hex format"""
         return ''.join([('%x' % random.randint(0,255)) for i in range(4)])
 
+
 class PJLinkCommandLine:
     """Encoding and decoding methods for PJLink commands
         Encoded command lines are of the following format:
@@ -146,6 +158,7 @@ class PJLinkCommandLine:
         command = encoded_command[1:5]
         data = encoded_command[6:len(encoded_command_line) - 1]
         return PJLinkCommandLine(command, data, version, auth_token)
+
 
 class PJLinkResponse:
     """Encoding and decoding methods for PJLink responses from the projector
@@ -182,6 +195,7 @@ class PJLinkResponse:
             return PJLinkResponse(command, data, version)
         if encoded_command_line.startswith('%s=%s' % (PJLinkProtocol.AUTHENTICATE, PJLinkProtocol.INVALID_PASSWORD_ERROR)):
             return PJLinkResponse(PJLinkProtocol.AUTHENTICATE, PJLinkProtocol.INVALID_PASSWORD_ERROR)
+
 
 class PJLinkController:
     """A command object for projectors which are controlled using the PJLink protocol"""
@@ -255,75 +269,35 @@ class PJLinkController:
     def query_class_info(self): return self._send_command_line(PJLinkCommandLine(PJLinkProtocol.CLASS_INFO, PJLinkProtocol.QUERY, self.version)).data
 
     def _send_command_line(self, command_line):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(15)
-        sock.connect((self.host, self.port))
-        encoded_auth_request = sock.recv(512)
-        auth_request = PJLinkAuthenticationRequest.decode(encoded_auth_request)
-        if auth_request.seed:
-            if self.password:
-                command_line.authentication_hash = PJLinkAuthenticationRequest.generate_hash(auth_request.seed, self.password)
-            else:
-                sock.close()
-                raise PJLinkAuthenticationException('The Projector requires a password, but we have none')
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(15)
+            sock.connect((self.host, self.port))
+            encoded_auth_request = sock.recv(512)
 
-        #print 'sending', command_line.encode()
-        sock.send(command_line.encode())
-        encoded_response = sock.recv(512)
-        #print 'received', encoded_response
-        sock.close()
-        if encoded_response == '': encoded_response = None
-        response = PJLinkResponse.decode(encoded_response)
-        if response.command == PJLinkProtocol.AUTHENTICATE and response.data == PJLinkProtocol.INVALID_PASSWORD_ERROR:
-            raise PJLinkAuthenticationException('The projector rejected our password')
-        return response
+            auth_request = PJLinkAuthenticationRequest.decode(encoded_auth_request)
 
-USAGE_MESSAGE = 'usage: pjlink [projector|name|on|off|mute|unmute|mute-status] <host> <password>'
+            if auth_request.seed:
+                if self.password:
+                    command_line.authentication_hash = PJLinkAuthenticationRequest.generate_hash(auth_request.seed, self.password)
+                else:
+                    sock.close()
+                    raise PJLinkAuthenticationException('The Projector requires a password, but we have none')
 
-def main():
-    try:
-        action = sys.argv[1]
-    except IndexError:
-        print USAGE_MESSAGE
-        return
-    if action == 'name':
-        controller = PJLinkController(host=sys.argv[2], password=sys.argv[3])
-        print controller.query_name()
-    elif action == 'off':
-        controller = PJLinkController(host=sys.argv[2], password=sys.argv[3])
-        controller.power_off()
-    elif action == 'on':
-        controller = PJLinkController(host=sys.argv[2], password=sys.argv[3])
-        controller.power_on()
-    elif action == 'status':
-        controller = PJLinkController(host=sys.argv[2], password=sys.argv[3])
-        print controller.query_power()
-    elif action == 'mute':
-        controller = PJLinkController(host=sys.argv[2], password=sys.argv[3])
-        print controller.set_mute(PJLinkProtocol.VIDEO_MUTE_ON)
-    elif action == 'unmute':
-        controller = PJLinkController(host=sys.argv[2], password=sys.argv[3])
-        print controller.set_mute(PJLinkProtocol.VIDEO_MUTE_OFF)
-    elif action == 'mute-status':
-        controller = PJLinkController(host=sys.argv[2], password=sys.argv[3])
-        print "(audio is muted, video is muted): (%s, %s)"  % controller.query_mute()
-    elif action == 'projector':
-        from tests.test_lighting import MockPJLinkProjector
-        projector = MockPJLinkProjector()
-        projector.port = 4352
-        projector.start()
-        seconds_to_wait = 5
-        while projector.running == False and seconds_to_wait > 0:
-            time.sleep(1)
-            seconds_to_wait -= 1
-        if not projector.running:
-            print 'Could not start the projector'
-            return
-        print 'Projector running: %s:%s' % (projector.server.getsockname()[0], projector.server.getsockname()[1])
-        while True: time.sleep(100)
-    else:
-        print USAGE_MESSAGE
-        return
+            #print 'sending', command_line.encode()
+            sock.send(command_line.encode())
+            encoded_response = sock.recv(512)
+            #print 'received', encoded_response
 
-if __name__ == "__main__":
-    main()
+            sock.close()
+
+            if encoded_response == '': encoded_response = None
+            response = PJLinkResponse.decode(encoded_response)
+
+            if response.command == PJLinkProtocol.AUTHENTICATE and response.data == PJLinkProtocol.INVALID_PASSWORD_ERROR:
+                raise PJLinkAuthenticationException('The projector rejected our password')
+
+            return response
+
+        except socket_error as serr:
+            raise SocketException(serr)
