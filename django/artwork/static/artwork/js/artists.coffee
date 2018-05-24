@@ -14,9 +14,9 @@ do ->
   "use strict"
 
 
-  class IBootUnitHeader extends React.Component
+  class ArtistUnitHeader extends React.Component
 
-    displayName: "iBoot Header"
+    displayName: "Artist Header"
 
     constructor: (props) ->
       super(props)
@@ -25,89 +25,59 @@ do ->
       dom.div {className: "extra content"},
         dom.h3 {className: "left floated"},
           dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.iboot.name
+          dom.span null, @props.data.artist.name
 
 
-  class IBootUnitBody extends React.Component
+  class ArtistUnitBody extends React.Component
 
-    displayName: "iBoot Body"
+    displayName: "Artist Body"
 
     constructor: (props) ->
       super(props)
       @state = @state || {}
 
-    editIBoot: (data) ->
-      $('html').trigger("edit-iboot-dialog-#{data.iboot.id}", data)
+    editArtist: (data) ->
+      $('html').trigger("edit-artist-dialog-#{data.artist.id}", data)
 
-    sendCommand: (cmd) ->
-
-      url        = $("#root").data("command-url")
-      csrf_token = $("#root").data("csrf_token")
-      iboot_id = @props.data.iboot.id
-
-      $("[data-object='command-#{iboot_id}-#{cmd}']").toggleClass("loading")
-
-      adapter  = new Adapter(url)
-      postData =
-        id: iboot_id
-        command: cmd
-
-      props = @props
-      adapter.pushData "PUT", csrf_token, postData, ( (data) ->
-        # request ok
-        $('html').trigger('show-dialog', {message: data.details})
-      ), ( (data, status) ->
-        # request failed
-        $('html').trigger('show-dialog', {message: data.responseJSON.details})
-      ), () ->
-        # request finished
-        $("[data-object='command-#{iboot_id}-#{cmd}']").toggleClass("loading")
-
-    removeIBoot: (iboot_id) ->
+    removeArtist: (artist_id) ->
 
       if confirm "Are you sure?"
 
         url        = $("#root").data("url")
         csrf_token = $("#root").data("csrf_token")
 
-        $("[data-object ='iboot-#{iboot_id}']").toggleClass("loading")
+        $("[data-object ='artist-#{artist_id}']").toggleClass("loading")
 
         adapter  = new Adapter(url)
         postData =
-          id: iboot_id
+          id: artist_id
 
-        scope = this
         adapter.delete csrf_token, postData, ( (data, status) ->
           # request ok
-          $('html').trigger('iboot-deleted', data)
+          $('html').trigger('artist-deleted', data)
         ), ( (data, status) ->
           # request failed
         ), () ->
           # request finished
-          $("[data-object='iboot-#{iboot_id}']").toggleClass("loading")
-
+          $("[data-object='artist-#{artist_id}']").toggleClass("loading")
 
     render: ->
-      scope = this
+      date_time = @props.data.artist.created.substr(0, 10) + " " +
+                  @props.data.artist.created.substr(11, 8)
       dom.div {className: "content"},
 
-        dom.h3 null, "Mac: #{@props.data.iboot.mac_address} | IP: #{@props.data.iboot.ip}"
-
-        @props.data.iboot.commands.map (cmd) ->
-          dom.div
-            className: "button ui mini"
-            "data-object": "command-#{scope.props.data.iboot.id}-#{cmd.command}"
-            onClick: scope.sendCommand.bind(scope, cmd.command)
-          , "",
-            dom.i {className: "cog icon"}, ""
-            cmd.title
+        dom.p null, "Email:   #{@props.data.artist.email}"
+        dom.p null, "Phone:   #{@props.data.artist.phone}"
+        dom.p null, "URL:     #{@props.data.artist.url}"
+        dom.p null, "Notes:   #{@props.data.artist.notes}"
+        dom.p null, "Created: #{date_time}"
 
         dom.h3 null, "Actions"
 
         dom.div {className: "ui buttons mini"},
           dom.button
             className: "ui button"
-            onClick: @editIBoot.bind(this, @props.data)
+            onClick: @editArtist.bind(this, @props.data)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
@@ -116,30 +86,30 @@ do ->
 
           dom.button
             className: "ui button negative"
-            onClick: @removeIBoot.bind(this, @props.data.iboot.id)
+            onClick: @removeArtist.bind(this, @props.data.artist.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(IBootModal, {iboot: @props.data.iboot})
+        React.createElement(ArtistModal, {artist: @props.data.artist})
 
 
-  class IBootUnit extends React.Component
+  class ArtistUnit extends React.Component
 
-    displayName: "iBoot Unit"
+    displayName: "Artist Unit"
 
     constructor: (props) ->
       super(props)
 
     render: ->
         dom.div {className: "ui card"},
-          React.createElement(IBootUnitHeader, {data: @props})
-          React.createElement(IBootUnitBody, {data: @props})
+          React.createElement(ArtistUnitHeader, {data: @props})
+          React.createElement(ArtistUnitBody, {data: @props})
 
 
-  class IBootNoRecords extends React.Component
+  class ArtistNoRecords extends React.Component
 
-    displayName: "iBoot no records"
+    displayName: "Artist no records"
 
     constructor: (props) ->
       super(props)
@@ -151,18 +121,18 @@ do ->
         dom.h3 null, ""
 
 
-  class IBootPagination extends React.Component
+  class ArtistPagination extends React.Component
 
-    displayName: "iBoot pagination"
+    displayName: "Artist pagination"
 
     constructor: (props) ->
       super(props)
 
     clickNextPage: ->
-      $('html').trigger("iboot-next-page")
+      $('html').trigger("artist-next-page")
 
     clickPrevPage: ->
-      $('html').trigger("iboot-prev-page")
+      $('html').trigger("artist-prev-page")
 
     render: ->
       if @props.pages
@@ -191,11 +161,11 @@ do ->
         next_page: @props.next
         prev_page: @props.prev
 
-    buildIBoots: ->
-      @state.collection.map (iboot) =>
-        React.createElement(IBootUnit, {iboot: iboot})
+    buildArtists: ->
+      @state.collection.map (artist) =>
+        React.createElement(ArtistUnit, {artist: artist})
 
-    loadIBoots: (url) ->
+    loadArtists: (url) ->
       @adapter = new Adapter(url)
       @adapter.loadData (data) =>
         if data.results.length > 0
@@ -220,9 +190,9 @@ do ->
       return $('#root').data('url') + "?page=" + @state.current_page
 
     componentDidMount: ->
-      $('html').on 'update-iboots', (event, data) =>
+      $('html').on 'update-artists', (event, data) =>
         if @state.next_page
-          $('html').trigger("iboot-current-page")
+          $('html').trigger("artist-current-page")
         else
           index          = _.findIndex @state.collection, {id: data.id}
           new_collection = @state.collection
@@ -232,7 +202,7 @@ do ->
             new_collection[index] = data
           else
             if not @state.count or (@state.count % 9) == 0
-              $('html').trigger("iboot-current-page")
+              $('html').trigger("artist-current-page")
             else
               count += 1
               new_collection.push(data)
@@ -243,50 +213,50 @@ do ->
             count: count
 
 
-      $('html').on 'iboot-deleted', (event, data) =>
+      $('html').on 'artist-deleted', (event, data) =>
         count = @state.count - 1
         if @state.next_page
-          $('html').trigger("iboot-current-page")
+          $('html').trigger("artist-current-page")
         else if @state.prev_page and (count % 9) == 0
-          $('html').trigger("iboot-prev-page")
+          $('html').trigger("artist-prev-page")
         else
-          filtered_iboots = _.filter @state.collection, (iboot) =>
-            iboot.id != data.id
+          filtered_artists = _.filter @state.collection, (artist) =>
+            artist.id != data.id
 
           @setState
-            collection: filtered_iboots
-            no_records: if filtered_iboots.length > 0 then false else true
+            collection: filtered_artists
+            no_records: if filtered_artists.length > 0 then false else true
             count: count
 
-      $('html').on 'iboot-next-page', (event, data) =>
-        @loadIBoots(@state.next_page)
+      $('html').on 'artist-next-page', (event, data) =>
+        @loadArtists(@state.next_page)
 
-      $('html').on 'iboot-prev-page', (event, data) =>
-        @loadIBoots(@state.prev_page)
+      $('html').on 'artist-prev-page', (event, data) =>
+        @loadArtists(@state.prev_page)
 
-      $('html').on 'iboot-current-page', (event, data) =>
-        @loadIBoots(@getUrlCurrentPage())
+      $('html').on 'artist-current-page', (event, data) =>
+        @loadArtists(@getUrlCurrentPage())
 
-    newIBoot: ->
-      $('html').trigger("edit-iboot-dialog-new")
+    newArtist: ->
+      $('html').trigger("edit-artist-dialog-new")
 
     render: ->
       dom.div null,
         dom.h2 className: "ui dividing header",
-          "iBoot::iBoots"
+          "Artwork::Artists"
           dom.button
             className: "button ui mini right floated positive"
-            onClick: @newIBoot.bind(this)
+            onClick: @newArtist.bind(this)
           , "",
             dom.i {className: "plus icon"}, ""
-            "New iBoot"
+            "New artist"
         dom.div {className: "ui three cards"},
-          @buildIBoots()
-        React.createElement(IBootNoRecords, {output: @state.no_records})
-        React.createElement(IBootPagination, {
-          page: @state.current_page, pages: Math.ceil(@state.count / 9), 
+          @buildArtists()
+        React.createElement(ArtistNoRecords, {output: @state.no_records})
+        React.createElement(ArtistPagination, {
+          page: @state.current_page, pages: Math.ceil(@state.count / 9),
           next: @state.next_page, prev: @state.prev_page})
-        React.createElement(IBootModal, {iboot: {}})
+        React.createElement(ArtistModal, {artist: {}})
 
 
   class Visualizer

@@ -48,6 +48,7 @@ class IBootViewSet(api_helpers.GenericApiEndpoint):
 
         return Response({"id": iboot_id}, status=status.HTTP_200_OK)
 
+
 class IBootCommandViewSet(api_helpers.GenericApiEndpoint):
 
 

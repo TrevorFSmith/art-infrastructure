@@ -35,7 +35,30 @@
       <div class="ui menu">
         <div class="header item">ArtManager</div>
         <a class="item" href="/">Dashboard</a>
-        <a class="item" href="/">Artwork</a>
+
+        <div class="ui dropdown item" tabindex="0">
+          Artwork
+          <i class="dropdown icon"></i>
+          <div class="menu transition hidden" tabindex="-1">
+            <a class="item" href='{% url "artwork:artists" %}'>Artists</a>
+            <div class="divider"></div>
+            <a class="item" href='{% url "artwork:artist_groups" %}'>Artist Groups</a>
+            <div class="divider"></div>
+            <a class="item" href='{% url "artwork:photos" %}'>Photos</a>
+            <div class="divider"></div>
+            <a class="item" href='{% url "artwork:documents" %}'>Documents</a>
+            <div class="divider"></div>
+            <a class="item" href='{% url "artwork:equipment_types" %}'>Equipment Types</a>
+            <div class="divider"></div>
+            <a class="item" href='{% url "artwork:equipments" %}'>Equipments</a>
+            <div class="divider"></div>
+            <a class="item" href='{% url "artwork:installation_sites" %}'>Installation Sites</a>
+            <div class="divider"></div>
+            <a class="item" href='{% url "artwork:installations" %}'>Installations</a>
+            <div class="divider"></div>
+            <a class="item" href='{% url "artwork:system_status" %}'>System Status</a>
+          </div>
+        </div>
 
         <div class="ui dropdown item" tabindex="0">
           Lighting
