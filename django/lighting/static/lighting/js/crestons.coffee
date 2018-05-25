@@ -235,7 +235,7 @@ do ->
 
     buildCrestons: ->
       @state.collection.map (creston) =>
-        React.createElement(CrestonUnit, {creston: creston})
+        React.createElement(CrestonUnit, {creston: creston, key: creston.id})
 
     loadCrestons: (url) ->
       @adapter = new Adapter(url)

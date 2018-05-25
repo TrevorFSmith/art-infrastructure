@@ -163,7 +163,7 @@ do ->
 
     buildArtists: ->
       @state.collection.map (artist) =>
-        React.createElement(ArtistUnit, {artist: artist})
+        React.createElement(ArtistUnit, {artist: artist, key: artist.id})
 
     loadArtists: (url) ->
       @adapter = new Adapter(url)

@@ -198,7 +198,7 @@ do ->
 
     buildBACNetLights: ->
       @state.collection.map (bacnet_light) =>
-        React.createElement(BACNetLightUnit, {bacnet_light: bacnet_light})
+        React.createElement(BACNetLightUnit, {bacnet_light: bacnet_light, key: bacnet_light.id})
 
     loadBACNetLights: (url) ->
       @adapter = new Adapter(url)

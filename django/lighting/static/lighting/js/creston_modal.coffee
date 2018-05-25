@@ -72,20 +72,12 @@ class @CrestonModal extends React.Component
     else
       "Add New Creston"
 
-  componentWillReceiveProps: (nextProps) ->
-    if(@props.creston.id != nextProps.creston.id)
-      @setState
-        id: nextProps.creston.id
-        name: nextProps.creston.name
-        host: nextProps.creston.host
-        port: nextProps.creston.port
-
-      $('html').on "edit-creston-dialog-#{nextProps.creston.id}", (event, scope) =>
-        $("[data-object='creston-#{nextProps.creston.id}']").modal("show")
-
   componentDidMount: ->
     $('html').on "edit-creston-dialog-#{@domNode()}", (event, scope) =>
       $("[data-object='creston-#{@domNode()}']").modal("show")
+
+  componentWillUnmount: ->
+    $("[data-object='creston-#{@domNode()}']").remove()
 
   render: ->
     dom.div className: "ui modal", 'data-object': "creston-#{@domNode()}",

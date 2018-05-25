@@ -79,22 +79,12 @@ class @ArtistModal extends React.Component
     else
       "Add New Artist"
 
-  componentWillReceiveProps: (nextProps) ->
-    if(@props.artist.id != nextProps.artist.id)
-      @setState
-        id: nextProps.artist.id
-        name: nextProps.artist.name
-        email: nextProps.artist.email
-        phone: nextProps.artist.phone
-        url: nextProps.artist.url
-        notes: nextProps.artist.notes
-
-      $('html').on "edit-artist-dialog-#{nextProps.artist.id}", (event, scope) =>
-        $("[data-object='artist-#{nextProps.artist.id}']").modal("show")
-
   componentDidMount: ->
     $('html').on "edit-artist-dialog-#{@domNode()}", (event, scope) =>
       $("[data-object='artist-#{@domNode()}']").modal("show")
+
+  componentWillUnmount: ->
+    $("[data-object='artist-#{@domNode()}']").remove()
 
   render: ->
     dom.div className: "ui modal", 'data-object': "artist-#{@domNode()}",

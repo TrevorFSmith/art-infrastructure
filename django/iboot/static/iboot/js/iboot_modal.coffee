@@ -72,20 +72,12 @@ class @IBootModal extends React.Component
     else
       "Add New iBoot"
 
-  componentWillReceiveProps: (nextProps) ->
-    if(@props.iboot.id != nextProps.iboot.id)
-      @setState
-        id: nextProps.iboot.id
-        name: nextProps.iboot.name
-        mac_address: nextProps.iboot.mac_address
-        ip: nextProps.iboot.ip
-
-      $('html').on "edit-iboot-dialog-#{nextProps.iboot.id}", (event, scope) =>
-        $("[data-object='iboot-#{nextProps.iboot.id}']").modal("show")
-
   componentDidMount: ->
     $('html').on "edit-iboot-dialog-#{@domNode()}", (event, scope) =>
       $("[data-object='iboot-#{@domNode()}']").modal("show")
+
+  componentWillUnmount: ->
+    $("[data-object='iboot-#{@domNode()}']").remove()
 
   render: ->
     dom.div className: "ui modal", 'data-object': "iboot-#{@domNode()}",

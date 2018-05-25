@@ -193,7 +193,7 @@ do ->
 
     buildIBoots: ->
       @state.collection.map (iboot) =>
-        React.createElement(IBootUnit, {iboot: iboot})
+        React.createElement(IBootUnit, {iboot: iboot, key: iboot.id})
 
     loadIBoots: (url) ->
       @adapter = new Adapter(url)

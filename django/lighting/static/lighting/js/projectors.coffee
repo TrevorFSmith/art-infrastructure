@@ -194,7 +194,7 @@ do ->
 
     buildProjectors: ->
       @state.collection.map (projector) =>
-        React.createElement(ProjectorUnit, {projector: projector})
+        React.createElement(ProjectorUnit, {projector: projector, key: projector.id})
 
     loadProjectors: (url) ->
       @adapter = new Adapter(url)

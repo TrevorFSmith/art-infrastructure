@@ -72,20 +72,12 @@ class @BACNetLightModal extends React.Component
     else
       "Add New BACNet Light"
 
-  componentWillReceiveProps: (nextProps) ->
-    if(@props.bacnet_light.id != nextProps.bacnet_light.id)
-      @setState
-        id: nextProps.bacnet_light.id
-        name: nextProps.bacnet_light.name
-        device_id: nextProps.bacnet_light.device_id
-        property_id: nextProps.bacnet_light.property_id
-
-      $('html').on "edit-bacnet-light-dialog-#{nextProps.bacnet_light.id}", (event, scope) =>
-        $("[data-object='bacnet-light-#{nextProps.bacnet_light.id}']").modal("show")
-
   componentDidMount: ->
     $('html').on "edit-bacnet-light-dialog-#{@domNode()}", (event, scope) =>
       $("[data-object='bacnet-light-#{@domNode()}']").modal("show")
+
+  componentWillUnmount: ->
+    $("[data-object='bacnet-light-#{@domNode()}']").remove()
 
   render: ->
     dom.div className: "ui modal", 'data-object': "bacnet-light-#{@domNode()}",
