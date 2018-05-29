@@ -21,7 +21,10 @@ class GenericApiEndpoint(APIView, pagination.PageNumberPagination):
     page_size = 9
 
     def get_queryset(self, request):
-        collection = self.get_queryset_class.objects.all()
+        if not request.data:
+          collection = self.get_queryset_class.objects.all()
+        else:
+          collection = self.get_queryset_class.objects.filter(pk__in=request.data)
         return self.paginate_queryset(collection, self.request)
 
 
@@ -41,7 +44,7 @@ class GenericApiEndpoint(APIView, pagination.PageNumberPagination):
 
     def put(self, request, format=None):
         try:
-            get_object  = self.get_queryset_class.objects.get(pk=int(request.data.get("id")))
+            get_object = self.get_queryset_class.objects.get(pk=int(request.data.get("id")))
             serializer = self.get_queryset_serializer_class(get_object, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -66,3 +69,17 @@ class GenericApiEndpoint(APIView, pagination.PageNumberPagination):
 
     def __get_object(self, pk):
         pass
+
+
+class Utils:
+
+    @staticmethod
+    def convert_request(request):
+        data = request.data.copy()
+        if data.has_key("artists[]"):
+          artists = data.pop("artists[]")
+          artists_new= []
+          for el in artists:
+            artists_new.append(int(el))
+          data.setlist("artists", artists_new)
+        return data

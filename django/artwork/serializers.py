@@ -12,12 +12,14 @@ class ArtistSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "email",
             "phone",
+            "url",
             "notes",
             "created",
             ]
 
 
-class ArtistGroupSerializer(serializers.HyperlinkedModelSerializer):
+class ArtistGroupSerializer(serializers.ModelSerializer):
+    artists_info = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         ordering = ['name']
@@ -26,9 +28,13 @@ class ArtistGroupSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "artists",
+            "artists_info",
             "url",
             "created",
             ]
+
+    def get_artists_info(self, obj):
+        return obj.artists.values_list("id", "name")
 
 
 class PhotoSerializer(serializers.HyperlinkedModelSerializer):
