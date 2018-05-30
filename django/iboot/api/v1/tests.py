@@ -35,7 +35,7 @@ class IBootPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         all_keys = ["count", "next", "previous", "results"]
-        object_keys = ["id", "name", "mac_address", "ip", "commands"]
+        object_keys = ["id", "name", "mac_address", "host", "port", "commands"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
         self.assertEqual(sorted(all_keys), sorted(response_all_keys))
@@ -68,13 +68,15 @@ class IBootPriviligedEndpointTestCase(APITestCase):
         response = self.client.put(reverse('iboot_api:iboots'), {"id": iboot.pk})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json.loads(response.content),
-                         {"details":{"mac_address":["This field is required."],"name":["This field is required."]}})
+                         {"details":{"mac_address":["This field is required."],
+                                     "name":["This field is required."],
+                                     "host":["This field is required."]}})
 
 
     def test_update_without_errors_for_privileged_user(self):
         iboot = IBootFactory()
         response = self.client.put(reverse('iboot_api:iboots'),
-            {"id": iboot.pk, "name": "iBoot1", "mac_address": "00-0D-AD-01-94-6F", "ip": "127.0.0.1"})
+            {"id": iboot.pk, "name": "iBoot1", "mac_address": "00-0D-AD-01-94-6F", "host": "127.0.0.1", "port": 8008})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -84,7 +86,8 @@ class IBootPriviligedEndpointTestCase(APITestCase):
 
         self.assertEqual(response["name"], "iBoot1")
         self.assertEqual(response["mac_address"], "00-0D-AD-01-94-6F")
-        self.assertEqual(response["ip"], "127.0.0.1")
+        self.assertEqual(response["host"], "127.0.0.1")
+        self.assertEqual(response["port"], 8008)
 
 
 class IBootUnpriviligedEndpointTestCase(APITestCase):
@@ -141,6 +144,6 @@ class IBootUnpriviligedEndpointTestCase(APITestCase):
     def test_update_without_errors_for_unprivileged_user(self):
         iboot = IBootFactory()
         response = self.client.put(reverse('iboot_api:iboots'),
-            {"id": iboot.pk, "name": "iBoot1", "mac_address": "00-0D-AD-01-94-6F", "ip": "127.0.0.1"})
+            {"id": iboot.pk, "name": "iBoot1", "mac_address": "00-0D-AD-01-94-6F", "host": "127.0.0.1", "port": 8008})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(json.loads(response.content), {'detail':'You do not have permission to perform this action.'})

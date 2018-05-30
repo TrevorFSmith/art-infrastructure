@@ -42,4 +42,5 @@ class IBootFactory(factory.django.DjangoModelFactory):
 
     name = factory.Sequence(lambda n: 'iBoot {}'.format(n))
     mac_address = factory.Sequence(lambda n: '00-0D-AD-01-94-6{}'.format(n))
-    ip = '127.0.0.1'
+    host = '127.0.0.1'
+    port = 8008

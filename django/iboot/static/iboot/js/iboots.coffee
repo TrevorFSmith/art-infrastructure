@@ -91,7 +91,9 @@ do ->
       scope = this
       dom.div {className: "content"},
 
-        dom.h3 null, "Mac: #{@props.data.iboot.mac_address} | IP: #{@props.data.iboot.ip}"
+        dom.h3 null, 
+          dom.p null, "Host: #{@props.data.iboot.host} | Port: #{@props.data.iboot.port}"
+          dom.p null, "Mac: #{@props.data.iboot.mac_address}"
 
         @props.data.iboot.commands.map (cmd) ->
           dom.div
