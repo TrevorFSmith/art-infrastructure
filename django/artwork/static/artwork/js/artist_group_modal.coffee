@@ -18,14 +18,12 @@ class @ArtistGroupModal extends React.Component
         id: @props.artist_group.id
         name: @props.artist_group.name
         artists: @props.artist_group.artists
-        artists_info: @props.artist_group.artists_info
         url: @props.artist_group.url
         all_artists: []
     else
       this.state =
         name: ""
         artists: []
-        artists_info:[]
         url: ""
         all_artists: []
 
@@ -38,7 +36,6 @@ class @ArtistGroupModal extends React.Component
       @setState
         name: ""
         artists: []
-        artists_info: []
         url: ""
 
   domNode: ->

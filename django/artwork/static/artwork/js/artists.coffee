@@ -66,11 +66,15 @@ do ->
                   @props.data.artist.created.substr(11, 8)
       dom.div {className: "content"},
 
-        dom.p null, "Email:   #{@props.data.artist.email}"
-        dom.p null, "Phone:   #{@props.data.artist.phone}"
-        dom.p null, "URL:     #{@props.data.artist.url}"
-        dom.p null, "Notes:   #{@props.data.artist.notes}"
-        dom.p null, "Created: #{date_time}"
+        dom.div null, "Email:   #{@props.data.artist.email}"
+        dom.div null, "Phone:   #{@props.data.artist.phone}"
+        dom.div null, "Groups:"
+        dom.div className: "ui list",
+          @props.data.artist.groups_info.map (group) ->
+            dom.div className: "item", group[1]
+        dom.div null, "URL:     #{@props.data.artist.url}"
+        dom.div null, "Notes:   #{@props.data.artist.notes}"
+        dom.div null, "Created: #{date_time}"
 
         dom.h3 null, "Actions"
 

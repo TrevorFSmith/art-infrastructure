@@ -8,13 +8,36 @@ class ArtistViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Artist
     get_queryset_serializer_class = serializers.ArtistSerializer
 
+    def post(self, request, format=None):
+        data = api_helpers.Utils.convert_request(request, "artistgroup_set")
+        serializer = serializers.ArtistSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        data = api_helpers.Utils.convert_request(request, "artistgroup_set")
+        try:
+            get_object = models.Artist.objects.get(pk=int(data.get("id")))
+            serializer = serializers.ArtistSerializer(get_object, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ObjectDoesNotExist:
+            raise Http404
+
 
 class ArtistGroupViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.ArtistGroup
     get_queryset_serializer_class = serializers.ArtistGroupSerializer
 
     def post(self, request, format=None):
-        data = api_helpers.Utils.convert_request(request=request)
+        data = api_helpers.Utils.convert_request(request, "artists")
         serializer = serializers.ArtistGroupSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -23,7 +46,7 @@ class ArtistGroupViewSet(api_helpers.GenericApiEndpoint):
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):
-        data = api_helpers.Utils.convert_request(request=request)
+        data = api_helpers.Utils.convert_request(request, "artists")
         try:
             get_object = models.ArtistGroup.objects.get(pk=int(data.get("id")))
             serializer = serializers.ArtistGroupSerializer(get_object, data=data)

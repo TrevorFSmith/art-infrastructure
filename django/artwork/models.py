@@ -36,7 +36,7 @@ class ArtistGroup(models.Model):
 
     """A group of artists who collectively create installations, perhaps also with individual artists."""
     name = models.TextField(blank=False, null=False)
-    artists = models.ManyToManyField(Artist)
+    artists = models.ManyToManyField(Artist, blank=True, null=True)
     url = models.URLField(blank=True, null=True, max_length=2048)
     created = models.DateTimeField(auto_now_add=True)
 

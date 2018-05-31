@@ -6,6 +6,8 @@ class @ArtistModal extends React.Component
   dom.label    = React.createFactory "label"
   dom.input    = React.createFactory "input"
   dom.textarea = React.createFactory "textarea"
+  dom.select   = React.createFactory "select"
+  dom.option   = React.createFactory "option"
 
   displayName: "Edit/New Artist Modal Dialog"
 
@@ -17,15 +19,23 @@ class @ArtistModal extends React.Component
         name: @props.artist.name
         email: @props.artist.email
         phone: @props.artist.phone
+        groups: @props.artist.artistgroup_set
         url: @props.artist.url
         notes: @props.artist.notes
+        all_groups: []
     else
       this.state =
         name: ""
         email: ""
         phone: ""
+        groups: ""
         url: ""
         notes: ""
+        all_groups: []
+
+    @promiseGroups().then (results) => 
+      @setState
+        all_groups: results
 
   resetForm: =>
     if not @state.id
@@ -33,6 +43,7 @@ class @ArtistModal extends React.Component
         name: ""
         email: ""
         phone: ""
+        groups: ""
         url: ""
         notes: ""
 
@@ -48,14 +59,41 @@ class @ArtistModal extends React.Component
     else
       "POST"
 
+  promiseGroups: ->
+    new Promise (resolve) -> 
+      url = $("#root").data("url-groups")
+      @adapter = new Adapter(url)
+      @adapter.loadData (data) ->
+        resolve(data.results)
+
+  buildGroups: (groups) =>
+    options = []
+    if groups.length > 0
+      groups.map (group) =>
+        if _.includes(@state.groups, group.id)
+          options.push(dom.option selected:true, group.name)
+        else
+          options.push(dom.option null, group.name)
+    options
+
+
   saveArtist: ->
 
     url        = $("#root").data("url")
     csrf_token = $("#root").data("csrf_token")
     adapter    = new Adapter(url)
 
+    data = {
+      id: @state.id
+      name: @state.name
+      email: @state.email
+      phone: @state.phone
+      artistgroup_set: @state.groups
+      url: @state.url
+      notes: @state.notes
+    }
     scope = this
-    adapter.pushData @action(), csrf_token, @state, ( (data) =>
+    adapter.pushData @action(), csrf_token, data, ( (data) =>
       # request ok
       $('html').trigger('update-artists', data)
       scope.resetForm()
@@ -72,6 +110,13 @@ class @ArtistModal extends React.Component
   handleChange: (event) ->
     @setState
       "#{$(event.target).prop('name')}": $(event.target).val()
+
+  handleSelectChange: (event) ->
+    groups = _.filter(@state.all_groups, (group) ->
+      _.includes($(event.target).val(), group.name))
+    groups = _.map(groups, "id")
+    @setState
+      "#{$(event.target).prop('name')}": groups
 
   title: ->
     if @state.id
@@ -107,6 +152,11 @@ class @ArtistModal extends React.Component
           dom.div className: "field",
             dom.label null, "Phone"
             dom.input value: @state.phone, onChange: @handleChange.bind(this), name: 'phone'
+
+          dom.div className: "field",
+            dom.label null, "Groups"
+            dom.select placeholder: "Groups", multiple: "multiple", onChange: @handleSelectChange.bind(this), name: 'groups',
+              @buildGroups(@state.all_groups)
 
           dom.div className: "field",
             dom.label null, "URL"

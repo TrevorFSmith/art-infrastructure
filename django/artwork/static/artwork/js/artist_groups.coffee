@@ -66,8 +66,6 @@ do ->
                   @props.data.artist_group.created.substr(11, 8)
       dom.div {className: "content"},
 
-
-        #console.log(@props.data.artist_group.artists)
         dom.div null, "Artists:"
         dom.div className: "ui list",
           @props.data.artist_group.artists_info.map (artist) ->

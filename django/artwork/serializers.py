@@ -2,7 +2,8 @@ from rest_framework import serializers
 from artwork import models
 
 
-class ArtistSerializer(serializers.HyperlinkedModelSerializer):
+class ArtistSerializer(serializers.ModelSerializer):
+    groups_info = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         ordering = ['name']
@@ -12,10 +13,15 @@ class ArtistSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "email",
             "phone",
+            "artistgroup_set",
+            "groups_info",
             "url",
             "notes",
             "created",
             ]
+
+    def get_groups_info(self, obj):
+        return obj.artistgroup_set.values_list("id", "name")
 
 
 class ArtistGroupSerializer(serializers.ModelSerializer):
