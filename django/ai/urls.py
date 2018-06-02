@@ -4,6 +4,9 @@ from django.conf.urls import include
 
 import weather.views as weather_views
 
+from django.conf.urls.static import static
+from django.conf import settings
+
 urlpatterns = [
 
     url(r'^api/weather/icao-airport/(?P<airport_code>[^/]+).txt$', weather_views.icao_airport_observation, name='weather_icao'),
@@ -19,4 +22,4 @@ urlpatterns = [
     url(r'^api/lighting/', include('lighting.api_urls', namespace='lighting_api')),
     url(r'^api/iboot/', include('iboot.api_urls', namespace='iboot_api')),
     url(r'^api/artwork/', include('artwork.api_urls', namespace='artwork_api')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

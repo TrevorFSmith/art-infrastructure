@@ -11,9 +11,8 @@ class @ArtistGroupModal extends React.Component
   displayName: "Edit/New Artist Group Modal Dialog"
 
   constructor: (props, context) ->
-    super(props, context);
-
-    if @props.artist_group
+    super(props, context)
+    if not _.isEmpty(@props.artist_group)
       @state =
         id: @props.artist_group.id
         name: @props.artist_group.name

@@ -9,8 +9,8 @@ class @CrestonModal extends React.Component
   displayName: "Edit/New Creston Modal Dialog"
 
   constructor: (props, context) ->
-    super(props, context);
-    if @props.creston
+    super(props, context)
+    if not _.isEmpty(@props.creston)
       this.state =
         id: @props.creston.id
         name: @props.creston.name

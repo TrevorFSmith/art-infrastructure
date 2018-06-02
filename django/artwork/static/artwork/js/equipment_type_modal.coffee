@@ -1,4 +1,4 @@
-2class @EquipmentTypeModal extends React.Component
+class @EquipmentTypeModal extends React.Component
 
   dom       = {}
   dom.i     = React.createFactory "i"
@@ -9,8 +9,8 @@
   displayName: "Edit/New Equipment Type Modal Dialog"
 
   constructor: (props, context) ->
-    super(props, context);
-    if @props.equipment_type
+    super(props, context)
+    if not _.isEmpty(@props.equipment_type)
       @state =
         id: @props.equipment_type.id
         name: @props.equipment_type.name

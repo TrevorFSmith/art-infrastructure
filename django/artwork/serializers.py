@@ -43,7 +43,7 @@ class ArtistGroupSerializer(serializers.ModelSerializer):
         return obj.artists.values_list("id", "name")
 
 
-class PhotoSerializer(serializers.HyperlinkedModelSerializer):
+class PhotoSerializer(serializers.ModelSerializer):
 
     class Meta:
         ordering = ['-created']
@@ -75,6 +75,7 @@ class EquipmentTypeSerializer(serializers.ModelSerializer):
 
 class EquipmentSerializer(serializers.ModelSerializer):
     equipment_type_name = serializers.SerializerMethodField(read_only=True)
+    photos_info = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         verbose_name_plural = 'equipment'
@@ -86,12 +87,16 @@ class EquipmentSerializer(serializers.ModelSerializer):
             "equipment_type",
             "equipment_type_name",
             "photos",
+            "photos_info",
             "notes",
             "created",
             ]
 
     def get_equipment_type_name(self, obj):
         return obj.equipment_type.name
+
+    def get_photos_info(self, obj):
+        return obj.photos.values_list("id", "image", "title")
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):

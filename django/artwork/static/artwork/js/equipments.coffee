@@ -9,6 +9,7 @@ do ->
   dom.div    = React.createFactory "div"
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
+  dom.a      = React.createFactory "a"
 
 
   "use strict"
@@ -65,13 +66,13 @@ do ->
       date_time = @props.data.equipment.created.substr(0, 10) + " " +
                   @props.data.equipment.created.substr(11, 8)
       dom.div {className: "content"},
-
         dom.div null, "Email: #{@props.data.equipment.email}"
         dom.div null, "Type:  #{@props.data.equipment.equipment_type_name}"
         dom.div null, "Photos:"
-        # dom.div className: "ui list",
-        #   @props.data.equipment.photos_info.map (photo) ->
-        #     dom.div className: "item", photo[1]
+        dom.div className: "ui list",
+          @props.data.equipment.photos_info.map (photo) ->
+            dom.div className: "item", 
+              dom.a href: "/media/" + photo[1], photo[2]
         dom.div null, "Notes:   #{@props.data.equipment.notes}"
         dom.div null, "Created: #{date_time}"
 

@@ -79,6 +79,29 @@ class EquipmentViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Equipment
     get_queryset_serializer_class = serializers.EquipmentSerializer
 
+    def post(self, request, format=None):
+        data = api_helpers.Utils.convert_request(request, "photos")
+        serializer = serializers.EquipmentSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        data = api_helpers.Utils.convert_request(request, "photos")
+        try:
+            get_object = models.Equipment.objects.get(pk=int(data.get("id")))
+            serializer = serializers.EquipmentSerializer(get_object, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ObjectDoesNotExist:
+            raise Http404
+
 
 class InstallationSiteViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.InstallationSite

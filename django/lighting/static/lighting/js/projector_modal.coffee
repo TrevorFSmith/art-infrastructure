@@ -9,8 +9,8 @@ class @ProjectorModal extends React.Component
   displayName: "Edit/New Projector Modal Dialog"
 
   constructor: (props, context) ->
-    super(props, context);
-    if @props.projector
+    super(props, context)
+    if not _.isEmpty(@props.projector)
       this.state =
         id: @props.projector.id
         name: @props.projector.name

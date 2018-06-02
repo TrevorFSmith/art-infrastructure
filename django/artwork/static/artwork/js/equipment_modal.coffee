@@ -12,8 +12,8 @@ class @EquipmentModal extends React.Component
   displayName: "Edit/New Equipment Modal Dialog"
 
   constructor: (props, context) ->
-    super(props, context);
-    if @props.equipment
+    super(props, context)
+    if not _.isEmpty(@props.equipment)
       this.state =
         id: @props.equipment.id
         name: @props.equipment.name
@@ -22,7 +22,6 @@ class @EquipmentModal extends React.Component
         notes: @props.equipment.notes
         all_types: []
         all_photos: []
-
     else
       this.state =
         name: ""
@@ -89,9 +88,9 @@ class @EquipmentModal extends React.Component
     if photos.length > 0
       photos.map (photo) ->
         if _.includes(selected_photos, photo.id)
-          options.push(dom.option {selected: true, value: photo.id}, photo.name)
+          options.push(dom.option {selected: true, value: photo.id}, photo.title)
         else
-          options.push(dom.option value: photo.id, photo.name)
+          options.push(dom.option value: photo.id, photo.title)
     options
 
   saveEquipment: =>

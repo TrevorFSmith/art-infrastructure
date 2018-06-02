@@ -9,8 +9,8 @@ class @BACNetLightModal extends React.Component
   displayName: "Edit/New BACNet Light Modal Dialog"
 
   constructor: (props, context) ->
-    super(props, context);
-    if @props.bacnet_light
+    super(props, context)
+    if not _.isEmpty(@props.bacnet_light)
       @state =
         id: @props.bacnet_light.id
         name: @props.bacnet_light.name

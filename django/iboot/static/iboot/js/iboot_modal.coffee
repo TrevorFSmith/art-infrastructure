@@ -9,8 +9,8 @@ class @IBootModal extends React.Component
   displayName: "Edit/New iBoot Modal Dialog"
 
   constructor: (props, context) ->
-    super(props, context);
-    if @props.iboot
+    super(props, context)
+    if not _.isEmpty(@props.iboot)
       this.state =
         id: @props.iboot.id
         name: @props.iboot.name
