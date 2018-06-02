@@ -58,7 +58,7 @@ class PhotoSerializer(serializers.HyperlinkedModelSerializer):
             ]
 
 
-class EquipmentTypeSerializer(serializers.HyperlinkedModelSerializer):
+class EquipmentTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         ordering = ['name']
@@ -73,7 +73,8 @@ class EquipmentTypeSerializer(serializers.HyperlinkedModelSerializer):
             ]
 
 
-class EquipmentSerializer(serializers.HyperlinkedModelSerializer):
+class EquipmentSerializer(serializers.ModelSerializer):
+    equipment_type_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         verbose_name_plural = 'equipment'
@@ -83,10 +84,14 @@ class EquipmentSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "equipment_type",
+            "equipment_type_name",
             "photos",
             "notes",
             "created",
             ]
+
+    def get_equipment_type_name(self, obj):
+        return obj.equipment_type.name
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):

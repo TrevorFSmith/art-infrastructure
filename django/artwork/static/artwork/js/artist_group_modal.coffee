@@ -14,14 +14,14 @@ class @ArtistGroupModal extends React.Component
     super(props, context);
 
     if @props.artist_group
-      this.state =
+      @state =
         id: @props.artist_group.id
         name: @props.artist_group.name
         artists: @props.artist_group.artists
         url: @props.artist_group.url
         all_artists: []
     else
-      this.state =
+      @state =
         name: ""
         artists: []
         url: ""
@@ -31,7 +31,7 @@ class @ArtistGroupModal extends React.Component
       @setState
         all_artists: results
 
-  resetForm: =>
+  resetForm: ->
     if not @state.id
       @setState
         name: ""
@@ -53,21 +53,21 @@ class @ArtistGroupModal extends React.Component
   promiseArtists: ->
     new Promise (resolve) -> 
       url = $("#root").data("url-artists")
-      @adapter = new Adapter(url)
-      @adapter.loadData (data) ->
+      adapter = new Adapter(url)
+      adapter.loadData (data) ->
         resolve(data.results)
 
-  buildArtists: (artists) =>
+  buildArtists: (artists, selected_artists) ->
     options = []
     if artists.length > 0
-      artists.map (artist) =>
-        if _.includes(@state.artists, artist.id)
-          options.push(dom.option selected:true, artist.name)
+      artists.map (artist) ->
+        if _.includes(selected_artists, artist.id)
+          options.push(dom.option {selected: true, value: artist.id}, artist.name)
         else
-          options.push(dom.option null, artist.name)
+          options.push(dom.option value: artist.id, artist.name)
     options
 
-  saveArtistGroup: ->
+  saveArtistGroup: =>
 
     url        = $("#root").data("url")
     csrf_token = $("#root").data("csrf_token")
@@ -76,7 +76,7 @@ class @ArtistGroupModal extends React.Component
     data = {
       id: @state.id
       name: @state.name
-      artists: @state.artists
+      artists: if @state.artists then @state.artists else []
       url: @state.url
     }
     scope = this
@@ -91,19 +91,12 @@ class @ArtistGroupModal extends React.Component
       $('html').trigger('show-dialog', {message: messages.join(" ")})
     )
 
-  closeDialog: ->
+  closeDialog: =>
     $("[data-object='artist_group-#{@domNode()}']").modal("hide")
 
-  handleChange: (event) ->
+  handleChange: (event) =>
     @setState
       "#{$(event.target).prop('name')}": $(event.target).val()
-
-  handleSelectChange: (event) ->
-    artists = _.filter(@state.all_artists, (artist) ->
-      _.includes($(event.target).val(), artist.name))
-    artists = _.map(artists, "id")
-    @setState
-      "#{$(event.target).prop('name')}": artists
 
   title: ->
     if @state.id
@@ -118,7 +111,7 @@ class @ArtistGroupModal extends React.Component
   componentWillUnmount: ->
     $("[data-object='artist_group-#{@domNode()}']").remove()
 
-  render: =>
+  render: ->
     dom.div className: "ui modal", 'data-object': "artist_group-#{@domNode()}",
 
       dom.div className: "header",
@@ -134,8 +127,8 @@ class @ArtistGroupModal extends React.Component
 
           dom.div className: "field",
             dom.label null, "Artists"
-            dom.select placeholder: "Artists", multiple: "multiple", onChange: @handleSelectChange.bind(this), name: 'artists',
-              @buildArtists(@state.all_artists)
+            dom.select placeholder: "Artists", multiple: "multiple", onChange: @handleChange.bind(this), name: 'artists',
+              @buildArtists(@state.all_artists, @state.artists)
 
           dom.div className: "field",
             dom.label null, "URL"

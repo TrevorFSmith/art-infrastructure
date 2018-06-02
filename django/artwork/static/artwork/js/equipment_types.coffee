@@ -14,9 +14,9 @@ do ->
   "use strict"
 
 
-  class ArtistUnitHeader extends React.Component
+  class EquipmentTypeUnitHeader extends React.Component
 
-    displayName: "Artist Header"
+    displayName: "Equipment Type Header"
 
     constructor: (props) ->
       super(props)
@@ -25,63 +25,82 @@ do ->
       dom.div {className: "extra content"},
         dom.h3 {className: "left floated"},
           dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.artist.name
+          dom.span null, @props.data.equipment_type.name
 
 
-  class ArtistUnitBody extends React.Component
+  class EquipmentTypeUnitBody extends React.Component
 
-    displayName: "Artist Body"
+    displayName: "Equipment Type Body"
 
     constructor: (props) ->
       super(props)
       @state = @state || {}
 
-    editArtist: (data) =>
-      $('html').trigger("edit-artist-dialog-#{data.artist.id}", data)
+    editEquipmentType: (data) =>
+      $('html').trigger("edit-equipment-type-dialog-#{data.equipment_type.id}", data)
 
-    removeArtist: (artist_id) =>
+    sendCommand: (cmd) =>
+
+      url        = $("#root").data("command-url")
+      csrf_token = $("#root").data("csrf_token")
+      equipment_type_id = @props.data.equipment_type.id
+
+      $("[data-object='command-#{equipment_type_id}-#{cmd}']").toggleClass("loading")
+
+      adapter  = new Adapter(url)
+      postData =
+        id: equipment_type_id
+        command: cmd
+
+      props = @props
+      adapter.pushData "PUT", csrf_token, postData, ( (data) ->
+        # request ok
+        $('html').trigger('show-dialog', {message: data.details})
+      ), ( (data, status) ->
+        # request failed
+        $('html').trigger('show-dialog', {message: data.responseJSON.details})
+      ), () ->
+        # request finished
+        $("[data-object='command-#{equipment_type_id}-#{cmd}']").toggleClass("loading")
+
+    removeEquipmentType: (equipment_type_id) =>
 
       if confirm "Are you sure?"
 
         url        = $("#root").data("url")
         csrf_token = $("#root").data("csrf_token")
 
-        $("[data-object ='artist-#{artist_id}']").toggleClass("loading")
+        $("[data-object ='equipment-type-#{equipment_type_id}']").toggleClass("loading")
 
         adapter  = new Adapter(url)
         postData =
-          id: artist_id
+          id: equipment_type_id
 
+        scope = this
         adapter.delete csrf_token, postData, ( (data, status) ->
           # request ok
-          $('html').trigger('artist-deleted', data)
+          $('html').trigger('equipment-type-deleted', data)
         ), ( (data, status) ->
           # request failed
         ), () ->
           # request finished
-          $("[data-object='artist-#{artist_id}']").toggleClass("loading")
+          $("[data-object='equipment-type-#{equipment_type_id}']").toggleClass("loading")
+
 
     render: ->
-      date_time = @props.data.artist.created.substr(0, 10) + " " +
-                  @props.data.artist.created.substr(11, 8)
+      scope = this
       dom.div {className: "content"},
 
-        dom.div null, "Email:   #{@props.data.artist.email}"
-        dom.div null, "Phone:   #{@props.data.artist.phone}"
-        dom.div null, "Groups:"
-        dom.div className: "ui list",
-          @props.data.artist.groups_info.map (group) ->
-            dom.div className: "item", group[1]
-        dom.div null, "URL:     #{@props.data.artist.url}"
-        dom.div null, "Notes:   #{@props.data.artist.notes}"
-        dom.div null, "Created: #{date_time}"
+        dom.div null, "Provider: #{@props.data.equipment_type.provider}"
+        dom.div null, "URL:      #{@props.data.equipment_type.url}"
+        dom.div null, "Notes:    #{@props.data.equipment_type.notes}"
 
         dom.h3 null, "Actions"
 
         dom.div {className: "ui buttons mini"},
           dom.button
             className: "ui button"
-            onClick: @editArtist.bind(this, @props.data)
+            onClick: @editEquipmentType.bind(this, @props.data)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
@@ -90,30 +109,30 @@ do ->
 
           dom.button
             className: "ui button negative"
-            onClick: @removeArtist.bind(this, @props.data.artist.id)
+            onClick: @removeEquipmentType.bind(this, @props.data.equipment_type.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(ArtistModal, {artist: @props.data.artist})
+        React.createElement(EquipmentTypeModal, {equipment_type: @props.data.equipment_type})
 
 
-  class ArtistUnit extends React.Component
+  class EquipmentTypeUnit extends React.Component
 
-    displayName: "Artist Unit"
+    displayName: "Equipment Type Unit"
 
     constructor: (props) ->
       super(props)
 
     render: ->
         dom.div {className: "ui card"},
-          React.createElement(ArtistUnitHeader, {data: @props})
-          React.createElement(ArtistUnitBody, {data: @props})
+          React.createElement(EquipmentTypeUnitHeader, {data: @props})
+          React.createElement(EquipmentTypeUnitBody, {data: @props})
 
 
-  class ArtistNoRecords extends React.Component
+  class EquipmentTypeNoRecords extends React.Component
 
-    displayName: "Artist no records"
+    displayName: "Equipment Type no records"
 
     constructor: (props) ->
       super(props)
@@ -125,18 +144,18 @@ do ->
         dom.h3 null, ""
 
 
-  class ArtistPagination extends React.Component
+  class EquipmentTypePagination extends React.Component
 
-    displayName: "Artist pagination"
+    displayName: "Equipment Type pagination"
 
     constructor: (props) ->
       super(props)
 
     clickNextPage: ->
-      $('html').trigger("artist-next-page")
+      $('html').trigger("equipment-type-next-page")
 
     clickPrevPage: ->
-      $('html').trigger("artist-prev-page")
+      $('html').trigger("equipment-type-prev-page")
 
     render: ->
       if @props.pages
@@ -165,11 +184,11 @@ do ->
         next_page: @props.next
         prev_page: @props.prev
 
-    buildArtists: ->
-      @state.collection.map (artist) =>
-        React.createElement(ArtistUnit, {artist: artist, key: artist.id})
+    buildEquipmentTypes: ->
+      @state.collection.map (equipment_type) =>
+        React.createElement(EquipmentTypeUnit, {equipment_type: equipment_type, key: equipment_type.id})
 
-    loadArtists: (url) ->
+    loadEquipmentTypes: (url) ->
       adapter = new Adapter(url)
       adapter.loadData (data) =>
         if data.results.length > 0
@@ -194,9 +213,9 @@ do ->
       return $('#root').data('url') + "?page=" + @state.current_page
 
     componentDidMount: ->
-      $('html').on 'update-artists', (event, data) =>
+      $('html').on 'update-equipment-types', (event, data) =>
         if @state.next_page
-          $('html').trigger("artist-current-page")
+          $('html').trigger("equipment-type-current-page")
         else
           index          = _.findIndex @state.collection, {id: data.id}
           new_collection = @state.collection
@@ -206,7 +225,7 @@ do ->
             new_collection[index] = data
           else
             if not @state.count or (@state.count % 9) == 0
-              $('html').trigger("artist-current-page")
+              $('html').trigger("equipment-type-current-page")
             else
               count += 1
               new_collection.push(data)
@@ -217,50 +236,50 @@ do ->
             count: count
 
 
-      $('html').on 'artist-deleted', (event, data) =>
+      $('html').on 'equipment-type-deleted', (event, data) =>
         count = @state.count - 1
         if @state.next_page
-          $('html').trigger("artist-current-page")
+          $('html').trigger("equipment-type-current-page")
         else if @state.prev_page and (count % 9) == 0
-          $('html').trigger("artist-prev-page")
+          $('html').trigger("equipment-type-prev-page")
         else
-          filtered_artists = _.filter @state.collection, (artist) =>
-            artist.id != data.id
+          filtered_equipment_types = _.filter @state.collection, (equipment_type) =>
+            equipment_type.id != data.id
 
           @setState
-            collection: filtered_artists
-            no_records: if filtered_artists.length > 0 then false else true
+            collection: filtered_equipment_types
+            no_records: if filtered_equipment_types.length > 0 then false else true
             count: count
 
-      $('html').on 'artist-next-page', (event, data) =>
-        @loadArtists(@state.next_page)
+      $('html').on 'equipment-type-next-page', (event, data) =>
+        @loadEquipmentTypes(@state.next_page)
 
-      $('html').on 'artist-prev-page', (event, data) =>
-        @loadArtists(@state.prev_page)
+      $('html').on 'equipment-type-prev-page', (event, data) =>
+        @loadEquipmentTypes(@state.prev_page)
 
-      $('html').on 'artist-current-page', (event, data) =>
-        @loadArtists(@getUrlCurrentPage())
+      $('html').on 'equipment-type-current-page', (event, data) =>
+        @loadEquipmentTypes(@getUrlCurrentPage())
 
-    newArtist: ->
-      $('html').trigger("edit-artist-dialog-new")
+    newEquipmentType: ->
+      $('html').trigger("edit-equipment-type-dialog-new")
 
     render: ->
       dom.div null,
         dom.h2 className: "ui dividing header",
-          "Artwork::Artists"
+          "Artwork::Equipment Types"
           dom.button
             className: "button ui mini right floated positive"
-            onClick: @newArtist
+            onClick: @newEquipmentType
           , "",
             dom.i {className: "plus icon"}, ""
-            "New artist"
+            "New Equipment Type"
         dom.div {className: "ui three cards"},
-          @buildArtists()
-        React.createElement(ArtistNoRecords, {output: @state.no_records})
-        React.createElement(ArtistPagination, {
-          page: @state.current_page, pages: Math.ceil(@state.count / 9),
+          @buildEquipmentTypes()
+        React.createElement(EquipmentTypeNoRecords, {output: @state.no_records})
+        React.createElement(EquipmentTypePagination, {
+          page: @state.current_page, pages: Math.ceil(@state.count / 9), 
           next: @state.next_page, prev: @state.prev_page})
-        React.createElement(ArtistModal, {artist: {}})
+        React.createElement(EquipmentTypeModal, {equipment_type: {}})
 
 
   class Visualizer

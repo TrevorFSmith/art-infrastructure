@@ -36,10 +36,10 @@ do ->
       super(props)
       @state = @state || {}
 
-    editArtistGroup: (data) ->
+    editArtistGroup: (data) =>
       $('html').trigger("edit-artist_group-dialog-#{data.artist_group.id}", data)
 
-    removeArtistGroup: (artist_group_id) ->
+    removeArtistGroup: (artist_group_id) =>
 
       if confirm "Are you sure?"
 
@@ -139,10 +139,10 @@ do ->
       if @props.pages
         dom.div {className: "ui center aligned segment"},
           if @props.prev
-            dom.button {className: "ui button margin-right", onClick: @clickPrevPage.bind(this)}, "Prev"
+            dom.button {className: "ui button margin-right", onClick: @clickPrevPage}, "Prev"
           dom.span {className: "margin-right"}, "Page #{@props.page} of #{@props.pages}"
           if @props.next
-            dom.button {className: "ui button", onClick: @clickNextPage.bind(this)}, "Next"
+            dom.button {className: "ui button", onClick: @clickNextPage}, "Next"
       else
         dom.div null, ""
 
@@ -167,8 +167,8 @@ do ->
         React.createElement(ArtistGroupUnit, {artist_group: artist_group, key: artist_group.id})
 
     loadArtistGroups: (url) ->
-      @adapter = new Adapter(url)
-      @adapter.loadData (data) =>
+      adapter = new Adapter(url)
+      adapter.loadData (data) =>
         if data.results.length > 0
           @setState
             collection: data.results
@@ -247,7 +247,7 @@ do ->
           "Artwork::ArtistGroups"
           dom.button
             className: "button ui mini right floated positive"
-            onClick: @newArtistGroup.bind(this)
+            onClick: @newArtistGroup
           , "",
             dom.i {className: "plus icon"}, ""
             "New artist group"

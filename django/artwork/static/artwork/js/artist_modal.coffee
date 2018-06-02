@@ -33,7 +33,7 @@ class @ArtistModal extends React.Component
         notes: ""
         all_groups: []
 
-    @promiseGroups().then (results) => 
+    @promiseGroups().then (results) =>
       @setState
         all_groups: results
 
@@ -62,22 +62,21 @@ class @ArtistModal extends React.Component
   promiseGroups: ->
     new Promise (resolve) -> 
       url = $("#root").data("url-groups")
-      @adapter = new Adapter(url)
-      @adapter.loadData (data) ->
+      adapter = new Adapter(url)
+      adapter.loadData (data) ->
         resolve(data.results)
 
-  buildGroups: (groups) =>
+  buildGroups: (groups, selected_groups) ->
     options = []
     if groups.length > 0
-      groups.map (group) =>
-        if _.includes(@state.groups, group.id)
-          options.push(dom.option selected:true, group.name)
+      groups.map (group) ->
+        if _.includes(selected_groups, group.id)
+          options.push(dom.option {selected: true, value: group.id}, group.name)
         else
-          options.push(dom.option null, group.name)
+          options.push(dom.option value: group.id, group.name)
     options
 
-
-  saveArtist: ->
+  saveArtist: =>
 
     url        = $("#root").data("url")
     csrf_token = $("#root").data("csrf_token")
@@ -88,7 +87,7 @@ class @ArtistModal extends React.Component
       name: @state.name
       email: @state.email
       phone: @state.phone
-      artistgroup_set: @state.groups
+      artistgroup_set: if @state.groups then @state.groups else []
       url: @state.url
       notes: @state.notes
     }
@@ -104,19 +103,12 @@ class @ArtistModal extends React.Component
       $('html').trigger('show-dialog', {message: messages.join(" ")})
     )
 
-  closeDialog: ->
+  closeDialog: =>
     $("[data-object='artist-#{@domNode()}']").modal("hide")
 
-  handleChange: (event) ->
+  handleChange: (event) =>
     @setState
       "#{$(event.target).prop('name')}": $(event.target).val()
-
-  handleSelectChange: (event) ->
-    groups = _.filter(@state.all_groups, (group) ->
-      _.includes($(event.target).val(), group.name))
-    groups = _.map(groups, "id")
-    @setState
-      "#{$(event.target).prop('name')}": groups
 
   title: ->
     if @state.id
@@ -155,8 +147,8 @@ class @ArtistModal extends React.Component
 
           dom.div className: "field",
             dom.label null, "Groups"
-            dom.select placeholder: "Groups", multiple: "multiple", onChange: @handleSelectChange.bind(this), name: 'groups',
-              @buildGroups(@state.all_groups)
+            dom.select placeholder: "Groups", multiple: "multiple", onChange: @handleChange.bind(this), name: 'groups',
+              @buildGroups(@state.all_groups, @state.groups)
 
           dom.div className: "field",
             dom.label null, "URL"
