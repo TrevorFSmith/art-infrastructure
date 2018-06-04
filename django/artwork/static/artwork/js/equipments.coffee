@@ -72,7 +72,7 @@ do ->
         dom.div className: "ui list",
           @props.data.equipment.photos_info.map (photo) ->
             dom.div className: "item", 
-              dom.a href: "/media/" + photo[1], photo[2]
+              dom.a href: "/media/" + photo.image, photo.title
         dom.div null, "Notes:   #{@props.data.equipment.notes}"
         dom.div null, "Created: #{date_time}"
 

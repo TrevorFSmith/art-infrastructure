@@ -21,7 +21,7 @@ class ArtistSerializer(serializers.ModelSerializer):
             ]
 
     def get_groups_info(self, obj):
-        return obj.artistgroup_set.values_list("id", "name")
+        return obj.artistgroup_set.values("id", "name")
 
 
 class ArtistGroupSerializer(serializers.ModelSerializer):
@@ -40,7 +40,7 @@ class ArtistGroupSerializer(serializers.ModelSerializer):
             ]
 
     def get_artists_info(self, obj):
-        return obj.artists.values_list("id", "name")
+        return obj.artists.values("id", "name")
 
 
 class PhotoSerializer(serializers.ModelSerializer):
@@ -96,7 +96,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
         return obj.equipment_type.name
 
     def get_photos_info(self, obj):
-        return obj.photos.values_list("id", "image", "title")
+        return obj.photos.values("id", "image", "title")
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):

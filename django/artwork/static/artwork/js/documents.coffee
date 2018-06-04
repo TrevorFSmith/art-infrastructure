@@ -9,14 +9,15 @@ do ->
   dom.div    = React.createFactory "div"
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
+  dom.a      = React.createFactory "a"
 
 
   "use strict"
 
 
-  class ArtistUnitHeader extends React.Component
+  class DocumentUnitHeader extends React.Component
 
-    displayName: "Artist Header"
+    displayName: "Document Header"
 
     constructor: (props) ->
       super(props)
@@ -25,62 +26,56 @@ do ->
       dom.div {className: "extra content"},
         dom.h3 {className: "left floated"},
           dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.artist.name
+          dom.span null, @props.data.document.title
 
 
-  class ArtistUnitBody extends React.Component
+  class DocumentUnitBody extends React.Component
 
-    displayName: "Artist Body"
+    displayName: "Document Body"
 
     constructor: (props) ->
       super(props)
       @state = @state || {}
 
-    editArtist: (data) =>
-      $('html').trigger("edit-artist-dialog-#{data.artist.id}", data)
+    editDocument: (data) =>
+      $('html').trigger("edit-document-dialog-#{data.document.id}", data)
 
-    removeArtist: (artist_id) =>
+    removeDocument: (document_id) =>
 
       if confirm "Are you sure?"
 
         url        = $("#root").data("url")
         csrf_token = $("#root").data("csrf_token")
 
-        $("[data-object ='artist-#{artist_id}']").toggleClass("loading")
+        $("[data-object ='document-#{document_id}']").toggleClass("loading")
 
         adapter  = new Adapter(url)
         postData =
-          id: artist_id
+          id: document_id
 
         adapter.delete csrf_token, postData, ( (data, status) ->
           # request ok
-          $('html').trigger('artist-deleted', data)
+          $('html').trigger('document-deleted', data)
         ), ( (data, status) ->
           # request failed
         ), () ->
           # request finished
-          $("[data-object='artist-#{artist_id}']").toggleClass("loading")
+          $("[data-object='document-#{document_id}']").toggleClass("loading")
 
     render: ->
-      date_time = @props.data.artist.created.substr(0, 10) + " " +
-                  @props.data.artist.created.substr(11, 8)
+      date_time = @props.data.document.created.substr(0, 10) + " " +
+                  @props.data.document.created.substr(11, 8)
       dom.div {className: "content"},
-        dom.div null, "Email:   #{@props.data.artist.email}"
-        dom.div null, "Phone:   #{@props.data.artist.phone}"
-        dom.div null, "Groups:"
-        dom.div className: "ui list",
-          @props.data.artist.groups_info.map (group) ->
-            dom.div className: "item", group.name
-        dom.div null, "URL:     #{@props.data.artist.url}"
-        dom.div null, "Notes:   #{@props.data.artist.notes}"
-        dom.div null, "Created: #{date_time}"
+        dom.div null, "Document:",
+          dom.a {href: @props.data.document.doc}, "__link__"
+        dom.div null, "Created:     #{date_time}"
 
         dom.h3 null, "Actions"
 
         dom.div {className: "ui buttons mini"},
           dom.button
             className: "ui button"
-            onClick: @editArtist.bind(this, @props.data)
+            onClick: @editDocument.bind(this, @props.data)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
@@ -89,30 +84,30 @@ do ->
 
           dom.button
             className: "ui button negative"
-            onClick: @removeArtist.bind(this, @props.data.artist.id)
+            onClick: @removeDocument.bind(this, @props.data.document.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(ArtistModal, {artist: @props.data.artist})
+        React.createElement(DocumentModal, {document: @props.data.document})
 
 
-  class ArtistUnit extends React.Component
+  class DocumentUnit extends React.Component
 
-    displayName: "Artist Unit"
+    displayName: "Document Unit"
 
     constructor: (props) ->
       super(props)
 
     render: ->
         dom.div {className: "ui card"},
-          React.createElement(ArtistUnitHeader, {data: @props})
-          React.createElement(ArtistUnitBody, {data: @props})
+          React.createElement(DocumentUnitHeader, {data: @props})
+          React.createElement(DocumentUnitBody, {data: @props})
 
 
-  class ArtistNoRecords extends React.Component
+  class DocumentNoRecords extends React.Component
 
-    displayName: "Artist no records"
+    displayName: "Document no records"
 
     constructor: (props) ->
       super(props)
@@ -124,18 +119,18 @@ do ->
         dom.h3 null, ""
 
 
-  class ArtistPagination extends React.Component
+  class DocumentPagination extends React.Component
 
-    displayName: "Artist pagination"
+    displayName: "Document pagination"
 
     constructor: (props) ->
       super(props)
 
     clickNextPage: ->
-      $('html').trigger("artist-next-page")
+      $('html').trigger("document-next-page")
 
     clickPrevPage: ->
-      $('html').trigger("artist-prev-page")
+      $('html').trigger("document-prev-page")
 
     render: ->
       if @props.pages
@@ -164,11 +159,11 @@ do ->
         next_page: @props.next
         prev_page: @props.prev
 
-    buildArtists: ->
-      @state.collection.map (artist) =>
-        React.createElement(ArtistUnit, {artist: artist, key: artist.id})
+    buildDocuments: ->
+      @state.collection.map (document) =>
+        React.createElement(DocumentUnit, {document: document, key: document.id})
 
-    loadArtists: (url) ->
+    loadDocuments: (url) ->
       adapter = new Adapter(url)
       adapter.loadData (data) =>
         if data.results.length > 0
@@ -193,9 +188,9 @@ do ->
       return $('#root').data('url') + "?page=" + @state.current_page
 
     componentDidMount: ->
-      $('html').on 'update-artists', (event, data) =>
+      $('html').on 'update-documents', (event, data) =>
         if @state.next_page
-          $('html').trigger("artist-current-page")
+          $('html').trigger("document-current-page")
         else
           index          = _.findIndex @state.collection, {id: data.id}
           new_collection = @state.collection
@@ -205,7 +200,7 @@ do ->
             new_collection[index] = data
           else
             if not @state.count or (@state.count % 9) == 0
-              $('html').trigger("artist-current-page")
+              $('html').trigger("document-current-page")
             else
               count += 1
               new_collection.push(data)
@@ -216,50 +211,50 @@ do ->
             count: count
 
 
-      $('html').on 'artist-deleted', (event, data) =>
+      $('html').on 'document-deleted', (event, data) =>
         count = @state.count - 1
         if @state.next_page
-          $('html').trigger("artist-current-page")
+          $('html').trigger("document-current-page")
         else if @state.prev_page and (count % 9) == 0
-          $('html').trigger("artist-prev-page")
+          $('html').trigger("document-prev-page")
         else
-          filtered_artists = _.filter @state.collection, (artist) =>
-            artist.id != data.id
+          filtered_documents = _.filter @state.collection, (document) =>
+            document.id != data.id
 
           @setState
-            collection: filtered_artists
-            no_records: if filtered_artists.length > 0 then false else true
+            collection: filtered_documents
+            no_records: if filtered_documents.length > 0 then false else true
             count: count
 
-      $('html').on 'artist-next-page', (event, data) =>
-        @loadArtists(@state.next_page)
+      $('html').on 'document-next-page', (event, data) =>
+        @loadDocuments(@state.next_page)
 
-      $('html').on 'artist-prev-page', (event, data) =>
-        @loadArtists(@state.prev_page)
+      $('html').on 'document-prev-page', (event, data) =>
+        @loadDocuments(@state.prev_page)
 
-      $('html').on 'artist-current-page', (event, data) =>
-        @loadArtists(@getUrlCurrentPage())
+      $('html').on 'document-current-page', (event, data) =>
+        @loadDocuments(@getUrlCurrentPage())
 
-    newArtist: ->
-      $('html').trigger("edit-artist-dialog-new")
+    newDocument: ->
+      $('html').trigger("edit-document-dialog-new")
 
     render: ->
       dom.div null,
         dom.h2 className: "ui dividing header",
-          "Artwork::Artists"
+          "Artwork::Documents"
           dom.button
             className: "button ui mini right floated positive"
-            onClick: @newArtist
+            onClick: @newDocument
           , "",
             dom.i {className: "plus icon"}, ""
-            "New artist"
+            "New document"
         dom.div {className: "ui three cards"},
-          @buildArtists()
-        React.createElement(ArtistNoRecords, {output: @state.no_records})
-        React.createElement(ArtistPagination, {
+          @buildDocuments()
+        React.createElement(DocumentNoRecords, {output: @state.no_records})
+        React.createElement(DocumentPagination, {
           page: @state.current_page, pages: Math.ceil(@state.count / 9),
           next: @state.next_page, prev: @state.prev_page})
-        React.createElement(ArtistModal, {artist: {}})
+        React.createElement(DocumentModal, {document: {}})
 
 
   class Visualizer

@@ -69,7 +69,7 @@ do ->
         dom.div null, "Artists:"
         dom.div className: "ui list",
           @props.data.artist_group.artists_info.map (artist) ->
-            dom.div className: "item", artist[1]
+            dom.div className: "item", artist.name
         dom.div null, "URL:     #{@props.data.artist_group.url}"
         dom.div null, "Created: #{date_time}"
 
