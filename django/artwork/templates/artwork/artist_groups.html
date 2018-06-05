@@ -11,7 +11,7 @@
   <div class="ui one column relaxed grid">
     <div class="column">
 
-      <div id="root" data-url="{% url 'artwork_api:artist_groups' %}" data-url-artists="{% url 'artwork_api:artists' %}" data-csrf_token="{{ csrf_token }}">
+      <div id="root" data-url="{% url 'artwork_api:artist_groups' %}" data-url-artists="{% url 'artwork_api:artists' paginate='off' %}" data-csrf_token="{{ csrf_token }}">
         <div class="ui segment">
           <div class="ui active inverted dimmer">
             <div class="ui large text loader">Loading. Please wait.</div>

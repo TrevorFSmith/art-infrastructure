@@ -32,6 +32,7 @@ class @ArtistGroupModal extends React.Component
 
   resetForm: ->
     if not @state.id
+      $("[data-object='artist-group-new'] option:selected").prop('selected', false)
       @setState
         name: ""
         artists: []
@@ -54,7 +55,7 @@ class @ArtistGroupModal extends React.Component
       url = $("#root").data("url-artists")
       adapter = new Adapter(url)
       adapter.loadData (data) ->
-        resolve(data.results)
+        resolve(data)
 
   buildArtists: (artists, selected_artists) ->
     options = []
@@ -81,7 +82,7 @@ class @ArtistGroupModal extends React.Component
     scope = this
     adapter.pushData @action(), csrf_token, data, ( (data) =>
       # request ok
-      $('html').trigger('update-artist_groups', data)
+      $('html').trigger('update-artist-groups', data)
       scope.resetForm()
     ), ( (data) ->
       # request failed
@@ -91,7 +92,7 @@ class @ArtistGroupModal extends React.Component
     )
 
   closeDialog: =>
-    $("[data-object='artist_group-#{@domNode()}']").modal("hide")
+    $("[data-object='artist-group-#{@domNode()}']").modal("hide")
 
   handleChange: (event) =>
     @setState
@@ -104,14 +105,14 @@ class @ArtistGroupModal extends React.Component
       "Add New Artist Group"
 
   componentDidMount: ->
-    $('html').on "edit-artist_group-dialog-#{@domNode()}", (event, scope) =>
-      $("[data-object='artist_group-#{@domNode()}']").modal("show")
+    $('html').on "edit-artist-group-dialog-#{@domNode()}", (event, scope) =>
+      $("[data-object='artist-group-#{@domNode()}']").modal("show")
 
   componentWillUnmount: ->
-    $("[data-object='artist_group-#{@domNode()}']").remove()
+    $("[data-object='artist=group-#{@domNode()}']").remove()
 
   render: ->
-    dom.div className: "ui modal", 'data-object': "artist_group-#{@domNode()}",
+    dom.div className: "ui modal", 'data-object': "artist-group-#{@domNode()}",
 
       dom.div className: "header",
         dom.i className: "pencil icon"

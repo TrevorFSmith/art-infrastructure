@@ -41,6 +41,7 @@ class @EquipmentModal extends React.Component
 
   resetForm: ->
     if not @state.id
+      $("[data-object='equipment-new'] option:selected").prop('selected', false)
       @setState
         name: ""
         type: ""
@@ -64,14 +65,14 @@ class @EquipmentModal extends React.Component
       url = $("#root").data("url-types")
       adapter = new Adapter(url)
       adapter.loadData (data) ->
-        resolve(data.results)
+        resolve(data)
 
   promisePhotos: ->
     new Promise (resolve) -> 
       url = $("#root").data("url-photos")
       adapter = new Adapter(url)
       adapter.loadData (data) ->
-        resolve(data.results)
+        resolve(data)
 
   buildTypes: (types, selected_type) ->
     options = []

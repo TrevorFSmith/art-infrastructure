@@ -10,6 +10,14 @@ class ArtistViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Artist
     get_queryset_serializer_class = serializers.ArtistSerializer
 
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(ArtistViewSet, self).get(request, format)
+        else:
+            artists = models.Artist.objects.all()
+            serializer = serializers.ArtistSerializer(artists, many=True)
+            return Response(serializer.data)
+
     def post(self, request, format=None):
         data = api_helpers.Utils.convert_request(request, "artistgroup_set")
         serializer = serializers.ArtistSerializer(data=data)
@@ -37,6 +45,15 @@ class ArtistViewSet(api_helpers.GenericApiEndpoint):
 class ArtistGroupViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.ArtistGroup
     get_queryset_serializer_class = serializers.ArtistGroupSerializer
+
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(ArtistGroupViewSet, self).get(request, format)
+        else:
+            artist_groups = models.ArtistGroup.objects.all()
+            serializer = serializers.ArtistGroupSerializer(artist_groups, many=True)
+            return Response(serializer.data)
+
 
     def post(self, request, format=None):
         data = api_helpers.Utils.convert_request(request, "artists")
@@ -66,6 +83,14 @@ class PhotoViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Photo
     get_queryset_serializer_class = serializers.PhotoSerializer
 
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(PhotoViewSet, self).get(request, format)
+        else:
+            photos = models.Photo.objects.all()
+            serializer = serializers.PhotoSerializer(photos, many=True)
+            return Response(serializer.data)
+
 
 class DocumentViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Document
@@ -75,6 +100,14 @@ class DocumentViewSet(api_helpers.GenericApiEndpoint):
 class EquipmentTypeViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.EquipmentType
     get_queryset_serializer_class = serializers.EquipmentTypeSerializer
+
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(EquipmentTypeViewSet, self).get(request, format)
+        else:
+            equipment_types = models.EquipmentType.objects.all()
+            serializer = serializers.EquipmentTypeSerializer(equipment_types, many=True)
+            return Response(serializer.data)
 
 
 class EquipmentViewSet(api_helpers.GenericApiEndpoint):

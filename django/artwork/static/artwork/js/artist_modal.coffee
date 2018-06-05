@@ -39,6 +39,7 @@ class @ArtistModal extends React.Component
 
   resetForm: =>
     if not @state.id
+      $("[data-object='artist-new'] option:selected").prop('selected', false)
       @setState
         name: ""
         email: ""
@@ -64,7 +65,7 @@ class @ArtistModal extends React.Component
       url = $("#root").data("url-groups")
       adapter = new Adapter(url)
       adapter.loadData (data) ->
-        resolve(data.results)
+        resolve(data)
 
   buildGroups: (groups, selected_groups) ->
     options = []

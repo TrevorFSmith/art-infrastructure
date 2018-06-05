@@ -37,7 +37,7 @@ do ->
       @state = @state || {}
 
     editArtistGroup: (data) =>
-      $('html').trigger("edit-artist_group-dialog-#{data.artist_group.id}", data)
+      $('html').trigger("edit-artist-group-dialog-#{data.artist_group.id}", data)
 
     removeArtistGroup: (artist_group_id) =>
 
@@ -46,7 +46,7 @@ do ->
         url        = $("#root").data("url")
         csrf_token = $("#root").data("csrf_token")
 
-        $("[data-object ='artist_group-#{artist_group_id}']").toggleClass("loading")
+        $("[data-object ='artist-group-#{artist_group_id}']").toggleClass("loading")
 
         adapter  = new Adapter(url)
         postData =
@@ -54,12 +54,12 @@ do ->
 
         adapter.delete csrf_token, postData, ( (data, status) ->
           # request ok
-          $('html').trigger('artist_group-deleted', data)
+          $('html').trigger('artist-group-deleted', data)
         ), ( (data, status) ->
           # request failed
         ), () ->
           # request finished
-          $("[data-object='artist_group-#{artist_group_id}']").toggleClass("loading")
+          $("[data-object='artist-group-#{artist_group_id}']").toggleClass("loading")
 
     render: ->
       date_time = @props.data.artist_group.created.substr(0, 10) + " " +
@@ -130,10 +130,10 @@ do ->
       super(props)
 
     clickNextPage: ->
-      $('html').trigger("artist_group-next-page")
+      $('html').trigger("artist-group-next-page")
 
     clickPrevPage: ->
-      $('html').trigger("artist_group-prev-page")
+      $('html').trigger("artist-group-prev-page")
 
     render: ->
       if @props.pages
@@ -191,9 +191,9 @@ do ->
       return $('#root').data('url') + "?page=" + @state.current_page
 
     componentDidMount: ->
-      $('html').on 'update-artist_groups', (event, data) =>
+      $('html').on 'update-artist-groups', (event, data) =>
         if @state.next_page
-          $('html').trigger("artist_group-current-page")
+          $('html').trigger("artist-group-current-page")
         else
           index          = _.findIndex @state.collection, {id: data.id}
           new_collection = @state.collection
@@ -203,7 +203,7 @@ do ->
             new_collection[index] = data
           else
             if not @state.count or (@state.count % 9) == 0
-              $('html').trigger("artist_group-current-page")
+              $('html').trigger("artist-group-current-page")
             else
               count += 1
               new_collection.push(data)
@@ -214,12 +214,12 @@ do ->
             count: count
 
 
-      $('html').on 'artist_group-deleted', (event, data) =>
+      $('html').on 'artist-group-deleted', (event, data) =>
         count = @state.count - 1
         if @state.next_page
-          $('html').trigger("artist_group-current-page")
+          $('html').trigger("artist-group-current-page")
         else if @state.prev_page and (count % 9) == 0
-          $('html').trigger("artist_group-prev-page")
+          $('html').trigger("artist-group-prev-page")
         else
           filtered_artist_groups = _.filter @state.collection, (artist_group) =>
             artist_group.id != data.id
@@ -229,17 +229,17 @@ do ->
             no_records: if filtered_artist_groups.length > 0 then false else true
             count: count
 
-      $('html').on 'artist_group-next-page', (event, data) =>
+      $('html').on 'artist-group-next-page', (event, data) =>
         @loadArtistGroups(@state.next_page)
 
-      $('html').on 'artist_group-prev-page', (event, data) =>
+      $('html').on 'artist-group-prev-page', (event, data) =>
         @loadArtistGroups(@state.prev_page)
 
-      $('html').on 'artist_group-current-page', (event, data) =>
+      $('html').on 'artist-group-current-page', (event, data) =>
         @loadArtistGroups(@getUrlCurrentPage())
 
     newArtistGroup: ->
-      $('html').trigger("edit-artist_group-dialog-new")
+      $('html').trigger("edit-artist-group-dialog-new")
 
     render: ->
       dom.div null,

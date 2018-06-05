@@ -14,23 +14,9 @@ do ->
   "use strict"
 
 
-  class ArtistUnitHeader extends React.Component
+  class ArtistUnit extends React.Component
 
-    displayName: "Artist Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.artist.name
-
-
-  class ArtistUnitBody extends React.Component
-
-    displayName: "Artist Body"
+    displayName: "Artist Unit"
 
     constructor: (props) ->
       super(props)
@@ -62,52 +48,42 @@ do ->
           $("[data-object='artist-#{artist_id}']").toggleClass("loading")
 
     render: ->
-      date_time = @props.data.artist.created.substr(0, 10) + " " +
-                  @props.data.artist.created.substr(11, 8)
-      dom.div {className: "content"},
-        dom.div null, "Email:   #{@props.data.artist.email}"
-        dom.div null, "Phone:   #{@props.data.artist.phone}"
-        dom.div null, "Groups:"
-        dom.div className: "ui list",
-          @props.data.artist.groups_info.map (group) ->
-            dom.div className: "item", group.name
-        dom.div null, "URL:     #{@props.data.artist.url}"
-        dom.div null, "Notes:   #{@props.data.artist.notes}"
-        dom.div null, "Created: #{date_time}"
+      date_time = @props.artist.created.substr(0, 10) + " " +
+                  @props.artist.created.substr(11, 8)
 
-        dom.h3 null, "Actions"
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.artist.name
 
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "content"},
+          dom.div null, "Email:   #{@props.artist.email}"
+          dom.div null, "Phone:   #{@props.artist.phone}"
+          dom.div null, "Groups:"
+          dom.div className: "ui list",
+            @props.artist.groups_info.map (group) ->
+              dom.div className: "item", group.name
+          dom.div null, "URL:     #{@props.artist.url}"
+          dom.div null, "Notes:   #{@props.artist.notes}"
+          dom.div null, "Created: #{date_time}"
+
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editArtist.bind(this, @props.data)
+            onClick: @editArtist.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeArtist.bind(this, @props.data.artist.id)
+            onClick: @removeArtist.bind(this, @props.artist.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(ArtistModal, {artist: @props.data.artist})
-
-
-  class ArtistUnit extends React.Component
-
-    displayName: "Artist Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(ArtistUnitHeader, {data: @props})
-          React.createElement(ArtistUnitBody, {data: @props})
+        React.createElement(ArtistModal, {artist: @props.artist})
 
 
   class ArtistNoRecords extends React.Component
