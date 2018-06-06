@@ -16,21 +16,7 @@ do ->
   "use strict"
 
 
-  class CrestonUnitHeader extends React.Component
-
-    displayName: "Creston Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.creston.name
-
-
-  class CrestonUnitBody extends React.Component
+  class CrestonUnit extends React.Component
 
     displayName: "Creston Body"
 
@@ -66,43 +52,32 @@ do ->
 
 
     render: ->
-      scope = this
-      dom.div {className: "content"},
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.creston.name
 
-        dom.h3 null, "Host: #{@props.data.creston.host} | Port: #{@props.data.creston.port}"
-        React.createElement(CrestonSelectCommand, {creston: @props.data.creston})
-        dom.h3 null, "Actions:"
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "content"},
+          dom.h3 null, "Host: #{@props.creston.host} | Port: #{@props.creston.port}"
+          React.createElement(CrestonSelectCommand, {creston: @props.creston})
+
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editCreston.bind(this, @props.data)
+            onClick: @editCreston.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeCreston.bind(this, @props.data.creston.id)
+            onClick: @removeCreston.bind(this, @props.creston.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(CrestonModal, {creston: @props.data.creston})
-
-
-  class CrestonUnit extends React.Component
-
-    displayName: "Creston Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(CrestonUnitHeader, {data: @props})
-          React.createElement(CrestonUnitBody, {data: @props})
+        React.createElement(CrestonModal, {creston: @props.creston})
 
 
   class CrestonNoRecords extends React.Component

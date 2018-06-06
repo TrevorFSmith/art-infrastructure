@@ -114,6 +114,14 @@ class EquipmentViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Equipment
     get_queryset_serializer_class = serializers.EquipmentSerializer
 
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(EquipmentViewSet, self).get(request, format)
+        else:
+            equipment_types = models.Equipment.objects.all()
+            serializer = serializers.EquipmentSerializer(equipment_types, many=True)
+            return Response(serializer.data)
+
     def post(self, request, format=None):
         data = api_helpers.Utils.convert_request(request, "photos")
         serializer = serializers.EquipmentSerializer(data=data)
@@ -141,6 +149,29 @@ class EquipmentViewSet(api_helpers.GenericApiEndpoint):
 class InstallationSiteViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.InstallationSite
     get_queryset_serializer_class = serializers.InstallationSiteSerializer
+
+    def post(self, request, format=None):
+        data = api_helpers.Utils.convert_request(request, "photos", "equipment")
+        serializer = serializers.InstallationSiteSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        data = api_helpers.Utils.convert_request(request, "photos", "equipment")
+        try:
+            get_object = models.InstallationSite.objects.get(pk=int(data.get("id")))
+            serializer = serializers.InstallationSiteSerializer(get_object, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ObjectDoesNotExist:
+            raise Http404
 
 
 class InstallationViewSet(api_helpers.GenericApiEndpoint):

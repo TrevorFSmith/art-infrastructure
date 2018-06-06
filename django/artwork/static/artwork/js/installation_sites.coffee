@@ -15,77 +15,84 @@ do ->
   "use strict"
 
 
-  class PhotoUnit extends React.Component
+  class InstallationSiteUnit extends React.Component
 
-    displayName: "Photo Body"
+    displayName: "Installation Site Unit"
 
     constructor: (props) ->
       super(props)
       @state = @state || {}
 
-    editPhoto: (data) =>
-      $('html').trigger("edit-photo-dialog-#{data.photo.id}", data)
+    editInstallationSite: (data) =>
+      $('html').trigger("edit-installation-site-dialog-#{data.installation_site.id}", data)
 
-    removePhoto: (photo_id) =>
+    removeInstallationSite: (installation_site_id) =>
 
       if confirm "Are you sure?"
 
         url        = $("#root").data("url")
         csrf_token = $("#root").data("csrf_token")
 
-        $("[data-object ='photo-#{photo_id}']").toggleClass("loading")
+        $("[data-object ='installation-site-#{installation_site_id}']").toggleClass("loading")
 
         adapter  = new Adapter(url)
         postData =
-          id: photo_id
+          id: installation_site_id
 
         adapter.delete csrf_token, postData, ( (data, status) ->
           # request ok
-          $('html').trigger('photo-deleted', data)
+          $('html').trigger('installation-site-deleted', data)
         ), ( (data, status) ->
           # request failed
         ), () ->
           # request finished
-          $("[data-object='photo-#{photo_id}']").toggleClass("loading")
+          $("[data-object='installation-site-#{installation_site_id}']").toggleClass("loading")
 
     render: ->
-      date_time = @props.photo.created.substr(0, 10) + " " +
-                  @props.photo.created.substr(11, 8)
+      date_time = @props.installation_site.created.substr(0, 10) + " " +
+                  @props.installation_site.created.substr(11, 8)
 
       dom.div {className: "ui card"},
         dom.div {className: "extra content"},
           dom.h3 {className: "left floated"},
             dom.i {className: "ui icon check circle"}, ""
-            dom.span null, @props.photo.title
+            dom.span null, @props.installation_site.name
 
         dom.div {className: "content"},
-          dom.div null, "Photo:",
-            dom.a {href: @props.photo.image}, "__link__"
-          dom.div null, "Caption:     #{@props.photo.caption}"
-          dom.div null, "Description: #{@props.photo.description}"
-          dom.div null, "Created:     #{date_time}"
+          dom.div null, "Location:   #{@props.installation_site.location}"
+          dom.div null, "Photos:"
+          dom.div className: "ui list",
+            @props.installation_site.photos_info.map (photo) ->
+              dom.div className: "item", 
+                dom.a href: "/media/" + photo.image, photo.title
+          dom.div null, "Equipment:"
+          dom.div className: "ui list",
+            @props.installation_site.equipment_info.map (equipment) ->
+              dom.div className: "item", equipment.name
+          dom.div null, "Notes:   #{@props.installation_site.notes}"
+          dom.div null, "Created: #{date_time}"
 
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editPhoto.bind(this, @props)
+            onClick: @editInstallationSite.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
           dom.div {className: "or"}
           dom.button
             className: "ui button negative"
-            onClick: @removePhoto.bind(this, @props.photo.id)
+            onClick: @removeInstallationSite.bind(this, @props.installation_site.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(PhotoModal, {photo: @props.photo})
+        React.createElement(InstallationSiteModal, {installation_site: @props.installation_site})
 
 
-  class PhotoNoRecords extends React.Component
+  class InstallationSiteNoRecords extends React.Component
 
-    displayName: "Photo no records"
+    displayName: "Installation Site no records"
 
     constructor: (props) ->
       super(props)
@@ -97,18 +104,18 @@ do ->
         dom.h3 null, ""
 
 
-  class PhotoPagination extends React.Component
+  class InstallationSitePagination extends React.Component
 
-    displayName: "Photo pagination"
+    displayName: "Installation Site pagination"
 
     constructor: (props) ->
       super(props)
 
     clickNextPage: ->
-      $('html').trigger("photo-next-page")
+      $('html').trigger("installation-site-next-page")
 
     clickPrevPage: ->
-      $('html').trigger("photo-prev-page")
+      $('html').trigger("installation-site-prev-page")
 
     render: ->
       if @props.pages
@@ -137,11 +144,11 @@ do ->
         next_page: @props.next
         prev_page: @props.prev
 
-    buildPhotos: ->
-      @state.collection.map (photo) =>
-        React.createElement(PhotoUnit, {photo: photo, key: photo.id})
+    buildInstallationSites: ->
+      @state.collection.map (installation_site) =>
+        React.createElement(InstallationSiteUnit, {installation_site: installation_site, key: installation_site.id})
 
-    loadPhotos: (url) ->
+    loadInstallationSites: (url) ->
       adapter = new Adapter(url)
       adapter.loadData (data) =>
         if data.results.length > 0
@@ -166,9 +173,9 @@ do ->
       return $('#root').data('url') + "?page=" + @state.current_page
 
     componentDidMount: ->
-      $('html').on 'update-photos', (event, data) =>
+      $('html').on 'update-installation-sites', (event, data) =>
         if @state.next_page
-          $('html').trigger("photo-current-page")
+          $('html').trigger("installation-site-current-page")
         else
           index          = _.findIndex @state.collection, {id: data.id}
           new_collection = @state.collection
@@ -178,7 +185,7 @@ do ->
             new_collection[index] = data
           else
             if not @state.count or (@state.count % 9) == 0
-              $('html').trigger("photo-current-page")
+              $('html').trigger("installation-site-current-page")
             else
               count += 1
               new_collection.push(data)
@@ -189,50 +196,50 @@ do ->
             count: count
 
 
-      $('html').on 'photo-deleted', (event, data) =>
+      $('html').on 'installation-site-deleted', (event, data) =>
         count = @state.count - 1
         if @state.next_page
-          $('html').trigger("photo-current-page")
+          $('html').trigger("installation-site-current-page")
         else if @state.prev_page and (count % 9) == 0
-          $('html').trigger("photo-prev-page")
+          $('html').trigger("installation-site-prev-page")
         else
-          filtered_photos = _.filter @state.collection, (photo) =>
-            photo.id != data.id
+          filtered_installation_sites = _.filter @state.collection, (installation_site) =>
+            installation_site.id != data.id
 
           @setState
-            collection: filtered_photos
-            no_records: if filtered_photos.length > 0 then false else true
+            collection: filtered_installation_sites
+            no_records: if filtered_installation_sites.length > 0 then false else true
             count: count
 
-      $('html').on 'photo-next-page', (event, data) =>
-        @loadPhotos(@state.next_page)
+      $('html').on 'installation-site-next-page', (event, data) =>
+        @loadInstallationSites(@state.next_page)
 
-      $('html').on 'photo-prev-page', (event, data) =>
-        @loadPhotos(@state.prev_page)
+      $('html').on 'installation-site-prev-page', (event, data) =>
+        @loadInstallationSites(@state.prev_page)
 
-      $('html').on 'photo-current-page', (event, data) =>
-        @loadPhotos(@getUrlCurrentPage())
+      $('html').on 'installation-site-current-page', (event, data) =>
+        @loadInstallationSites(@getUrlCurrentPage())
 
-    newPhoto: ->
-      $('html').trigger("edit-photo-dialog-new")
+    newInstallationSite: ->
+      $('html').trigger("edit-installation-site-dialog-new")
 
     render: ->
       dom.div null,
         dom.h2 className: "ui dividing header",
-          "Artwork::Photos"
+          "Artwork::InstallationSites"
           dom.button
             className: "button ui mini right floated positive"
-            onClick: @newPhoto
+            onClick: @newInstallationSite
           , "",
             dom.i {className: "plus icon"}, ""
-            "New photo"
+            "New installation site"
         dom.div {className: "ui three cards"},
-          @buildPhotos()
-        React.createElement(PhotoNoRecords, {output: @state.no_records})
-        React.createElement(PhotoPagination, {
+          @buildInstallationSites()
+        React.createElement(InstallationSiteNoRecords, {output: @state.no_records})
+        React.createElement(InstallationSitePagination, {
           page: @state.current_page, pages: Math.ceil(@state.count / 9),
           next: @state.next_page, prev: @state.prev_page})
-        React.createElement(PhotoModal, {photo: {}})
+        React.createElement(InstallationSiteModal, {installation_site: {}})
 
 
   class Visualizer

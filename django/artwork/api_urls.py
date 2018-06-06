@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^v1/equipment_types/$', views_v1.EquipmentTypeViewSet.as_view(), name='equipment_types'),
     url(r'^v1/equipment_types/(?P<paginate>\w+)/$', views_v1.EquipmentTypeViewSet.as_view(), name='equipment_types'),
     url(r'^v1/equipments/$', views_v1.EquipmentViewSet.as_view(), name='equipments'),
+    url(r'^v1/equipments/(?P<paginate>\w+)/$', views_v1.EquipmentViewSet.as_view(), name='equipments'),
     url(r'^v1/installation_sites/$', views_v1.InstallationSiteViewSet.as_view(), name='installation_sites'),
     url(r'^v1/installations/$', views_v1.InstallationViewSet.as_view(), name='installations'),
     url(r'^v1/system_status/$', views_v1.SystemStatusViewSet.as_view(), name='system_status'),

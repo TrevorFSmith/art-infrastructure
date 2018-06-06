@@ -14,21 +14,7 @@ do ->
   "use strict"
 
 
-  class EquipmentTypeUnitHeader extends React.Component
-
-    displayName: "Equipment Type Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.equipment_type.name
-
-
-  class EquipmentTypeUnitBody extends React.Component
+  class EquipmentTypeUnit extends React.Component
 
     displayName: "Equipment Type Body"
 
@@ -76,7 +62,6 @@ do ->
         postData =
           id: equipment_type_id
 
-        scope = this
         adapter.delete csrf_token, postData, ( (data, status) ->
           # request ok
           $('html').trigger('equipment-type-deleted', data)
@@ -88,46 +73,33 @@ do ->
 
 
     render: ->
-      scope = this
-      dom.div {className: "content"},
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.equipment_type.name
 
-        dom.div null, "Provider: #{@props.data.equipment_type.provider}"
-        dom.div null, "URL:      #{@props.data.equipment_type.url}"
-        dom.div null, "Notes:    #{@props.data.equipment_type.notes}"
+        dom.div {className: "content"},
+          dom.div null, "Provider: #{@props.equipment_type.provider}"
+          dom.div null, "URL:      #{@props.equipment_type.url}"
+          dom.div null, "Notes:    #{@props.equipment_type.notes}"
 
-        dom.h3 null, "Actions"
-
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editEquipmentType.bind(this, @props.data)
+            onClick: @editEquipmentType.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeEquipmentType.bind(this, @props.data.equipment_type.id)
+            onClick: @removeEquipmentType.bind(this, @props.equipment_type.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(EquipmentTypeModal, {equipment_type: @props.data.equipment_type})
-
-
-  class EquipmentTypeUnit extends React.Component
-
-    displayName: "Equipment Type Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(EquipmentTypeUnitHeader, {data: @props})
-          React.createElement(EquipmentTypeUnitBody, {data: @props})
+        React.createElement(EquipmentTypeModal, {equipment_type: @props.equipment_type})
 
 
   class EquipmentTypeNoRecords extends React.Component

@@ -15,21 +15,7 @@ do ->
   "use strict"
 
 
-  class EquipmentUnitHeader extends React.Component
-
-    displayName: "Equipment Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.equipment.name
-
-
-  class EquipmentUnitBody extends React.Component
+  class EquipmentUnit extends React.Component
 
     displayName: "Equipment Body"
 
@@ -63,52 +49,42 @@ do ->
           $("[data-object='equipment-#{equipment_id}']").toggleClass("loading")
 
     render: ->
-      date_time = @props.data.equipment.created.substr(0, 10) + " " +
-                  @props.data.equipment.created.substr(11, 8)
-      dom.div {className: "content"},
-        dom.div null, "Email: #{@props.data.equipment.email}"
-        dom.div null, "Type:  #{@props.data.equipment.equipment_type_name}"
-        dom.div null, "Photos:"
-        dom.div className: "ui list",
-          @props.data.equipment.photos_info.map (photo) ->
-            dom.div className: "item", 
-              dom.a href: "/media/" + photo.image, photo.title
-        dom.div null, "Notes:   #{@props.data.equipment.notes}"
-        dom.div null, "Created: #{date_time}"
+      date_time = @props.equipment.created.substr(0, 10) + " " +
+                  @props.equipment.created.substr(11, 8)
 
-        dom.h3 null, "Actions"
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.equipment.name
 
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "content"},
+          dom.div null, "Email: #{@props.equipment.email}"
+          dom.div null, "Type:  #{@props.equipment.equipment_type_name}"
+          dom.div null, "Photos:"
+          dom.div className: "ui list",
+            @props.equipment.photos_info.map (photo) ->
+              dom.div className: "item", 
+                dom.a href: "/media/" + photo.image, photo.title
+          dom.div null, "Notes:   #{@props.equipment.notes}"
+          dom.div null, "Created: #{date_time}"
+
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editEquipment.bind(this, @props.data)
+            onClick: @editEquipment.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeEquipment.bind(this, @props.data.equipment.id)
+            onClick: @removeEquipment.bind(this, @props.equipment.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(EquipmentModal, {equipment: @props.data.equipment})
-
-
-  class EquipmentUnit extends React.Component
-
-    displayName: "Equipment Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(EquipmentUnitHeader, {data: @props})
-          React.createElement(EquipmentUnitBody, {data: @props})
+        React.createElement(EquipmentModal, {equipment: @props.equipment})
 
 
   class EquipmentNoRecords extends React.Component

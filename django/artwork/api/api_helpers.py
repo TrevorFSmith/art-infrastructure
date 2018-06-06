@@ -74,9 +74,10 @@ class GenericApiEndpoint(APIView, pagination.PageNumberPagination):
 class Utils:
 
     @staticmethod
-    def convert_request(request, field):
+    def convert_request(request, *fields):
         data = request.data.copy()
-        if data.has_key(field + "[]"):
-          artists = data.getlist(field + "[]")
-          data.setlist(field, artists)
+        for field in fields:
+            if data.has_key(field + "[]"):
+              artists = data.getlist(field + "[]")
+              data.setlist(field, artists)
         return data

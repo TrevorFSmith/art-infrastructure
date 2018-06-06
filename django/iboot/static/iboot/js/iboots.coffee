@@ -14,21 +14,7 @@ do ->
   "use strict"
 
 
-  class IBootUnitHeader extends React.Component
-
-    displayName: "iBoot Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.iboot.name
-
-
-  class IBootUnitBody extends React.Component
+  class IBootUnit extends React.Component
 
     displayName: "iBoot Body"
 
@@ -43,7 +29,7 @@ do ->
 
       url        = $("#root").data("command-url")
       csrf_token = $("#root").data("csrf_token")
-      iboot_id = @props.data.iboot.id
+      iboot_id = @props.iboot.id
 
       $("[data-object='command-#{iboot_id}-#{cmd}']").toggleClass("loading")
 
@@ -89,54 +75,42 @@ do ->
 
     render: ->
       scope = this
-      dom.div {className: "content"},
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.iboot.name
 
-        dom.h3 null, 
-          dom.p null, "Host: #{@props.data.iboot.host} | Port: #{@props.data.iboot.port}"
-          dom.p null, "Mac: #{@props.data.iboot.mac_address}"
+        dom.div {className: "content"},
+          dom.h3 null, 
+            dom.p null, "Host: #{@props.iboot.host} | Port: #{@props.iboot.port}"
+            dom.p null, "Mac: #{@props.iboot.mac_address}"
 
-        @props.data.iboot.commands.map (cmd) ->
-          dom.div
-            className: "button ui mini"
-            "data-object": "command-#{scope.props.data.iboot.id}-#{cmd.command}"
-            onClick: scope.sendCommand.bind(scope, cmd.command)
-          , "",
-            dom.i {className: "cog icon"}, ""
-            cmd.title
+          @props.iboot.commands.map (cmd) ->
+            dom.div
+              className: "button ui mini"
+              "data-object": "command-#{scope.props.iboot.id}-#{cmd.command}"
+              onClick: scope.sendCommand.bind(scope, cmd.command)
+            , "",
+              dom.i {className: "cog icon"}, ""
+              cmd.title
 
-        dom.h3 null, "Actions"
-
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editIBoot.bind(this, @props.data)
+            onClick: @editIBoot.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeIBoot.bind(this, @props.data.iboot.id)
+            onClick: @removeIBoot.bind(this, @props.iboot.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(IBootModal, {iboot: @props.data.iboot})
-
-
-  class IBootUnit extends React.Component
-
-    displayName: "iBoot Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(IBootUnitHeader, {data: @props})
-          React.createElement(IBootUnitBody, {data: @props})
+        React.createElement(IBootModal, {iboot: @props.iboot})
 
 
   class IBootNoRecords extends React.Component

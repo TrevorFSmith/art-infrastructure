@@ -14,21 +14,7 @@ do ->
   "use strict"
 
 
-  class ProjectorUnitHeader extends React.Component
-
-    displayName: "Projector Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.projector.name
-
-
-  class ProjectorUnitBody extends React.Component
+  class ProjectorUnit extends React.Component
 
     displayName: "Projector Body"
 
@@ -43,7 +29,7 @@ do ->
 
       url        = $("#root").data("command-url")
       csrf_token = $("#root").data("csrf_token")
-      projector_id = @props.data.projector.id
+      projector_id = @props.projector.id
 
       $("[data-object='command-#{projector_id}-#{cmd}']").toggleClass("loading")
 
@@ -90,52 +76,39 @@ do ->
 
     render: ->
       scope = this
-      dom.div {className: "content"},
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.projector.name
 
-        dom.h3 null, "Host: #{@props.data.projector.pjlink_host} | Port: #{@props.data.projector.pjlink_port}"
+        dom.div {className: "content"},
+          dom.h3 null, "Host: #{@props.projector.pjlink_host} | Port: #{@props.projector.pjlink_port}"
+          @props.projector.commands.map (cmd) ->
+            dom.div
+              className: "button ui mini"
+              "data-object": "command-#{scope.props.projector.id}-#{cmd.command}"
+              onClick: scope.sendCommand.bind(scope, cmd.command)
+            , "",
+              dom.i {className: "cog icon"}, ""
+              cmd.title
 
-        @props.data.projector.commands.map (cmd) ->
-          dom.div
-            className: "button ui mini"
-            "data-object": "command-#{scope.props.data.projector.id}-#{cmd.command}"
-            onClick: scope.sendCommand.bind(scope, cmd.command)
-          , "",
-            dom.i {className: "cog icon"}, ""
-            cmd.title
-
-        dom.h3 null, ""
-
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editProjector.bind(this, @props.data)
+            onClick: @editProjector.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeProjector.bind(this, @props.data.projector.id)
+            onClick: @removeProjector.bind(this, @props.projector.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(ProjectorModal, {projector: @props.data.projector})
-
-
-  class ProjectorUnit extends React.Component
-
-    displayName: "Projector Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(ProjectorUnitHeader, {data: @props})
-          React.createElement(ProjectorUnitBody, {data: @props})
+        React.createElement(ProjectorModal, {projector: @props.projector})
 
 
   class ProjectorNoRecords extends React.Component

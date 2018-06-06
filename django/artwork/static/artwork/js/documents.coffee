@@ -15,21 +15,7 @@ do ->
   "use strict"
 
 
-  class DocumentUnitHeader extends React.Component
-
-    displayName: "Document Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.document.title
-
-
-  class DocumentUnitBody extends React.Component
+  class DocumentUnit extends React.Component
 
     displayName: "Document Body"
 
@@ -63,46 +49,36 @@ do ->
           $("[data-object='document-#{document_id}']").toggleClass("loading")
 
     render: ->
-      date_time = @props.data.document.created.substr(0, 10) + " " +
-                  @props.data.document.created.substr(11, 8)
-      dom.div {className: "content"},
-        dom.div null, "Document:",
-          dom.a {href: @props.data.document.doc}, "__link__"
-        dom.div null, "Created:     #{date_time}"
+      date_time = @props.document.created.substr(0, 10) + " " +
+                  @props.document.created.substr(11, 8)
 
-        dom.h3 null, "Actions"
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.document.title
 
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "content"},
+          dom.div null, "Document:",
+            dom.a {href: @props.document.doc}, "__link__"
+          dom.div null, "Created:     #{date_time}"
+
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editDocument.bind(this, @props.data)
+            onClick: @editDocument.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeDocument.bind(this, @props.data.document.id)
+            onClick: @removeDocument.bind(this, @props.document.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(DocumentModal, {document: @props.data.document})
-
-
-  class DocumentUnit extends React.Component
-
-    displayName: "Document Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(DocumentUnitHeader, {data: @props})
-          React.createElement(DocumentUnitBody, {data: @props})
+        React.createElement(DocumentModal, {document: @props.document})
 
 
   class DocumentNoRecords extends React.Component

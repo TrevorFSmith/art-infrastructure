@@ -99,7 +99,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
         return obj.photos.values("id", "image", "title")
 
 
-class DocumentSerializer(serializers.HyperlinkedModelSerializer):
+class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         ordering = ['-created']
@@ -112,7 +112,9 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             ]
 
 
-class InstallationSiteSerializer(serializers.HyperlinkedModelSerializer):
+class InstallationSiteSerializer(serializers.ModelSerializer):
+    photos_info = serializers.SerializerMethodField(read_only=True)
+    equipment_info = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         verbose_name = 'location'
@@ -125,12 +127,20 @@ class InstallationSiteSerializer(serializers.HyperlinkedModelSerializer):
             "location",
             "notes",
             "photos",
+            "photos_info",
             "equipment",
+            "equipment_info",
             "created",
             ]
 
+    def get_photos_info(self, obj):
+        return obj.photos.values("id", "image", "title")
 
-class InstallationSerializer(serializers.HyperlinkedModelSerializer):
+    def get_equipment_info(self, obj):
+        return obj.equipment.values("id", "name")
+
+
+class InstallationSerializer(serializers.ModelSerializer):
 
     class Meta:
         verbose_name =  'artwork'
