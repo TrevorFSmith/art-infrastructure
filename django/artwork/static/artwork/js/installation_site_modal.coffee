@@ -33,11 +33,11 @@ class @InstallationSiteModal extends React.Component
         all_photos: []
         all_equipment: []
 
-    @promisePhotos().then (results) =>
+    @promiseObjects("url-photos").then (results) =>
       @setState
         all_photos: results
 
-    @promiseEquipment().then (results) =>
+    @promiseObjects("url-equipment").then (results) =>
       @setState
         all_equipment: results
 
@@ -63,16 +63,9 @@ class @InstallationSiteModal extends React.Component
     else
       "POST"
 
-  promisePhotos: ->
+  promiseObjects: (url) ->
     new Promise (resolve) -> 
-      url = $("#root").data("url-photos")
-      adapter = new Adapter(url)
-      adapter.loadData (data) ->
-        resolve(data)
-
-  promiseEquipment: ->
-    new Promise (resolve) -> 
-      url = $("#root").data("url-equipment")
+      url = $("#root").data(url)
       adapter = new Adapter(url)
       adapter.loadData (data) ->
         resolve(data)

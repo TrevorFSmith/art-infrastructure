@@ -96,6 +96,14 @@ class DocumentViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Document
     get_queryset_serializer_class = serializers.DocumentSerializer
 
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(DocumentViewSet, self).get(request, format)
+        else:
+            documents = models.Document.objects.all()
+            serializer = serializers.DocumentSerializer(documents, many=True)
+            return Response(serializer.data)
+
 
 class EquipmentTypeViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.EquipmentType
@@ -150,6 +158,15 @@ class InstallationSiteViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.InstallationSite
     get_queryset_serializer_class = serializers.InstallationSiteSerializer
 
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(InstallationSiteViewSet, self).get(request, format)
+        else:
+            installation_sites = models.InstallationSite.objects.all()
+            serializer = serializers.InstallationSiteSerializer(installation_sites, many=True)
+            return Response(serializer.data)
+
+
     def post(self, request, format=None):
         data = api_helpers.Utils.convert_request(request, "photos", "equipment")
         serializer = serializers.InstallationSiteSerializer(data=data)
@@ -177,6 +194,29 @@ class InstallationSiteViewSet(api_helpers.GenericApiEndpoint):
 class InstallationViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Installation
     get_queryset_serializer_class = serializers.InstallationSerializer
+
+    def post(self, request, format=None):
+        data = api_helpers.Utils.convert_request(request, "groups", "artists", "users", "photos", "documents")
+        serializer = serializers.InstallationSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, format=None):
+        data = api_helpers.Utils.convert_request(request, "groups", "artists", "users", "photos", "documents")
+        try:
+            get_object = models.Installation.objects.get(pk=int(data.get("id")))
+            serializer = serializers.InstallationSerializer(get_object, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ObjectDoesNotExist:
+            raise Http404
 
 
 class SystemStatusViewSet(api_helpers.GenericApiEndpoint):

@@ -141,6 +141,11 @@ class InstallationSiteSerializer(serializers.ModelSerializer):
 
 
 class InstallationSerializer(serializers.ModelSerializer):
+    site_name = serializers.SerializerMethodField(read_only=True)
+    groups_info = serializers.SerializerMethodField(read_only=True)
+    artists_info = serializers.SerializerMethodField(read_only=True)
+    photos_info = serializers.SerializerMethodField(read_only=True)
+    documents_info = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         verbose_name =  'artwork'
@@ -160,4 +165,24 @@ class InstallationSerializer(serializers.ModelSerializer):
             "photos",
             "documents",
             "created",
+            "site_name",
+            "groups_info",
+            "artists_info",
+            "photos_info",
+            "documents_info",
             ]
+
+    def get_site_name(self, obj):
+        return obj.site.name
+
+    def get_groups_info(self, obj):
+        return obj.groups.values("id", "name")
+
+    def get_artists_info(self, obj):
+        return obj.artists.values("id", "name")
+
+    def get_photos_info(self, obj):
+        return obj.photos.values("id", "image", "title")
+
+    def get_documents_info(self, obj):
+        return obj.documents.values("id", "doc", "title")
