@@ -55,6 +55,10 @@ class @InstallationModal extends React.Component
       @setState
         all_artists: results
 
+    @promiseObjects("url-users").then (results) =>
+      @setState
+        all_users: results
+
     @promiseObjects("url-sites").then (results) =>
       @setState
         all_sites: results
@@ -190,22 +194,27 @@ class @InstallationModal extends React.Component
 
           dom.div className: "field",
             dom.label null, "Artist groups"
-            dom.select placeholder: "Groups", multiple: "multiple", onChange: @handleChange.bind(this), name: 'groups',
+            dom.select  multiple: "multiple", onChange: @handleChange.bind(this), name: 'groups',
               @buildObjectsName(@state.all_artist_groups, @state.groups)
 
           dom.div className: "field",
             dom.label null, "Artists"
-            dom.select placeholder: "Artists", multiple: "multiple", onChange: @handleChange.bind(this), name: 'artists',
+            dom.select multiple: "multiple", onChange: @handleChange.bind(this), name: 'artists',
               @buildObjectsName(@state.all_artists, @state.artists)
 
           dom.div className: "field",
+            dom.label null, "Users"
+            dom.select multiple: "multiple", onChange: @handleChange.bind(this), name: 'users',
+              @buildObjectsName(@state.all_users, @state.users)
+
+          dom.div className: "field",
             dom.label null, "Photos"
-            dom.select placeholder: "Photos", multiple: "multiple", onChange: @handleChange.bind(this), name: 'photos',
+            dom.select multiple: "multiple", onChange: @handleChange.bind(this), name: 'photos',
               @buildObjectsTitle(@state.all_photos, @state.photos)
 
           dom.div className: "field",
             dom.label null, "Documents"
-            dom.select placeholder: "Documents", multiple: "multiple", onChange: @handleChange.bind(this), name: 'documents',
+            dom.select multiple: "multiple", onChange: @handleChange.bind(this), name: 'documents',
               @buildObjectsTitle(@state.all_documents, @state.documents)
 
           dom.div className: "field",

@@ -68,6 +68,10 @@ do ->
           dom.div className: "ui list",
             @props.installation.artists_info.map (artist) ->
               dom.div className: "item", artist.name
+          dom.div null, "Users:"
+          dom.div className: "ui list",
+            @props.installation.users_info.map (user) ->
+              dom.div className: "item", user.username
           dom.div null, "Photos:"
           dom.div className: "ui list",
             @props.installation.photos_info.map (photo) ->

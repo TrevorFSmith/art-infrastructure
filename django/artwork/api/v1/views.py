@@ -4,6 +4,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
+from django.contrib.auth.models import User
 
 
 class ArtistViewSet(api_helpers.GenericApiEndpoint):
@@ -196,7 +198,7 @@ class InstallationViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_serializer_class = serializers.InstallationSerializer
 
     def post(self, request, format=None):
-        data = api_helpers.Utils.convert_request(request, "groups", "artists", "users", "photos", "documents")
+        data = api_helpers.Utils.convert_request(request, "groups", "artists", "user", "photos", "documents")
         serializer = serializers.InstallationSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -205,7 +207,7 @@ class InstallationViewSet(api_helpers.GenericApiEndpoint):
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):
-        data = api_helpers.Utils.convert_request(request, "groups", "artists", "users", "photos", "documents")
+        data = api_helpers.Utils.convert_request(request, "groups", "artists", "user", "photos", "documents")
         try:
             get_object = models.Installation.objects.get(pk=int(data.get("id")))
             serializer = serializers.InstallationSerializer(get_object, data=data)
@@ -221,3 +223,11 @@ class InstallationViewSet(api_helpers.GenericApiEndpoint):
 
 class SystemStatusViewSet(api_helpers.GenericApiEndpoint):
     pass
+
+
+class UserViewSet(APIView):
+
+    def get(self, request, format=None):
+        users = User.objects.all()
+        serializer = serializers.UserSerializer(users, many=True)
+        return Response(serializer.data)

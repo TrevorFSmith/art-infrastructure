@@ -19,4 +19,5 @@ urlpatterns = [
     url(r'^v1/installation_sites/(?P<paginate>\w+)/$', views_v1.InstallationSiteViewSet.as_view(), name='installation_sites'),
     url(r'^v1/installations/$', views_v1.InstallationViewSet.as_view(), name='installations'),
     url(r'^v1/system_status/$', views_v1.SystemStatusViewSet.as_view(), name='system_status'),
+    url(r'^v1/users/$', views_v1.UserViewSet.as_view(), name='users'),
 ]

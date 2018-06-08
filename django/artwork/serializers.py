@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from artwork import models
+from django.contrib.auth.models import User
+
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -144,6 +146,7 @@ class InstallationSerializer(serializers.ModelSerializer):
     site_name = serializers.SerializerMethodField(read_only=True)
     groups_info = serializers.SerializerMethodField(read_only=True)
     artists_info = serializers.SerializerMethodField(read_only=True)
+    users_info = serializers.SerializerMethodField(read_only=True)
     photos_info = serializers.SerializerMethodField(read_only=True)
     documents_info = serializers.SerializerMethodField(read_only=True)
 
@@ -168,6 +171,7 @@ class InstallationSerializer(serializers.ModelSerializer):
             "site_name",
             "groups_info",
             "artists_info",
+            "users_info",
             "photos_info",
             "documents_info",
             ]
@@ -181,8 +185,23 @@ class InstallationSerializer(serializers.ModelSerializer):
     def get_artists_info(self, obj):
         return obj.artists.values("id", "name")
 
+    def get_users_info(self, obj):
+        return obj.user.values("id", "username")
+
     def get_photos_info(self, obj):
         return obj.photos.values("id", "image", "title")
 
     def get_documents_info(self, obj):
         return obj.documents.values("id", "doc", "title")
+
+
+class UserSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='username')
+
+    class Meta:
+        ordering = ['username']
+        model = User
+        fields = [
+            "id",
+            "name",
+            ]
