@@ -16,6 +16,9 @@ class Artist(models.Model):
     notes = models.TextField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['name']
+
     def __unicode__(self):
         return self.name
 

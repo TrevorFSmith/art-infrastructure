@@ -18,8 +18,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'ai_test',
         'USER': 'postgres',
-        'PASSWORD': 'mooa',
+        'PASSWORD': 'password_here',
         'HOST': '127.0.0.1',
         'PORT': '5432'
     }
 }
+
+MEDIA_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'media/for_test'))

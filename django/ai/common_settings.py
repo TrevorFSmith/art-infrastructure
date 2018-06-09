@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'compressor',
+    'django_cleanup',
 
     'rest_framework',
     'rest_framework.authtoken',
