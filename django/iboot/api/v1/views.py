@@ -15,6 +15,14 @@ class IBootViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.IBootDevice
     get_queryset_serializer_class = serializers.IBootSerializer
 
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(IBootViewSet, self).get(request, format)
+        else:
+            iboots = models.IBootDevice.objects.all()
+            serializer = serializers.IBootSerializer(iboots, many=True)
+            return Response(serializer.data)
+
     def post(self, request, format=None):
         serializer = serializers.IBootSerializer(data=request.data)
         if serializer.is_valid():

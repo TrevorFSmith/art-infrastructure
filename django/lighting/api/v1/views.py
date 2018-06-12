@@ -19,6 +19,14 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Creston
     get_queryset_serializer_class = serializers.CrestonSerializer
 
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(CrestonViewSet, self).get(request, format)
+        else:
+            crestons = models.Creston.objects.all()
+            serializer = serializers.CrestonSerializer(crestons, many=True)
+            return Response(serializer.data)
+
     def post(self, request, format=None):
         serializer = serializers.CrestonSerializer(data=request.data)
         if serializer.is_valid():
@@ -26,7 +34,6 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
     def put(self, request, format=None):
         try:
@@ -41,7 +48,6 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
         except ObjectDoesNotExist:
             raise Http404
 
-
     def delete(self, request, format=None):
         try:
             creston  = models.Creston.objects.get(pk=int(request.data.get("id")))
@@ -55,7 +61,6 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
 
 class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
 
-
     def get(self, request, format=None):
         try:
             creston = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
@@ -68,7 +73,6 @@ class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
             control_info = None
 
         return Response({'control_info':control_info})
-
 
     def put(self, request, format=None):
         command = request.data.get("command")
@@ -111,7 +115,6 @@ class LampInfo:
 
 
 class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
-
 
     def put(self, request, format=None):
 
@@ -169,6 +172,14 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.Projector
     get_queryset_serializer_class = serializers.ProjectorSerializer
 
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(ProjectorViewSet, self).get(request, format)
+        else:
+            projectors = models.Projector.objects.all()
+            serializer = serializers.ProjectorSerializer(projectors, many=True)
+            return Response(serializer.data)
+
     def post(self, request, format=None):
         serializer = serializers.ProjectorSerializer(data=request.data)
         if serializer.is_valid():
@@ -176,7 +187,6 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
     def put(self, request, format=None):
         try:
@@ -190,7 +200,6 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
 
         except ObjectDoesNotExist:
             raise Http404
-
 
     def delete(self, request, format=None):
         try:
@@ -208,6 +217,14 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.BACNetLight
     get_queryset_serializer_class = serializers.BACNetLightSerializer
 
+    def get(self, request, format=None, paginate="on"):
+        if paginate == "on":
+            return super(BACNetViewSet, self).get(request, format)
+        else:
+            bacnet_lights = models.BACNetLight.objects.all()
+            serializer = serializers.BACNetLightSerializer(bacnet_lights, many=True)
+            return Response(serializer.data)
+
     def post(self, request, format=None):
         serializer = serializers.BACNetLightSerializer(data=request.data)
         if serializer.is_valid():
@@ -215,7 +232,6 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
     def put(self, request, format=None):
 
@@ -231,7 +247,6 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
         except ObjectDoesNotExist:
             raise Http404
 
-
     def delete(self, request, format=None):
         try:
             bacnet_light  = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
@@ -245,7 +260,6 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
 
 class BACNetCommandViewSet(api_helpers.GenericApiEndpoint):
 
-
     def get(self, request, format=None):
         try:
             light = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
@@ -257,7 +271,6 @@ class BACNetCommandViewSet(api_helpers.GenericApiEndpoint):
             light_value = None
 
         return Response({'cmd':light_value})
-
 
     def put(self, request, format=None):
         cmd = request.data.get("command")

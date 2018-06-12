@@ -6,6 +6,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from lighting.models import BACNetLight, Projector, Creston
+from iboot.models import IBootDevice
 
 
 class ArtistViewSet(api_helpers.GenericApiEndpoint):
@@ -231,3 +234,27 @@ class UserViewSet(APIView):
         users = User.objects.all()
         serializer = serializers.UserSerializer(users, many=True)
         return Response(serializer.data)
+
+
+class DeviceTypeViewSet(APIView):
+
+    def get(self, request, format=None):
+        data = [
+            {
+              'name': "BACNetLight",
+              'id': ContentType.objects.get_for_model(BACNetLight).id
+            },
+            {
+              'name': "Projector",
+              'id': ContentType.objects.get_for_model(Projector).id
+            },
+            {
+              'name': "Creston",
+              'id': ContentType.objects.get_for_model(Creston).id
+            },
+            {
+              'name': "IBoot",
+              'id': ContentType.objects.get_for_model(IBootDevice).id
+            }
+        ]
+        return Response(data)

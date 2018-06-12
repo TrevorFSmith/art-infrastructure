@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^v1/installations/$', views_v1.InstallationViewSet.as_view(), name='installations'),
     url(r'^v1/system_status/$', views_v1.SystemStatusViewSet.as_view(), name='system_status'),
     url(r'^v1/users/$', views_v1.UserViewSet.as_view(), name='users'),
+    url(r'^v1/device_types/$', views_v1.DeviceTypeViewSet.as_view(), name='device_types'),
 ]

@@ -61,6 +61,8 @@ do ->
         dom.div {className: "content"},
           dom.div null, "Email: #{@props.equipment.email}"
           dom.div null, "Type:  #{@props.equipment.equipment_type_name}"
+          dom.div null, "Device type:  #{@props.equipment.device_type_name}"
+          dom.div null, "Device name:  #{@props.equipment.device_name}"
           dom.div null, "Photos:"
           dom.div className: "ui list",
             @props.equipment.photos_info.map (photo) ->

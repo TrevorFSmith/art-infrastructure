@@ -78,6 +78,8 @@ class EquipmentTypeSerializer(serializers.ModelSerializer):
 class EquipmentSerializer(serializers.ModelSerializer):
     equipment_type_name = serializers.SerializerMethodField(read_only=True)
     photos_info = serializers.SerializerMethodField(read_only=True)
+    device_type_name = serializers.SerializerMethodField(read_only=True)
+    device_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         verbose_name_plural = 'equipment'
@@ -91,6 +93,10 @@ class EquipmentSerializer(serializers.ModelSerializer):
             "photos",
             "photos_info",
             "notes",
+            "device_type",
+            "device_id",
+            "device_type_name",
+            "device_name",
             "created",
             ]
 
@@ -99,6 +105,12 @@ class EquipmentSerializer(serializers.ModelSerializer):
 
     def get_photos_info(self, obj):
         return obj.photos.values("id", "image", "title")
+
+    def get_device_type_name(self, obj):
+        return obj.device_type.name
+
+    def get_device_name(self, obj):
+        return obj.device_type.get_object_for_this_type(pk=obj.device_id).name
 
 
 class DocumentSerializer(serializers.ModelSerializer):

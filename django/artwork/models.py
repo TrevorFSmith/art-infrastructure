@@ -5,6 +5,8 @@ from django.db import models
 from django.utils import timezone
 
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 class Artist(models.Model):
@@ -108,6 +110,10 @@ class Equipment(models.Model):
     photos = models.ManyToManyField(Photo, blank=True)
     notes = models.TextField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
+
+    device_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    device_id = models.PositiveIntegerField(null=True)
+    device_object = GenericForeignKey('device_type', 'device_id')
 
     @models.permalink
     def get_absolute_url(self):

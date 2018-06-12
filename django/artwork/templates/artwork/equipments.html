@@ -7,11 +7,18 @@
 
 <div class="ui container">
 
-
   <div class="ui one column relaxed grid">
     <div class="column">
-
-      <div id="root" data-url="{% url 'artwork_api:equipments' %}" data-url-types="{% url 'artwork_api:equipment_types' paginate='off' %}" data-url-photos="{% url 'artwork_api:photos' paginate='off' %}" data-csrf_token="{{ csrf_token }}">
+      <div id="root" 
+           data-url="{% url 'artwork_api:equipments' %}" 
+           data-url-types="{% url 'artwork_api:equipment_types' paginate='off' %}" 
+           data-url-photos="{% url 'artwork_api:photos' paginate='off' %}" 
+           data-url-device-types="{% url 'artwork_api:device_types' %}" 
+           data-url-device-bacnet-lights="{% url 'lighting_api:bacnet_lights' paginate='off' %}" 
+           data-url-device-projectors="{% url 'lighting_api:projectors' paginate='off' %}" 
+           data-url-device-crestons="{% url 'lighting_api:crestons' paginate='off' %}" 
+           data-url-device-iboots="{% url 'iboot_api:iboots' paginate='off' %}" 
+           data-csrf_token="{{ csrf_token }}">
         <div class="ui segment">
           <div class="ui active inverted dimmer">
             <div class="ui large text loader">Loading. Please wait.</div>

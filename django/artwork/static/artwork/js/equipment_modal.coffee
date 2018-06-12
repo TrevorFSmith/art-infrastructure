@@ -20,24 +20,64 @@ class @EquipmentModal extends React.Component
         type: @props.equipment.equipment_type
         photos: @props.equipment.photos
         notes: @props.equipment.notes
+        device_type: @props.equipment.device_type
+        device_id: @props.equipment.device_id
         all_types: []
         all_photos: []
+        all_device_types: []
+        all_devices: []
+        all_device_bacnet_lights: []
+        all_device_projectors: []
+        all_device_crestons: []
+        all_device_iboots: []
     else
       this.state =
         name: ""
         type: ""
         photos: ""
         notes: ""
+        device_type: ""
+        device_id: ""
         all_types: []
         all_photos: []
+        all_devices: []
+        all_device_types: []
+        all_device_bacnet_lights: []
+        all_device_projectors: []
+        all_device_crestons: []
+        all_device_iboots: []
 
-    @promiseTypes().then (results) => 
+    @promiseObjects("url-types").then (results) =>
       @setState
         all_types: results
 
-    @promisePhotos().then (results) => 
+    @promiseObjects("url-photos").then (results) =>
       @setState
         all_photos: results
+
+    @promiseObjects("url-device-types").then (results) =>
+      @setState
+        all_device_types: results
+
+    @promiseObjects("url-device-bacnet-lights").then (results) =>
+      @setState
+        all_device_bacnet_lights: results
+      @setDevices('BACNetLight', results)
+
+    @promiseObjects("url-device-projectors").then (results) =>
+      @setState
+        all_device_projectors: results
+      @setDevices('Projector', results)
+
+    @promiseObjects("url-device-crestons").then (results) =>
+      @setState
+        all_device_crestons: results
+      @setDevices('Creston', results)
+
+    @promiseObjects("url-device-iboots").then (results) =>
+      @setState
+        all_device_iboots: results
+      @setDevices('IBoot', results)
 
   resetForm: ->
     if not @state.id
@@ -47,6 +87,8 @@ class @EquipmentModal extends React.Component
         type: ""
         photos: ""
         notes: ""
+        device_type: ""
+        device_id: ""
 
   domNode: ->
     if @state.id
@@ -60,39 +102,39 @@ class @EquipmentModal extends React.Component
     else
       "POST"
 
-  promiseTypes: ->
+  promiseObjects: (url) ->
     new Promise (resolve) -> 
-      url = $("#root").data("url-types")
+      url = $("#root").data(url)
       adapter = new Adapter(url)
       adapter.loadData (data) ->
         resolve(data)
 
-  promisePhotos: ->
-    new Promise (resolve) -> 
-      url = $("#root").data("url-photos")
-      adapter = new Adapter(url)
-      adapter.loadData (data) ->
-        resolve(data)
-
-  buildTypes: (types, selected_type) ->
+  buildObjects: (objects, selected_object) ->
     options = []
-    if types.length > 0
-      types.map (type) ->
-        if selected_type == type.id
-          options.push(dom.option {selected: true, value: type.id}, type.name)
+    if objects and objects.length > 0
+      objects.map (object) ->
+        if selected_object == object.id
+          options.push(dom.option {selected: true, value: object.id}, object.name)
         else
-          options.push(dom.option value: type.id, type.name)
+          options.push(dom.option value: object.id, object.name)
     options
 
   buildPhotos: (photos, selected_photos) ->
     options = []
-    if photos.length > 0
+    if photos and photos.length > 0
       photos.map (photo) ->
         if _.includes(selected_photos, photo.id)
           options.push(dom.option {selected: true, value: photo.id}, photo.title)
         else
           options.push(dom.option value: photo.id, photo.title)
     options
+
+  setDevices: (type, devices) =>
+    if (@state.all_devices.length == 0) and (@state.device_type)
+      @state.all_device_types.map (device_type) =>
+        if (device_type.name == type) and (device_type.id == @state.device_type)
+          @setState
+            all_devices: devices
 
   saveEquipment: =>
 
@@ -106,6 +148,8 @@ class @EquipmentModal extends React.Component
       equipment_type: if @state.type then @state.type else @state.all_types[0].id
       photos: if @state.photos then @state.photos else []
       notes: @state.notes
+      device_type: @state.device_type
+      device_id: @state.device_id
     }
     scope = this
     adapter.pushData @action(), csrf_token, data, ( (data) =>
@@ -125,6 +169,20 @@ class @EquipmentModal extends React.Component
   handleChange: (event) =>
     @setState
       "#{$(event.target).prop('name')}": $(event.target).val()
+
+  handleChangeDeviceType: (event) =>
+    device_type_id = $(event.target).val()
+    devices = []
+    @state.all_device_types.map (device_type) =>
+      if device_type.id == +device_type_id
+        switch(device_type.name)
+          when "BACNetLight" then devices = @state.all_device_bacnet_lights
+          when "Projector" then devices = @state.all_device_projectors
+          when "Creston" then devices = @state.all_device_crestons
+          when "IBoot" then devices = @state.all_device_iboots
+    @setState
+      device_type: device_type_id
+      all_devices: devices
 
   title: ->
     if @state.id
@@ -156,7 +214,18 @@ class @EquipmentModal extends React.Component
           dom.div className: "field",
             dom.label null, "Types"
             dom.select onChange: @handleChange.bind(this), name: 'type',
-              @buildTypes(@state.all_types, @state.type)
+              @buildObjects(@state.all_types, @state.type)
+
+          dom.div className: "field",
+            dom.label null, "Device types"
+            dom.select onChange: @handleChangeDeviceType.bind(this), name: 'device_type',
+              dom.option {selected: false, hidden: true}, "Select device type..."
+              @buildObjects(@state.all_device_types, @state.device_type)
+
+          dom.div className: "field",
+            dom.label null, "Devices"
+            dom.select onChange: @handleChange.bind(this), name: 'device_id',
+              @buildObjects(@state.all_devices, @state.device_id)
 
           dom.div className: "field",
             dom.label null, "Photos"
