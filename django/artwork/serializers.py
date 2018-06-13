@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from artwork import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 
 
@@ -107,10 +108,17 @@ class EquipmentSerializer(serializers.ModelSerializer):
         return obj.photos.values("id", "image", "title")
 
     def get_device_type_name(self, obj):
-        return obj.device_type.name
+        if obj.device_type:
+          return obj.device_type.name
+        return ""
 
     def get_device_name(self, obj):
-        return obj.device_type.get_object_for_this_type(pk=obj.device_id).name
+        if obj.device_type and obj.device_id:
+          try:
+            return obj.device_type.get_object_for_this_type(pk=obj.device_id).name
+          except obj.device_type.model_class().DoesNotExist:
+            raise ObjectDoesNotExist("%s matching query does not exist." % obj.device_type.model_class()._meta.object_name)
+        return ""
 
 
 class DocumentSerializer(serializers.ModelSerializer):

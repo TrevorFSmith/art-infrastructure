@@ -89,6 +89,7 @@ class @EquipmentModal extends React.Component
         notes: ""
         device_type: ""
         device_id: ""
+        all_devices: []
 
   domNode: ->
     if @state.id
@@ -142,6 +143,12 @@ class @EquipmentModal extends React.Component
     csrf_token = $("#root").data("csrf_token")
     adapter    = new Adapter(url)
 
+    device_id = ""
+    if @state.device_id
+      device_id = @state.device_id
+    else if @state.device_type
+      device_id = @state.all_devices[0].id
+
     data = {
       id: @state.id
       name: @state.name
@@ -149,7 +156,7 @@ class @EquipmentModal extends React.Component
       photos: if @state.photos then @state.photos else []
       notes: @state.notes
       device_type: @state.device_type
-      device_id: @state.device_id
+      device_id: device_id
     }
     scope = this
     adapter.pushData @action(), csrf_token, data, ( (data) =>
@@ -180,9 +187,20 @@ class @EquipmentModal extends React.Component
           when "Projector" then devices = @state.all_device_projectors
           when "Creston" then devices = @state.all_device_crestons
           when "IBoot" then devices = @state.all_device_iboots
+
+    $("[data-object='equipment-new'] [name='device_id'] option:selected").prop('selected', false)
     @setState
       device_type: device_type_id
+      device_id: ""
       all_devices: devices
+
+  handleClickDeviceType: (event) =>
+    option = $(event.target).find('option')[0]
+    $(option).attr('hidden', true)
+
+  handleResetDeviceType: (event) =>
+    option = $(event.target).find('option')[0]
+    $(option).attr('hidden', false)
 
   title: ->
     if @state.id
@@ -218,8 +236,12 @@ class @EquipmentModal extends React.Component
 
           dom.div className: "field",
             dom.label null, "Device types"
-            dom.select onChange: @handleChangeDeviceType.bind(this), name: 'device_type',
-              dom.option {selected: false, hidden: true}, "Select device type..."
+            dom.select {
+              onChange: @handleChangeDeviceType.bind(this),
+              onFocus: @handleClickDeviceType.bind(this),
+              onBlur: @handleResetDeviceType.bind(this),
+              name: 'device_type'},
+              dom.option null, "Select device type..."
               @buildObjects(@state.all_device_types, @state.device_type)
 
           dom.div className: "field",
