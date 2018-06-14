@@ -67,7 +67,7 @@ do ->
           dom.div className: "ui list",
             @props.equipment.photos_info.map (photo) ->
               dom.div className: "item", 
-                dom.a href: "/media/" + photo.image, photo.title
+                dom.a {href: "/media/" + photo.image, target: "_blank"}, photo.title
           dom.div null, "Notes:   #{@props.equipment.notes}"
           dom.div null, "Created: #{date_time}"
 

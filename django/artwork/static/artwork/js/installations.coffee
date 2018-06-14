@@ -76,12 +76,12 @@ do ->
           dom.div className: "ui list",
             @props.installation.photos_info.map (photo) ->
               dom.div className: "item", 
-                dom.a href: "/media/" + photo.image, photo.title
+                dom.a {href: "/media/" + photo.image, target: "_blank"}, photo.title
           dom.div null, "Documents:"
           dom.div className: "ui list",
             @props.installation.documents_info.map (document) ->
               dom.div className: "item", 
-                dom.a href: "/media/" + document.doc, document.title
+                dom.a {href: "/media/" + document.doc}, document.title
           dom.div null, "Notes:   #{@props.installation.notes}"
           dom.div null, "Created: #{date_time}"
 

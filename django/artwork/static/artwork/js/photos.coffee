@@ -60,7 +60,7 @@ do ->
 
         dom.div {className: "content"},
           dom.div null, "Photo:",
-            dom.a {href: @props.photo.image}, "__link__"
+            dom.a {href: @props.photo.image, target: "_blank"}, "__link__"
           dom.div null, "Caption:     #{@props.photo.caption}"
           dom.div null, "Description: #{@props.photo.description}"
           dom.div null, "Created:     #{date_time}"
