@@ -27,11 +27,9 @@ class GenericApiEndpoint(APIView, pagination.PageNumberPagination):
           collection = self.get_queryset_class.objects.filter(pk__in=request.data)
         return self.paginate_queryset(collection, self.request)
 
-
     def get(self, request, format=None):
         serializer = self.get_queryset_serializer_class(self.get_queryset(request), many=True)
         return self.get_paginated_response(serializer.data)
-
 
     def post(self, request, format=None):
         serializer = self.get_queryset_serializer_class(data=request.data)
@@ -40,7 +38,6 @@ class GenericApiEndpoint(APIView, pagination.PageNumberPagination):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
     def put(self, request, format=None):
         try:
@@ -55,7 +52,6 @@ class GenericApiEndpoint(APIView, pagination.PageNumberPagination):
         except ObjectDoesNotExist:
             raise Http404
 
-
     def delete(self, request, format=None):
         try:
             get_object  = self.get_queryset_class.objects.get(pk=int(request.data.get("id")))
@@ -66,6 +62,14 @@ class GenericApiEndpoint(APIView, pagination.PageNumberPagination):
 
         return Response({"id": object_id}, status=status.HTTP_200_OK)
 
+    def get_paginated_response(self, data):
+        return Response({
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'count': self.page.paginator.count,
+            'page_size': self.page_size,
+            'results': data
+        })
 
     def __get_object(self, pk):
         pass

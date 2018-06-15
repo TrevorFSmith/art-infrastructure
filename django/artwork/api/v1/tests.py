@@ -35,7 +35,7 @@ class ArtistPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "email", "phone", "artistgroup_set", "groups_info", "url", "notes", "created"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
@@ -160,7 +160,7 @@ class ArtistGroupPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "artists", "artists_info", "url", "created"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
@@ -280,7 +280,7 @@ class EquipmentTypePriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "provider", "url", "notes", "created"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
@@ -395,7 +395,7 @@ class EquipmentPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "equipment_type", "equipment_type_name", "photos", "photos_info", "notes", 
                        "device_type", "device_id", "device_type_name", "device_name", "created"]
         response_all_keys = response_content.keys()
@@ -534,7 +534,7 @@ class PhotoPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "image", "title", "caption", "description", "created"]
 
         response_all_keys = response_content.keys()
@@ -651,7 +651,7 @@ class DocumentPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "title", "doc", "created"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
@@ -764,7 +764,7 @@ class InstallationSitePriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "location", "notes", "photos", "photos_info", "equipment", "equipment_info", "created"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
@@ -894,7 +894,7 @@ class InstallationPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "groups", "artists", "user", "site", "opened", "closed", "notes", "photos", 
             "documents", "created", "site_name", "groups_info", "artists_info", "users_info", "photos_info", "documents_info"]
         response_all_keys = response_content.keys()

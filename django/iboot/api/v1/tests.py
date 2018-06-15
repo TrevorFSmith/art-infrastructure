@@ -34,7 +34,7 @@ class IBootPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "mac_address", "host", "port", "commands"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()

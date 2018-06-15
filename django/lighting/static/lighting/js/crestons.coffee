@@ -205,8 +205,9 @@ do ->
         no_records: if collection.length > 0 then false else true
         count: @props.count
         current_page: @getCurrentPage(@props.next, @props.prev)
-        next_page: @props.next
-        prev_page: @props.prev
+        next_page: @props.next_page
+        prev_page: @props.prev_page
+        page_size: @props.page_size
 
     buildCrestons: ->
       @state.collection.map (creston) =>
@@ -222,6 +223,7 @@ do ->
             current_page: @getCurrentPage(data.next, data.previous)
             next_page: data.next
             prev_page: data.previous
+            page_size: data.page_size
 
     getCurrentPage: (next_page, prev_page) ->
       if next_page
@@ -249,7 +251,7 @@ do ->
           if index >= 0
             new_collection[index] = data
           else
-            if not @state.count or (@state.count % 9) == 0
+            if not @state.count or (@state.count % @state.page_size) == 0
               $('html').trigger("creston-current-page")
             else
               count += 1
@@ -264,7 +266,7 @@ do ->
         count = @state.count - 1
         if @state.next_page
           $('html').trigger("creston-current-page")
-        else if @state.prev_page and (count % 9) == 0
+        else if @state.prev_page and (count % @state.page_size) == 0
           $('html').trigger("creston-prev-page")
         else
           filtered_crestons = _.filter @state.collection, (creston) =>
@@ -301,7 +303,7 @@ do ->
           @buildCrestons()
         React.createElement(CrestonNoRecords, {output: @state.no_records})
         React.createElement(CrestonPagination, {
-          page: @state.current_page, pages: Math.ceil(@state.count / 9), 
+          page: @state.current_page, pages: Math.ceil(@state.count / @state.page_size),
           next: @state.next_page, prev: @state.prev_page})
         React.createElement(CrestonModal, {creston: {}})
 
@@ -323,8 +325,9 @@ do ->
           ReactDOM.render(React.createElement(Composer, {
             collection: data.results,
             count: data.count,
-            next: data.next,
-            prev: data.previous,
+            next_page: data.next,
+            prev_page: data.previous,
+            page_size: data.page_size,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))

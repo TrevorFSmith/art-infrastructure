@@ -34,7 +34,7 @@ class ProjectorPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "pjlink_host", "pjlink_port", "pjlink_password", "commands"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
@@ -173,7 +173,7 @@ class BACNetLightPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "device_id", "property_id"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
@@ -307,7 +307,7 @@ class CrestonPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(len(response_content['results']), 2)
         self.assertEqual(response.status_code, 200)
 
-        all_keys = ["count", "next", "previous", "results"]
+        all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "host", "port", "commands"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
