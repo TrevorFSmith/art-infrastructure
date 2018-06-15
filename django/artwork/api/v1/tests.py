@@ -1,5 +1,6 @@
 from django.test import TestCase, LiveServerTestCase
 from django.core.urlresolvers import reverse
+from django.contrib.contenttypes.models import ContentType
 #from django.core.files.uploadedfile import SimpleUploadedFile
 from ai.factories import *
 from ai.test_helpers import *
@@ -395,7 +396,8 @@ class EquipmentPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         all_keys = ["count", "next", "previous", "results"]
-        object_keys = ["id", "name", "equipment_type", "equipment_type_name", "photos", "photos_info", "notes", "created"]
+        object_keys = ["id", "name", "equipment_type", "equipment_type_name", "photos", "photos_info", "notes", 
+                       "device_type", "device_id", "device_type_name", "device_name", "created"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
         self.assertEqual(sorted(all_keys), sorted(response_all_keys))
@@ -431,10 +433,14 @@ class EquipmentPriviligedEndpointTestCase(APITestCase):
         equipment_type = EquipmentTypeFactory()
         photo1 = PhotoFactory()
         photo2 = PhotoFactory()
+        device = CrestonFactory()
+        device_type = ContentType.objects.get_for_model(device.__class__)
+        device_type_name = device_type.get_object_for_this_type(pk=device.id).name
         equipment = EquipmentFactory()
         response = self.client.put(reverse('artwork_api:equipments'),
-            {"id": equipment.pk, "name": "New Equipment", 
-             "equipment_type": equipment_type.id, "photos": (photo1.id, photo2.id), "notes": "Note1"})
+            {"id": equipment.pk, "name": "New Equipment", "equipment_type": equipment_type.id, 
+            "photos": (photo1.id, photo2.id), "notes": "Note1", 
+             "device_type": device_type.id, "device_id": device.id})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -444,6 +450,10 @@ class EquipmentPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response["photos"], [photo2.id, photo1.id])
         self.assertEqual(response["notes"], "Note1")
         self.assertEqual(response["equipment_type_name"], equipment_type.name)
+        self.assertEqual(response["device_type"], device_type.id)
+        self.assertEqual(response["device_id"], device.id)
+        self.assertEqual(response["device_type_name"], 'creston')
+        self.assertEqual(response["device_name"], device.name)
         response_photos = response["photos_info"]
         self.assertEqual(len(response_photos), 2)
         self.assertEqual(response_photos[0], {"id": photo2.id, "image": photo2.image.name, "title": photo2.title})
