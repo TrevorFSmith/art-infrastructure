@@ -51,7 +51,7 @@ class WeatherInfo(models.Model):
     wind_chill = models.FloatField()
     created = models.DateTimeField(auto_now_add=True)
 
-    def __unicode__(self): return self.id
+    def __unicode__(self): return "%s" % self.id
 
     class Meta:
         ordering = ['-created']
