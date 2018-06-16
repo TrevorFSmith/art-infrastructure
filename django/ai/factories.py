@@ -3,6 +3,7 @@ import factory
 from lighting import models as lighting_models
 from iboot import models as iboot_models
 from artwork import models as artwork_models
+from weather import models as weather_models
 
 
 # For lighting
@@ -211,3 +212,21 @@ class UserFactory(factory.django.DjangoModelFactory):
 
     username = factory.Sequence(lambda n: 'Username {}'.format(n))
     password = "12345678"
+
+
+class LocationFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = weather_models.Location
+
+    name         = "Boeing Field King County International Airport"
+    airport_type = "large_airport"
+    latitude     = 47.529998779296875
+    longitude    = -122.302001953125
+    elevation    = 21
+    iso_country  = "US"
+    iso_region   = "US-WA"
+    municipality = "Seattle"
+    gps_code     = "KBFI"
+    iata_code    = "BFI"
+    local_code   = "BFI"
