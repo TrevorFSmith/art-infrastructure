@@ -10,6 +10,7 @@ do ->
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
   dom.a      = React.createFactory "a"
+  dom.img    = React.createFactory "img"
 
 
   "use strict"
@@ -59,8 +60,10 @@ do ->
             dom.span null, @props.photo.title
 
         dom.div {className: "content"},
-          dom.div null, "Photo:",
-            dom.a {href: @props.photo.image, target: "_blank"}, "__link__"
+          dom.div null,
+            dom.a {href: @props.photo.image, target: "_blank"},
+              dom.div {className: "ui small image"},
+                dom.img {src: @props.photo.image, alt: @props.photo.caption}
           dom.div null, "Caption:     #{@props.photo.caption}"
           dom.div null, "Description: #{@props.photo.description}"
           dom.div null, "Created:     #{date_time}"
