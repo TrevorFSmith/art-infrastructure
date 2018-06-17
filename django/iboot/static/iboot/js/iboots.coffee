@@ -249,7 +249,6 @@ do ->
       $('html').trigger("edit-iboot-dialog-new")
 
     render: ->
-      console.log(@state)
       dom.div null,
         dom.h2 className: "ui dividing header",
           "iBoot::iBoots"

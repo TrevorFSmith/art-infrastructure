@@ -7,10 +7,8 @@
 
 <div class="ui container">
 
-
   <div class="ui one column relaxed grid">
     <div class="column">
-
       <div id="root" data-url="{% url 'lighting_api:bacnet_lights' %}" data-command-url="{% url 'lighting_api:bacnet_lights_command' %}"
            data-csrf_token="{{ csrf_token }}">
         <div class="ui segment">
@@ -21,16 +19,17 @@
       </div>
     </div>
 
-   <div class="ui modal" data-object="simple-dialog">
-     <div class="header">
-       <i class="info icon"></i>
-       Information
-     </div>
-     <div class="content"></div>
-     <div class="actions">
-       <div class="ui button" data-action="close-dialog">OK</div>
-     </div>
-   </div>
+    <div class="ui modal" data-object="simple-dialog">
+      <div class="header">
+        <i class="info icon"></i>
+        Information
+      </div>
+      <div class="content"></div>
+      <div class="actions">
+        <div class="ui button" data-action="close-dialog">OK</div>
+      </div>
+    </div>
+  </div>
 
 </div>
 

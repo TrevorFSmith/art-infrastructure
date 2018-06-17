@@ -4,7 +4,7 @@ SECRET_KEY = 'YOUR KEY GOES HERE'
 
 DEBUG=True
 
-#from scheduler import TestTask
+#from scheduler.models import TestTask
 #SCHEDULED_TASKS = [TestTask(5, 0), ]
 SCHEDULED_TASKS = []
 

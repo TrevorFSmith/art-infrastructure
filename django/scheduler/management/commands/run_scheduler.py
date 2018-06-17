@@ -27,7 +27,7 @@ class Command(BaseCommand):
         try:
             while True: time.sleep(10000000)
         except KeyboardInterrupt:
-            #scheduler.stop_all_tasks()
+            scheduler.stop_all_tasks()
             os._exit(0)
         print 'Exited'
 

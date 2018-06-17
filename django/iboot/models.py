@@ -41,7 +41,7 @@ class IBootEvent(EventModel):
 
     def execute(self):
         try:
-            control = IBootControl(settings.IBOOT_POWER_PASSWORD, self.device.ip)
+            control = IBootControl(settings.IBOOT_POWER_PASSWORD, self.device.host, self.device.port)
             print 'running ', self
             if self.command == 'cycle':
                 control.cycle_power()

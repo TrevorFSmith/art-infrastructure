@@ -52,6 +52,7 @@ class BACNetLightSerializer(serializers.HyperlinkedModelSerializer):
             "property_id",
             ]
 
+
 class CrestonSerializer(serializers.HyperlinkedModelSerializer):
 
     commands = serializers.SerializerMethodField()
