@@ -226,7 +226,11 @@ class InstallationViewSet(api_helpers.GenericApiEndpoint):
 
 
 class SystemStatusViewSet(api_helpers.GenericApiEndpoint):
-    pass
+
+    def get(self, request, format=None):
+        installations = models.Installation.objects.all()
+        serializer = serializers.SystemStatusSerializer(installations, many=True)
+        return Response(serializer.data)
 
 
 class UserViewSet(APIView):

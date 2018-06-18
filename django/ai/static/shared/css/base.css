@@ -140,3 +140,11 @@ button:active {
 .margin-right{
   margin-right: 5px !important;
 }
+
+.device-active{
+	background-color: lightgreen !important;
+}
+
+.device-inactive{
+	background-color: tomato !important;
+}

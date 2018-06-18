@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from artwork import models
+from weather.models import Location
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -225,3 +226,34 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "name",
             ]
+
+
+class SystemStatusSerializer(serializers.ModelSerializer):
+    site_name = serializers.SerializerMethodField(read_only=True)
+    location_name = serializers.SerializerMethodField(read_only=True)
+    equipment = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        ordering = ['name']
+        model = models.Installation
+        fields = [
+            "id",
+            "name",
+            "site_name",
+            "location_name",
+            "equipment",
+            ]
+
+    def get_site_name(self, obj):
+        return obj.site.name
+
+    def get_location_name(self, obj):
+        location = Location.objects.search(obj.site.location)
+        if location is None:
+            return ""
+        return location.name
+
+    def get_equipment(self, obj):
+        serializer = EquipmentSerializer(data=obj.site.equipment.all(), many=True)
+        serializer.is_valid()
+        return serializer.data

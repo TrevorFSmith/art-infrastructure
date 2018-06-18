@@ -22,10 +22,15 @@ do ->
       super(props)
       @state = @state || {}
 
-    render: ->
-      date_time = @props.installation.created.substr(0, 10) + " " +
-                  @props.installation.created.substr(11, 8)
+    handleActiveChange: (event) =>
+      if $(event.target).hasClass("device-inactive")
+        $(event.target).removeClass("device-inactive").addClass("device-active")
+        $(event.target).find('i').removeClass("minus").addClass("check")
+      else
+        $(event.target).removeClass("device-active").addClass("device-inactive")
+        $(event.target).find('i').removeClass("check").addClass("minus")
 
+    render: ->
       dom.div {className: "ui card"},
         dom.div {className: "extra content"},
           dom.h3 {className: "left floated"},
@@ -33,8 +38,17 @@ do ->
             dom.span null, @props.installation.name
 
         dom.div {className: "content"},
-          dom.div null, "Status"
-
+          dom.h3 {className: "center aligned"}, "Location: #{@props.installation.location_name}"
+          dom.div {className: "ui cards centered"},
+            @props.installation.equipment.map (equipment) =>
+              dom.div {className: "ui card"},
+                dom.div {className: "extra content device-inactive", onClick: @handleActiveChange.bind(this)},
+                  dom.h3 {className: "left floated"},
+                    dom.i {className: "ui icon minus circle"}, ""
+                    dom.span null, equipment.name
+                dom.div {className: "content"},
+                  dom.div null, "Device type: #{equipment.device_type_name}"
+                  dom.div null, "Device name: #{equipment.device_name}"
 
   class InstallationNoRecords extends React.Component
 
@@ -85,51 +99,12 @@ do ->
       @state =
         collection: collection
         no_records: if collection.length > 0 then false else true
-        count: @props.count
-        current_page: @getCurrentPage(@props.next, @props.prev)
-        next_page: @props.next_page
-        prev_page: @props.prev_page
-        page_size: @props.page_size
 
     buildInstallations: ->
       @state.collection.map (installation) =>
         React.createElement(InstallationUnit, {installation: installation, key: installation.id})
 
-    loadInstallations: (url) ->
-      adapter = new Adapter(url)
-      adapter.loadData (data) =>
-        if data.results.length > 0
-          @setState
-            collection: data.results
-            count: data.count
-            current_page: @getCurrentPage(data.next, data.previous)
-            next_page: data.next
-            prev_page: data.previous
-            page_size: data.page_size
-
-    getCurrentPage: (next_page, prev_page) ->
-      if next_page
-        return next_page.substr(next_page.length - 1) - 1
-      if prev_page
-        if prev_page.indexOf("?page=") != -1
-          return +prev_page.substr(prev_page.length - 1) + 1
-        else
-          return 2
-      return 1
-
-    getUrlCurrentPage: ->
-      return $('#root').data('url') + "?page=" + @state.current_page
-
     componentDidMount: ->
-
-      $('html').on 'installation-next-page', (event, data) =>
-        @loadInstallations(@state.next_page)
-
-      $('html').on 'installation-prev-page', (event, data) =>
-        @loadInstallations(@state.prev_page)
-
-      $('html').on 'installation-current-page', (event, data) =>
-        @loadInstallations(@getUrlCurrentPage())
 
     newInstallation: ->
       $('html').trigger("edit-installation-dialog-new")
@@ -159,13 +134,9 @@ do ->
 
     render: ->
       @adapter.loadData (data) =>
-        if data.results.length > 0
+        if data.length > 0
           ReactDOM.render(React.createElement(Composer, {
-            collection: data.results,
-            count: data.count,
-            next_page: data.next,
-            prev_page: data.previous,
-            page_size: data.page_size,
+            collection: data,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))
