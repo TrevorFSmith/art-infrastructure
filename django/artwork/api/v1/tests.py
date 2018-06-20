@@ -1,7 +1,7 @@
 from django.test import TestCase, LiveServerTestCase
 from django.core.urlresolvers import reverse
+#from django.core.files import File
 from django.contrib.contenttypes.models import ContentType
-#from django.core.files.uploadedfile import SimpleUploadedFile
 from ai.factories import *
 from ai.test_helpers import *
 from django.db import IntegrityError
@@ -568,9 +568,9 @@ class PhotoPriviligedEndpointTestCase(APITestCase):
 
     # def test_update_without_errors_for_privileged_user(self):
     #     photo = PhotoFactory()
-    #     image = SimpleUploadedFile(name=photo.image.name, content=photo.image.read(), content_type='image/jpeg')
+    #     image = open(photo.image.url, "r")
     #     response = self.client.put(reverse('artwork_api:photos'),
-    #         {"id": photo.pk, "image": image, "title": "Title1", "caption": "Caption1", "description": "Desc1"})
+    #         {"id": photo.pk, "image": File(image), "title": "Title1", "caption": "Caption1", "description": "Desc1"})
 
     #     self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -684,8 +684,9 @@ class DocumentPriviligedEndpointTestCase(APITestCase):
 
     # def test_update_without_errors_for_privileged_user(self):
     #     document = DocumentFactory()
+    #     doc = open(document.doc.url, "r")
     #     response = self.client.put(reverse('artwork_api:documents'),
-    #         {"id": document.pk, "title": "Document1", "doc": document.doc})
+    #         {"id": document.pk, "title": "Document1", "doc": File(doc)})
 
     #     self.assertEqual(response.status_code, status.HTTP_200_OK)
 
