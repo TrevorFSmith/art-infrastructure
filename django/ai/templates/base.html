@@ -34,29 +34,29 @@
 
       <div class="ui menu">
         <div class="header item">ArtManager</div>
-        <a class="item" href="/">Dashboard</a>
+        <a class="item" href="{% url 'artwork:system_status' %}">Dashboard</a>
 
         <div class="ui dropdown item" tabindex="0">
           Artwork
           <i class="dropdown icon"></i>
           <div class="menu transition hidden" tabindex="-1">
-            <a class="item" href='{% url "artwork:artists" %}'>Artists</a>
+            <a class="item" href="{% url 'artwork:artists' %}">Artists</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "artwork:artist_groups" %}'>Artist Groups</a>
+            <a class="item" href="{% url 'artwork:artist_groups' %}">Artist Groups</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "artwork:photos" %}'>Photos</a>
+            <a class="item" href="{% url 'artwork:photos' %}">Photos</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "artwork:documents" %}'>Documents</a>
+            <a class="item" href="{% url 'artwork:documents' %}">Documents</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "artwork:equipment_types" %}'>Equipment Types</a>
+            <a class="item" href="{% url 'artwork:equipment_types' %}">Equipment Types</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "artwork:equipments" %}'>Equipments</a>
+            <a class="item" href="{% url 'artwork:equipments' %}">Equipments</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "artwork:installation_sites" %}'>Installation Sites</a>
+            <a class="item" href="{% url 'artwork:installation_sites' %}">Installation Sites</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "artwork:installations" %}'>Installations</a>
+            <a class="item" href="{% url 'artwork:installations' %}">Installations</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "artwork:system_status" %}'>System Status</a>
+            <a class="item" href="{% url 'artwork:system_status' %}">System Status</a>
           </div>
         </div>
 
@@ -64,16 +64,15 @@
           Lighting
           <i class="dropdown icon"></i>
           <div class="menu transition hidden" tabindex="-1">
-            <a class="item" href='{% url "lighting:bacnet_lights" %}'>BACNet Service</a>
+            <a class="item" href="{% url 'lighting:bacnet_lights' %}">BACNet Service</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "lighting:projectors" %}'>Projectors</a>
+            <a class="item" href="{% url 'lighting:projectors' %}">Projectors</a>
             <div class="divider"></div>
-            <a class="item" href='{% url "lighting:crestons" %}'>Creston</a>
+            <a class="item" href="{% url 'lighting:crestons' %}">Creston</a>
           </div>
         </div>
 
-        <a class="item" href='{% url "iboot:iboots" %}'>iBoot</a>
-        <a class="item" href='{% url "heartbeat:index" %}'>System Status</a>
+        <a class="item" href="{% url 'iboot:iboots' %}">iBoot</a>
         <div class="right menu">
           <a class="item" href="/admin/">Admin</a>
         </div>

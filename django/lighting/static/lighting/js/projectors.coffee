@@ -86,7 +86,7 @@ do ->
           dom.h3 null, "Host: #{@props.projector.pjlink_host} | Port: #{@props.projector.pjlink_port}"
           @props.projector.commands.map (cmd) ->
             dom.div
-              className: "button ui mini"
+              className: "button ui mini indent"
               "data-object": "command-#{scope.props.projector.id}-#{cmd.command}"
               onClick: scope.sendCommand.bind(scope, cmd.command)
             , "",

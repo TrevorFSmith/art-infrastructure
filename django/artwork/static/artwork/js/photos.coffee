@@ -63,7 +63,7 @@ do ->
           dom.div null,
             dom.a {href: @props.photo.image, target: "_blank"},
               dom.div {className: "ui small image"},
-                dom.img {src: @props.photo.image, alt: @props.photo.caption}
+                dom.img {src: @props.photo.image, alt: @props.photo.title}
           dom.div null, "Caption:     #{@props.photo.caption}"
           dom.div null, "Description: #{@props.photo.description}"
           dom.div null, "Created:     #{date_time}"

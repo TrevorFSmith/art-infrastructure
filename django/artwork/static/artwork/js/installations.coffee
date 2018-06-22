@@ -10,6 +10,7 @@ do ->
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
   dom.a      = React.createFactory "a"
+  dom.img    = React.createFactory "img"
 
 
   "use strict"
@@ -73,10 +74,9 @@ do ->
             @props.installation.users_info.map (user) ->
               dom.div className: "item", user.username
           dom.div null, "Photos:"
-          dom.div className: "ui list",
-            @props.installation.photos_info.map (photo) ->
-              dom.div className: "item", 
-                dom.a {href: "/media/" + photo.image, target: "_blank"}, photo.title
+          @props.installation.photos_info.map (photo) ->
+            dom.a {href: "/media/" + photo.image, target: "_blank"},
+              dom.img {className: "ui tiny image indent", src: "/media/" + photo.image, alt: photo.title}
           dom.div null, "Documents:"
           dom.div className: "ui list",
             @props.installation.documents_info.map (document) ->

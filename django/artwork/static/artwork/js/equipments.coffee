@@ -10,6 +10,7 @@ do ->
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
   dom.a      = React.createFactory "a"
+  dom.img    = React.createFactory "img"
 
 
   "use strict"
@@ -63,10 +64,9 @@ do ->
           dom.div null, "Device type:  #{@props.equipment.device_type_name}"
           dom.div null, "Device name:  #{@props.equipment.device_name}"
           dom.div null, "Photos:"
-          dom.div className: "ui list",
-            @props.equipment.photos_info.map (photo) ->
-              dom.div className: "item", 
-                dom.a {href: "/media/" + photo.image, target: "_blank"}, photo.title
+          @props.equipment.photos_info.map (photo) ->
+            dom.a {href: "/media/" + photo.image, target: "_blank"},
+              dom.img {className: "ui tiny image indent", src: "/media/" + photo.image, alt: photo.title}
           dom.div null, "Notes:   #{@props.equipment.notes}"
           dom.div null, "Created: #{date_time}"
 

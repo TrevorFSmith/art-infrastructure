@@ -9,6 +9,10 @@ do ->
   dom.div    = React.createFactory "div"
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
+  dom.table  = React.createFactory "table"
+  dom.tbody  = React.createFactory "tbody"
+  dom.tr     = React.createFactory "tr"
+  dom.td     = React.createFactory "td"
 
 
   "use strict"
@@ -23,32 +27,29 @@ do ->
       @state = @state || {}
 
     handleActiveChange: (event) =>
-      if $(event.target).hasClass("device-inactive")
-        $(event.target).removeClass("device-inactive").addClass("device-active")
-        $(event.target).find('i').removeClass("minus").addClass("check")
+      target = $(event.target)
+      i  = $(event.target).find("i")
+      if target.hasClass("device-inactive")
+        target.removeClass("device-inactive").addClass("device-active")
+        i.removeClass("minus").addClass("check")
       else
-        $(event.target).removeClass("device-active").addClass("device-inactive")
-        $(event.target).find('i').removeClass("check").addClass("minus")
+        target.removeClass("device-active").addClass("device-inactive")
+        i.removeClass("check").addClass("minus")
 
     render: ->
-      dom.div {className: "ui card"},
-        dom.div {className: "extra content"},
-          dom.h3 {className: "left floated"},
-            dom.i {className: "ui icon check circle"}, ""
-            dom.span null, @props.installation.name
+        @props.installation.equipment.map (equipment, i) =>
+          dom.tr null,
+            if i == 0
+              dom.td {rowspan: @props.installation.equipment.length}, 
+                @props.installation.name
+            dom.td {className: "device-inactive", onClick: @handleActiveChange.bind(this)},
+              dom.i {className: "ui icon minus circle"}, ""
+              equipment.name
+            dom.td null,
+             "#{equipment.device_type_name}"
+            dom.td null,
+             "#{equipment.device_name}"
 
-        dom.div {className: "content"},
-          dom.h3 {className: "center aligned"}, "Location: #{@props.installation.location_name}"
-          dom.div {className: "ui cards centered"},
-            @props.installation.equipment.map (equipment) =>
-              dom.div {className: "ui card"},
-                dom.div {className: "extra content device-inactive", onClick: @handleActiveChange.bind(this)},
-                  dom.h3 {className: "left floated"},
-                    dom.i {className: "ui icon minus circle"}, ""
-                    dom.span null, equipment.name
-                dom.div {className: "content"},
-                  dom.div null, "Device type: #{equipment.device_type_name}"
-                  dom.div null, "Device name: #{equipment.device_name}"
 
   class InstallationNoRecords extends React.Component
 
@@ -113,8 +114,9 @@ do ->
       dom.div null,
         dom.h2 className: "ui dividing header",
           "System Status"
-        dom.div {className: "ui one cards"},
-          @buildInstallations()
+        dom.table {className: "ui celled structured table"},
+          dom.tbody null,
+            @buildInstallations()
         React.createElement(InstallationNoRecords, {output: @state.no_records})
         React.createElement(InstallationPagination, {
           page: @state.current_page, pages: Math.ceil(@state.count / @state.page_size),

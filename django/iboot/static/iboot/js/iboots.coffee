@@ -88,7 +88,7 @@ do ->
 
           @props.iboot.commands.map (cmd) ->
             dom.div
-              className: "button ui mini"
+              className: "button ui mini indent"
               "data-object": "command-#{scope.props.iboot.id}-#{cmd.command}"
               onClick: scope.sendCommand.bind(scope, cmd.command)
             , "",
