@@ -14,6 +14,7 @@ class BACNetLight(models.Model):
     name = models.CharField(max_length=1024, null=False, blank=False)
     device_id = models.PositiveIntegerField(null=False, blank=False, default=0)
     property_id = models.PositiveIntegerField(null=False, blank=False, default=0)
+    status = models.BooleanField(default=False)
 
     @models.permalink
     def get_absolute_url(self):
@@ -35,6 +36,7 @@ class Projector(models.Model):
     pjlink_host = models.CharField(max_length=1024, null=False, blank=False)
     pjlink_port = models.IntegerField(null=False, blank=False, default=4352)
     pjlink_password = models.CharField(max_length=512, blank=True, null=True)
+    status = models.BooleanField(default=False)
 
     def __unicode__(self):
         return '%s' % self.name
@@ -82,6 +84,7 @@ class Creston(models.Model):
     name = models.CharField(max_length=1024, null=False, blank=False)
     host = models.CharField(max_length=1024, null=False, blank=False)
     port = models.IntegerField(null=False, blank=False, default=1313)
+    status = models.BooleanField(default=False)
 
     def __unicode__(self):
         return '%s' % self.name

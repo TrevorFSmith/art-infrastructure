@@ -61,8 +61,8 @@ do ->
 
         dom.div {className: "content"},
           dom.div null, "Type:  #{@props.equipment.equipment_type_name}"
-          dom.div null, "Device type:  #{@props.equipment.device_type_name}"
-          dom.div null, "Device name:  #{@props.equipment.device_name}"
+          dom.div null, "Device type:  #{@props.equipment.device_info.type}"
+          dom.div null, "Device name:  #{@props.equipment.device_info.name}"
           dom.div null, "Photos:"
           @props.equipment.photos_info.map (photo) ->
             dom.a {href: "/media/" + photo.image, target: "_blank"},

@@ -71,4 +71,5 @@ while True:
     except KeyboardInterrupt:
         print "Closing Projector server socket..."
         serversocket.close()
+        break
 

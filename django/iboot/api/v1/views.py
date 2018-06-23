@@ -67,7 +67,7 @@ class IBootCommandViewSet(api_helpers.GenericApiEndpoint):
         except SocketException:
             control_status = None
 
-        return Response({'control_status':control_status})
+        return Response({'details':control_status})
 
     def put(self, request, format=None):
         command = request.data.get("command")

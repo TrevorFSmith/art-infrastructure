@@ -17,6 +17,7 @@ class ProjectorSerializer(serializers.HyperlinkedModelSerializer):
             "pjlink_port",
             "pjlink_password",
             "commands",
+            "status",
             ]
 
     def get_commands(self, obj):
@@ -50,6 +51,7 @@ class BACNetLightSerializer(serializers.HyperlinkedModelSerializer):
             "name",
             "device_id",
             "property_id",
+            "status",
             ]
 
 
@@ -66,6 +68,7 @@ class CrestonSerializer(serializers.HyperlinkedModelSerializer):
             "host",
             "port",
             "commands",
+            "status",
             ]
 
     def get_commands(self, obj):

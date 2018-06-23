@@ -397,7 +397,7 @@ class EquipmentPriviligedEndpointTestCase(APITestCase):
 
         all_keys = ["count", "next", "previous", "page_size", "results"]
         object_keys = ["id", "name", "equipment_type", "equipment_type_name", "photos", "photos_info", "notes", 
-                       "device_type", "device_id", "device_type_name", "device_name", "created"]
+                       "device_type", "device_id", "device_info", "created"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
         self.assertEqual(sorted(all_keys), sorted(response_all_keys))
@@ -452,8 +452,9 @@ class EquipmentPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response["equipment_type_name"], equipment_type.name)
         self.assertEqual(response["device_type"], device_type.id)
         self.assertEqual(response["device_id"], device.id)
-        self.assertEqual(response["device_type_name"], 'creston')
-        self.assertEqual(response["device_name"], device.name)
+        self.assertEqual(response["device_info"]["type"], 'creston')
+        self.assertEqual(response["device_info"]["name"], device.name)
+        self.assertEqual(response["device_info"]["status"], False)
         response_photos = response["photos_info"]
         self.assertEqual(len(response_photos), 2)
         self.assertEqual(response_photos[0], {"id": photo2.id, "image": photo2.image.name, "title": photo2.title})

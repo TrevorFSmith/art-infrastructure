@@ -35,7 +35,7 @@ class ProjectorPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         all_keys = ["count", "next", "previous", "page_size", "results"]
-        object_keys = ["id", "name", "pjlink_host", "pjlink_port", "pjlink_password", "commands"]
+        object_keys = ["id", "name", "pjlink_host", "pjlink_port", "pjlink_password", "commands", "status"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
         self.assertEqual(sorted(all_keys), sorted(response_all_keys))
@@ -88,6 +88,7 @@ class ProjectorPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response["pjlink_host"], "localhost")
         self.assertEqual(response["pjlink_port"], 8888)
         self.assertEqual(response["pjlink_password"], "pass")
+        self.assertEqual(response["status"], False)
 
 
 class ProjectorUnpriviligedEndpointTestCase(APITestCase):
@@ -174,7 +175,7 @@ class BACNetLightPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         all_keys = ["count", "next", "previous", "page_size", "results"]
-        object_keys = ["id", "name", "device_id", "property_id"]
+        object_keys = ["id", "name", "device_id", "property_id", "status"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
         self.assertEqual(sorted(all_keys), sorted(response_all_keys))
@@ -224,6 +225,7 @@ class BACNetLightPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response["name"], "Light1")
         self.assertEqual(response["device_id"], 1)
         self.assertEqual(response["property_id"], 1)
+        self.assertEqual(response["status"], False)
 
 
 class BACNetLightUnpriviligedEndpointTestCase(APITestCase):
@@ -308,7 +310,7 @@ class CrestonPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         all_keys = ["count", "next", "previous", "page_size", "results"]
-        object_keys = ["id", "name", "host", "port", "commands"]
+        object_keys = ["id", "name", "host", "port", "commands", "status"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
         self.assertEqual(sorted(all_keys), sorted(response_all_keys))
@@ -358,6 +360,7 @@ class CrestonPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response["name"], "Creston1")
         self.assertEqual(response["host"], "localhost")
         self.assertEqual(response["port"], 8888)
+        self.assertEqual(response["status"], False)
 
 
 class CrestonUnpriviligedEndpointTestCase(APITestCase):

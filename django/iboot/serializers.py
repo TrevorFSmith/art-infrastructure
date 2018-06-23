@@ -16,6 +16,7 @@ class IBootSerializer(serializers.HyperlinkedModelSerializer):
             "host",
             "port",
             "commands",
+            "status",
             ]
 
     def get_commands(self, obj):

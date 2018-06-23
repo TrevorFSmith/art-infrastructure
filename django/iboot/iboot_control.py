@@ -20,11 +20,12 @@ class SocketException(Exception):
 class IBootControl:
     """A control object for Dataprobe's iBoot network attached remote power controller"""
 
-    def __init__(self,  password, host, port=80):
+    def __init__(self,  password, host, port=80, timeout=15):
         """The port should be the telnet port, not the http or heartbeat port"""
         self.password = password
         self.host = host
         self.port = port
+        self.timeout = timeout
 
 
     def query_iboot_state(self):
@@ -59,7 +60,7 @@ class IBootControl:
         "Sends a command to the device.  Returns the result code or None if it can't control the device."
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(15)
+            sock.settimeout(self.timeout)
 
             sock.connect((self.host, self.port))
             msg = self.format_command(command)

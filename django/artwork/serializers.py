@@ -80,8 +80,7 @@ class EquipmentTypeSerializer(serializers.ModelSerializer):
 class EquipmentSerializer(serializers.ModelSerializer):
     equipment_type_name = serializers.SerializerMethodField(read_only=True)
     photos_info = serializers.SerializerMethodField(read_only=True)
-    device_type_name = serializers.SerializerMethodField(read_only=True)
-    device_name = serializers.SerializerMethodField(read_only=True)
+    device_info = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         verbose_name_plural = 'equipment'
@@ -97,8 +96,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
             "notes",
             "device_type",
             "device_id",
-            "device_type_name",
-            "device_name",
+            "device_info",
             "created",
             ]
 
@@ -108,17 +106,20 @@ class EquipmentSerializer(serializers.ModelSerializer):
     def get_photos_info(self, obj):
         return obj.photos.values("id", "image", "title")
 
-    def get_device_type_name(self, obj):
-        if obj.device_type:
-          return obj.device_type.name
-        return ""
-
-    def get_device_name(self, obj):
+    def get_device_info(self, obj):
         if obj.device_type and obj.device_id:
           try:
-            return obj.device_type.get_object_for_this_type(pk=obj.device_id).name
+            device = obj.device_type.get_object_for_this_type(pk=obj.device_id)
+            device_info = {
+              "id": device.id,
+              "name": device.name,
+              "status": device.status,
+              "type": obj.device_type.name,
+            }
+            return device_info
           except obj.device_type.model_class().DoesNotExist:
-            raise ObjectDoesNotExist("%s matching query does not exist." % obj.device_type.model_class()._meta.object_name)
+            #raise ObjectDoesNotExist("%s matching query does not exist." % obj.device_type.model_class()._meta.object_name)
+            return ""
         return ""
 
 

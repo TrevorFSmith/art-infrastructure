@@ -63,7 +63,7 @@ class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
 
     def get(self, request, format=None):
         try:
-            creston = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
+            creston = models.Creston.objects.get(pk=int(request.data.get("id")))
             control = CrestonControl(creston.host, creston.port)
             control_info = control.query_status()
             #control_info = {'High': '55000', 'Current': '63098', 'Wake': '5:00 AM', 'Low': '63098', 'Lamp1': '2-1468', 'Sleep': '1:00 AM', 'Lamp2': '2-1469'}
@@ -72,7 +72,7 @@ class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
         except IOError:
             control_info = None
 
-        return Response({'control_info':control_info})
+        return Response({'details':control_info})
 
     def put(self, request, format=None):
         command = request.data.get("command")
@@ -85,7 +85,6 @@ class CrestonCommandViewSet(api_helpers.GenericApiEndpoint):
             else:
                 lines = 1
             result = control.send_command(command, lines)
-            print(result)
             # Please use result and pass it to the UI and render it there.
         except ObjectDoesNotExist:
             raise Http404
@@ -164,7 +163,6 @@ class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
             models.ProjectorEvent.objects.filter(device=projector), many=True)
 
         return Response({"details": "Command successfully sent."}, status=status.HTTP_201_CREATED)
-
 
 
 class ProjectorViewSet(api_helpers.GenericApiEndpoint):
@@ -270,7 +268,7 @@ class BACNetCommandViewSet(api_helpers.GenericApiEndpoint):
         except IOError:
             light_value = None
 
-        return Response({'cmd':light_value})
+        return Response({"details":"Command - #{light_value}"})
 
     def put(self, request, format=None):
         cmd = request.data.get("command")

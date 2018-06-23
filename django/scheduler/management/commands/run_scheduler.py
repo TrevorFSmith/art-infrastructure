@@ -4,10 +4,18 @@ import time
 import signal
 import logging
 
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from scheduler.models import Scheduler
+
+from lighting.tasks import LightingStatusTask
+from iboot.tasks import IBootStatusTask
+
+
+SCHEDULED_TASKS = [
+                   LightingStatusTask(5, 0), 
+                   IBootStatusTask(5, 0),
+                  ]
 
 
 class Command(BaseCommand):
@@ -20,7 +28,7 @@ class Command(BaseCommand):
         write_proc('/tmp/artserver_scheduler.pid')
 
         scheduler = Scheduler()
-        for task in settings.SCHEDULED_TASKS:
+        for task in SCHEDULED_TASKS:
             scheduler.add_task(task)
         scheduler.start_all_tasks()
 

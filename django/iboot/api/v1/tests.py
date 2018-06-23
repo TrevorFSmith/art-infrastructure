@@ -35,7 +35,7 @@ class IBootPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         all_keys = ["count", "next", "previous", "page_size", "results"]
-        object_keys = ["id", "name", "mac_address", "host", "port", "commands"]
+        object_keys = ["id", "name", "mac_address", "host", "port", "commands", "status"]
         response_all_keys = response_content.keys()
         response_object_keys = response_content['results'][0].keys()
         self.assertEqual(sorted(all_keys), sorted(response_all_keys))
@@ -88,6 +88,7 @@ class IBootPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response["mac_address"], "00-0D-AD-01-94-6F")
         self.assertEqual(response["host"], "127.0.0.1")
         self.assertEqual(response["port"], 8008)
+        self.assertEqual(response["status"], False)
 
 
 class IBootUnpriviligedEndpointTestCase(APITestCase):

@@ -3,6 +3,7 @@ from django.conf.urls import url
 from django.conf.urls import include
 
 import weather.views as weather_views
+import artwork.views as artwork_views
 
 from django.conf.urls.static import static
 from django.conf import settings
@@ -13,7 +14,8 @@ urlpatterns = [
     url(r'^lighting/', include('lighting.urls', namespace='lighting')),
     url(r'^iboot/', include('iboot.urls', namespace='iboot')),
     url(r'^artwork/', include('artwork.urls', namespace='artwork')),
-    url(r'^', include('front.urls', namespace='front')),
+    #url(r'^', include('front.urls', namespace='front')),
+    url(r'^$', artwork_views.SystemStatusViewSet.as_view(), name="system_status"),
 
     # url(r'^', include('account.api_urls', namespace='account_api')),
 

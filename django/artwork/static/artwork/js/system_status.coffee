@@ -26,29 +26,21 @@ do ->
       super(props)
       @state = @state || {}
 
-    handleActiveChange: (event) =>
-      target = $(event.target)
-      i  = $(event.target).find("i")
-      if target.hasClass("device-inactive")
-        target.removeClass("device-inactive").addClass("device-active")
-        i.removeClass("minus").addClass("check")
-      else
-        target.removeClass("device-active").addClass("device-inactive")
-        i.removeClass("check").addClass("minus")
-
     render: ->
         @props.installation.equipment.map (equipment, i) =>
+          class_device = if equipment.device_info.status then "device-active" else "device-inactive"
+          icon_device  = if equipment.device_info.status then "check" else "minus"
           dom.tr null,
             if i == 0
               dom.td {rowspan: @props.installation.equipment.length}, 
                 @props.installation.name
-            dom.td {className: "device-inactive", onClick: @handleActiveChange.bind(this)},
-              dom.i {className: "ui icon minus circle"}, ""
+            dom.td {className: "#{class_device}"},
+              dom.i {className: "ui icon circle #{icon_device}"}, ""
               equipment.name
             dom.td null,
-             "#{equipment.device_type_name}"
+             "#{equipment.device_info.type}"
             dom.td null,
-             "#{equipment.device_name}"
+             "#{equipment.device_info.name}"
 
 
   class InstallationNoRecords extends React.Component
@@ -100,6 +92,19 @@ do ->
       @state =
         collection: collection
         no_records: if collection.length > 0 then false else true
+
+      setInterval(=>
+        @promiseSystemStatus().then (results) => 
+          @setState
+            collection: results
+      , 30000)
+
+    promiseSystemStatus: ->
+      new Promise (resolve) -> 
+        url = $("#root").data("url")
+        adapter = new Adapter(url)
+        adapter.loadData (data) ->
+          resolve(data)
 
     buildInstallations: ->
       @state.collection.map (installation) =>
