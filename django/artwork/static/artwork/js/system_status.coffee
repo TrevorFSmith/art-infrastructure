@@ -10,8 +10,10 @@ do ->
   dom.span   = React.createFactory "span"
   dom.button = React.createFactory "button"
   dom.table  = React.createFactory "table"
+  dom.thead  = React.createFactory "thead"
   dom.tbody  = React.createFactory "tbody"
   dom.tr     = React.createFactory "tr"
+  dom.th     = React.createFactory "th"
   dom.td     = React.createFactory "td"
 
 
@@ -93,10 +95,13 @@ do ->
         collection: collection
         no_records: if collection.length > 0 then false else true
 
+      @updateSchedulerStatus(@props.scheduler_status)
+
       setInterval(=>
         @promiseSystemStatus().then (results) => 
+          @updateSchedulerStatus(results.scheduler_status)
           @setState
-            collection: results
+            collection: results.data
       , 30000)
 
     promiseSystemStatus: ->
@@ -112,14 +117,23 @@ do ->
 
     componentDidMount: ->
 
-    newInstallation: ->
-      $('html').trigger("edit-installation-dialog-new")
+    updateSchedulerStatus: (status) ->
+      if status
+        $('#scheduler').removeClass('device-inactive').addClass('device-active')
+      else
+        $('#scheduler').removeClass('device-active').addClass('device-inactive')
 
     render: ->
       dom.div null,
         dom.h2 className: "ui dividing header",
           "System Status"
         dom.table {className: "ui celled structured table"},
+          dom.thead null,
+            dom.tr null
+              dom.th null, "Installation"
+              dom.th null, "Equipment"
+              dom.th null, "Device Type"
+              dom.th null, "Device Name"
           dom.tbody null,
             @buildInstallations()
         React.createElement(InstallationNoRecords, {output: @state.no_records})
@@ -141,9 +155,10 @@ do ->
 
     render: ->
       @adapter.loadData (data) =>
-        if data.length > 0
+        if data.data.length > 0
           ReactDOM.render(React.createElement(Composer, {
-            collection: data,
+            collection: data.data,
+            scheduler_status: data.scheduler_status
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))

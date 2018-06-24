@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from lighting.models import BACNetLight, Projector, Creston
 from iboot.models import IBootDevice
+from scheduler.management.commands.run_scheduler import sceduler_status
 
 
 class ArtistViewSet(api_helpers.GenericApiEndpoint):
@@ -230,7 +231,10 @@ class SystemStatusViewSet(api_helpers.GenericApiEndpoint):
     def get(self, request, format=None):
         installations = models.Installation.objects.all()
         serializer = serializers.SystemStatusSerializer(installations, many=True)
-        return Response(serializer.data)
+        system_status = {}
+        system_status["data"] = serializer.data
+        system_status["scheduler_status"] = sceduler_status()
+        return Response(system_status)
 
 
 class UserViewSet(APIView):

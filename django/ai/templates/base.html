@@ -72,6 +72,8 @@
 
         <a class="item" href="{% url 'iboot:iboots' %}">iBoot</a>
         <div class="right menu">
+          {% block scheduler %}
+          {% endblock scheduler %}
           <a class="item" href="/admin/">Admin</a>
         </div>
       </div>
