@@ -8,12 +8,13 @@ from django.core.management.base import BaseCommand, CommandError
 
 from scheduler.models import Scheduler
 
-from lighting.tasks import LightingStatusTask
+from lighting.tasks import CrestonStatusTask, ProjectorStatusTask
 from iboot.tasks import IBootStatusTask
 
 
 SCHEDULED_TASKS = [
-                   LightingStatusTask(5, 0), 
+                   CrestonStatusTask(5, 0),
+                   ProjectorStatusTask(5, 0),
                    IBootStatusTask(5, 0),
                   ]
 

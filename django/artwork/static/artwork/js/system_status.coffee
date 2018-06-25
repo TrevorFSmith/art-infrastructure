@@ -30,7 +30,9 @@ do ->
 
     render: ->
         @props.installation.equipment.map (equipment, i) =>
-          class_device = if equipment.device_info.status then "device-active" else "device-inactive"
+          class_device = "device-inactive"
+          if equipment.device_info.status
+            class_device = if $('#scheduler').hasClass('device-active') then "device-active" else "device-pseudo-active"
           icon_device  = if equipment.device_info.status then "check" else "minus"
           dom.tr null,
             if i == 0

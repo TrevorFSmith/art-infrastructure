@@ -26,6 +26,9 @@ def handler(clientsocket, clientaddr):
             break
         else:
             print("%s" % data)
+
+        data = data.strip()
+        if data == "Update":
             clientsocket.send("Status-Ok")
 
     clients.remove(clientsocket)

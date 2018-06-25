@@ -1,6 +1,7 @@
 from scheduler.models import Task
 from models import *
 from lighting.creston import CrestonControl, SocketException as CrestonSocketException
+from lighting.pjlink import PJLinkController, SocketException as PJLinkSocketException
 
 class ProjectorEventTask(Task):
     """The task which runs scheduled events for the projector."""
@@ -12,7 +13,7 @@ class ProjectorEventTask(Task):
             if event.due_for_execution(): event.execute()
 
 
-class LightingStatusTask(Task):
+class CrestonStatusTask(Task):
     def __init__(self, loopdelay=5, initdelay=1):
         Task.__init__(self, self.do_it, loopdelay, initdelay)
 
@@ -21,15 +22,38 @@ class LightingStatusTask(Task):
         for creston in Creston.objects.all():
             control = CrestonControl(creston.host, creston.port, 1)
             try:
-                control_info = control.send_command("Update")
+                status = control.send_command("Update")
             except CrestonSocketException:
-                control_info = None
-            if control_info:
+                status= None
+            if status:
                 creston.status = True
                 creston.save()
                 status_list.append(True)
             else:
                 creston.status = False
                 creston.save()
+                status_list.append(False)
+        print status_list
+
+
+class ProjectorStatusTask(Task):
+    def __init__(self, loopdelay=5, initdelay=1):
+        Task.__init__(self, self.do_it, loopdelay, initdelay)
+
+    def do_it(self):
+        status_list = []
+        for projector in Projector.objects.all():
+            controller = PJLinkController(projector.pjlink_host, projector.pjlink_port, projector.pjlink_password)
+            try:
+                status = controller.query_power()
+            except PJLinkSocketException:
+                status = None
+            if status:
+                projector.status = True
+                projector.save()
+                status_list.append(True)
+            else:
+                projector.status = False
+                projector.save()
                 status_list.append(False)
         print status_list

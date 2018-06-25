@@ -149,6 +149,10 @@ button:active {
 	background-color: lightgreen !important;
 }
 
+.device-pseudo-active{
+	background-color: yellow !important;
+}
+
 .device-inactive{
 	background-color: tomato !important;
 }

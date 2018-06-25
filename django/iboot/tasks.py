@@ -23,10 +23,10 @@ class IBootStatusTask(Task):
         for iboot in IBootDevice.objects.all():
             control = IBootControl(settings.IBOOT_POWER_PASSWORD, iboot.host, iboot.port, 1)
             try:
-                control_status = control.query_iboot_state()
+                status = control.query_iboot_state()
             except SocketException:
-                control_status = None
-            if control_status:
+                status = None
+            if status:
                 iboot.status = True
                 iboot.save()
                 status_list.append(True)

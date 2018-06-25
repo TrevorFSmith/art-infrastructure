@@ -27,6 +27,7 @@ def handler(clientsocket, clientaddr):
         else:
             print("%s" % data)
 
+        data = data.strip()
         if "%1AVMT ?" == data:
             clientsocket.send("%1AVMT 11\\r\n")
         elif "%1POWR ?" == data:
