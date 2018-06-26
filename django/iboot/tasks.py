@@ -19,19 +19,14 @@ class IBootStatusTask(Task):
         Task.__init__(self, self.do_it, loopdelay, initdelay)
 
     def do_it(self):
-        status_list = []
         for iboot in IBootDevice.objects.all():
-            control = IBootControl(settings.IBOOT_POWER_PASSWORD, iboot.host, iboot.port, 1)
+            control = IBootControl(settings.IBOOT_POWER_PASSWORD, iboot.host, iboot.port)
             try:
                 status = control.query_iboot_state()
             except SocketException:
                 status = None
             if status:
                 iboot.status = True
-                iboot.save()
-                status_list.append(True)
             else:
                 iboot.status = False
-                iboot.save()
-                status_list.append(False)
-        print status_list
+            iboot.save()

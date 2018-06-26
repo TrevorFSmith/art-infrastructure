@@ -8,6 +8,7 @@ import pprint
 import traceback
 import socket
 from socket import error as socket_error
+from django.conf import settings
 
 
 class SocketException(Exception):
@@ -20,7 +21,7 @@ class SocketException(Exception):
 class IBootControl:
     """A control object for Dataprobe's iBoot network attached remote power controller"""
 
-    def __init__(self,  password, host, port=80, timeout=15):
+    def __init__(self,  password, host, port=80, timeout=settings.DEVICE_TIMEOUT):
         """The port should be the telnet port, not the http or heartbeat port"""
         self.password = password
         self.host = host

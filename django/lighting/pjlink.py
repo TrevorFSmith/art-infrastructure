@@ -3,6 +3,7 @@
 """
 import socket
 from socket import error as socket_error
+from django.conf import settings
 
 
 class PJLinkProtocol:
@@ -201,7 +202,7 @@ class PJLinkResponse:
 
 class PJLinkController:
     """A command object for projectors which are controlled using the PJLink protocol"""
-    def __init__(self, host, port=4352, password=None, version=1, timeout=15):
+    def __init__(self, host, port=4352, password=None, version=1, timeout=settings.DEVICE_TIMEOUT):
         self.host = host
         self.port = port
         self.password = password

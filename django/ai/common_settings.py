@@ -5,6 +5,8 @@ PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
 
 DEBUG=False
 
+DEVICE_TIMEOUT = 15
+
 IBOOT_POWER_PASSWORD="moo"
 
 LANGUAGE_CODE = 'en-us'

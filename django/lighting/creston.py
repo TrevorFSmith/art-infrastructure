@@ -2,6 +2,7 @@
 import socket
 import traceback
 from socket import error as socket_error
+from django.conf import settings
 
 
 BUFF = 1024
@@ -17,7 +18,7 @@ class SocketException(Exception):
 class CrestonControl(object):
     """The Crestron controller class.
     NOTE: This is not thread safe so use a controller in each thread."""
-    def __init__(self, host, port=1313, timeout=15):
+    def __init__(self, host, port=1313, timeout=settings.DEVICE_TIMEOUT):
         self.host = host
         self.port = port
         self.timeout = timeout
