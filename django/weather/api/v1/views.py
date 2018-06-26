@@ -1,14 +1,13 @@
+from rest_framework.views import APIView
 from weather import serializers, models
-from artwork.api import api_helpers
 from django.http import Http404
 from rest_framework.response import Response
-
 from datetime import timedelta
 from django.utils import timezone
 from weather.yahoo import YahooWeatherClient
 
 
-class WeatherViewSet(api_helpers.GenericApiEndpoint):
+class WeatherViewSet(APIView):
 
     def get(self, request, airport_code, format=None):
         location = models.Location.objects.search(airport_code)
