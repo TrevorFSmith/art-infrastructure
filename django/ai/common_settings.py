@@ -102,7 +102,7 @@ USE_TZ = True
 PRODUCTION = False
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.1.8", "192.168.43.158"]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'media'))

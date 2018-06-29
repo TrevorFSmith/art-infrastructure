@@ -199,7 +199,10 @@ class InstallationSerializer(serializers.ModelSerializer):
             ]
 
     def get_site_name(self, obj):
-        return obj.site.name
+        if obj.site:
+            return obj.site.name
+        else:
+            ""
 
     def get_groups_info(self, obj):
         return obj.groups.values("id", "name")
