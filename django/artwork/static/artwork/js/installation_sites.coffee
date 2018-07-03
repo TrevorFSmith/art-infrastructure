@@ -62,9 +62,12 @@ do ->
           # request finished
           $("[data-object='installation-site-#{installation_site_id}']").toggleClass("loading")
 
-    handleGetWeather: (location) =>
+    handleGetWeather: (location, event) =>
+      target = $(event.target)
+      target.toggleClass('loading')
       url = $("#root").data("url-weather").replace("none", location)
       @promiseObjects(url).then (results) =>
+        target.toggleClass('loading')
         @setState
           weather: results
 

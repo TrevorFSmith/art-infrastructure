@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from artwork import models
+from lighting.models import BACNetLight
 from weather.models import Location
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -101,7 +103,9 @@ class EquipmentSerializer(serializers.ModelSerializer):
             ]
 
     def get_equipment_type_name(self, obj):
-        return obj.equipment_type.name
+        if obj.equipment_type:
+            return obj.equipment_type.name
+        return ""
 
     def get_photos_info(self, obj):
         return obj.photos.values("id", "image", "title")
@@ -201,8 +205,7 @@ class InstallationSerializer(serializers.ModelSerializer):
     def get_site_name(self, obj):
         if obj.site:
             return obj.site.name
-        else:
-            ""
+        return ""
 
     def get_groups_info(self, obj):
         return obj.groups.values("id", "name")
@@ -249,15 +252,21 @@ class SystemStatusSerializer(serializers.ModelSerializer):
             ]
 
     def get_site_name(self, obj):
-        return obj.site.name
+        if obj.site:
+            return obj.site.name
+        return ""
 
     def get_location_name(self, obj):
-        location = Location.objects.search(obj.site.location)
-        if location is None:
-            return ""
-        return location.name
+        if obj.site:
+            location = Location.objects.search(obj.site.location)
+            if location:
+              return location.name
+        return ""
 
     def get_equipment(self, obj):
-        serializer = EquipmentSerializer(data=obj.site.equipment.all(), many=True)
-        serializer.is_valid()
-        return serializer.data
+        if obj.site:
+            exclude_device_type = ContentType.objects.get_for_model(BACNetLight)
+            serializer = EquipmentSerializer(data=obj.site.equipment.exclude(device_type=exclude_device_type), many=True)
+            serializer.is_valid()
+            return serializer.data
+        return []
