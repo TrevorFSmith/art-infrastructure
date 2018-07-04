@@ -8,17 +8,17 @@ from django.core.management.base import BaseCommand, CommandError
 
 from scheduler.models import Scheduler
 
-from lighting.tasks import CrestonStatusTask, ProjectorStatusTask
-from iboot.tasks import IBootStatusTask
+from lighting.tasks import ProjectorEventTask
+from iboot.tasks import IBootEventTask
 
 
 SCHEDULED_TASKS = [
-                   CrestonStatusTask(5, 0),
-                   ProjectorStatusTask(5, 0),
-                   IBootStatusTask(5, 0),
+                   ProjectorEventTask(),
+                   IBootEventTask(),
                   ]
 
 SCHEDULED_PATH_PID = '/tmp/artserver_scheduler.pid'
+
 
 class Command(BaseCommand):
 
@@ -58,13 +58,3 @@ def write_proc(lockfile_path):
     pidfile.write("%s" % os.getpid())
     pidfile.close
     return True
-
-
-def sceduler_status():
-    if os.access(SCHEDULED_PATH_PID, os.F_OK):
-        pidfile = open(SCHEDULED_PATH_PID, "r")
-        pidfile.seek(0)
-        pid = pidfile.readline()
-        if os.path.exists("/proc/%s" % pid):
-            return True
-    return False

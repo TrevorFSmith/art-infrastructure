@@ -20,7 +20,6 @@ from django.core.management.base import BaseCommand, CommandError
 
 from rest_framework.authtoken.models import Token
 
-from heartbeat.models import Heartbeat
 from weather.models import WeatherInfo
 from lighting.models import BACNetLight, Creston, Projector
 from iboot.models import IBootDevice
@@ -49,7 +48,6 @@ class Command(BaseCommand):
 
         call_command('migrate', interactive=False)
 
-        Heartbeat.objects.all().delete()
         WeatherInfo.objects.all().delete()
         Token.objects.all().delete()
 

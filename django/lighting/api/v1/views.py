@@ -128,25 +128,6 @@ class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
             projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
             controller = PJLinkController(projector.pjlink_host, projector.pjlink_port, projector.pjlink_password)
 
-            # FIXME:
-            # This is to be decided what to do with it. Probably makes sense to move it to Scheduler a.k.a. Heartbeat.
-            #
-            # audio_mute, video_mute = controller.query_mute()
-
-            # info = ProjectorInfo(
-            #     controller.query_power(),
-            #     controller.query_name(),
-            #     controller.query_manufacture_name(),
-            #     controller.query_product_name(),
-            #     controller.query_other_info(),
-            #     audio_mute,
-            #     video_mute
-            #     )
-            # See note above
-            #
-            # for lamp in controller.query_lamps():
-            #     info.lamps.append(LampInfo(lamp[0], lamp[1]))
-
             if cmd == PJLinkProtocol.POWER_ON_STATUS:
                 controller.power_on()
 
@@ -232,7 +213,6 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):
-
         try:
             bacnet_light = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
             serializer = serializers.BACNetLightSerializer(bacnet_light, data=request.data)

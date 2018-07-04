@@ -2,6 +2,7 @@
 import time
 import threading
 
+
 class Scheduler:
     """The class which manages starting and stopping of tasks."""
     def __init__(self):
@@ -17,7 +18,7 @@ class Scheduler:
         self._tasks.append(task)
 
     def start_all_tasks(self):
-        print 'Starting scheduler'
+        print 'Starting tasks'
         for task in self._tasks:
             print 'Starting task', task
             task.start()
@@ -66,6 +67,7 @@ class Task(threading.Thread):
 
     def stop(self):
         self._running = 0
+
 
 class TestTask(Task):
     """An example task"""

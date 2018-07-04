@@ -14,8 +14,9 @@ class IBootEventTask(Task):
         for event in IBootEvent.objects.all():
             if event.due_for_execution(): event.execute()
 
+
 class IBootStatusTask(Task):
-    def __init__(self, loopdelay=5, initdelay=1):
+    def __init__(self, loopdelay=5, initdelay=0):
         Task.__init__(self, self.do_it, loopdelay, initdelay)
 
     def do_it(self):
