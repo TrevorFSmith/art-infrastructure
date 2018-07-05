@@ -15,21 +15,7 @@ do ->
   "use strict"
 
 
-  class BACNetLightUnitHeader extends React.Component
-
-    displayName: "BACNet Light Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.bacnet_light.name
-
-
-  class BACNetLightUnitBody extends React.Component
+  class BACNetLightUnit extends React.Component
 
     displayName: "BACNet Light Body"
 
@@ -44,7 +30,7 @@ do ->
 
       url             = $("#root").data("command-url")
       csrf_token      = $("#root").data("csrf_token")
-      bacnet_light_id = @props.data.bacnet_light.id
+      bacnet_light_id = @props.bacnet_light.id
       cmd             = $("[data-object='command-#{bacnet_light_id}']").val()
 
       $("[data-object='command-send-#{bacnet_light_id}']").toggleClass("loading")
@@ -93,53 +79,42 @@ do ->
 
     render: ->
       scope = this
-      dom.div {className: "content"},
-        dom.h3 null, "Device ID: #{@props.data.bacnet_light.device_id} | Property ID: #{@props.data.bacnet_light.property_id}"
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.bacnet_light.name
 
-        dom.p
-          className: "ui input margin-right"
+        dom.div {className: "content"},
+          dom.h3 null, "Device ID: #{@props.bacnet_light.device_id} | Property ID: #{@props.bacnet_light.property_id}"
+          dom.p
+            className: "ui input margin-right"
+            , "",
+              dom.input placeholder: "Enter command ...", "data-object": "command-#{scope.props.bacnet_light.id}"
+          dom.div
+            className: "button ui mini"
+            "data-object": "command-send-#{scope.props.bacnet_light.id}"
+            onClick: scope.sendCommand.bind(scope)
           , "",
-            dom.input placeholder: "Enter command ...", "data-object": "command-#{scope.props.data.bacnet_light.id}"
-        dom.div
-          className: "button ui mini"
-          "data-object": "command-send-#{scope.props.data.bacnet_light.id}"
-          onClick: scope.sendCommand.bind(scope)
-        , "",
-          dom.i {className: "cog icon"}, ""
-          "Send command"
+            dom.i {className: "cog icon"}, ""
+            "Send command"
 
-        dom.h3 null, "Actions:"
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editBACNetLight.bind(this, @props.data)
+            onClick: @editBACNetLight.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeBACNetLight.bind(this, @props.data.bacnet_light.id)
+            onClick: @removeBACNetLight.bind(this, @props.bacnet_light.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(BACNetLightModal, {bacnet_light: @props.data.bacnet_light})
-
-
-  class BACNetLightUnit extends React.Component
-
-    displayName: "BACNetLight Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(BACNetLightUnitHeader, {data: @props})
-          React.createElement(BACNetLightUnitBody, {data: @props})
+        React.createElement(BACNetLightModal, {bacnet_light: @props.bacnet_light})
 
 
   class BACNetLightNoRecords extends React.Component
@@ -193,12 +168,13 @@ do ->
         no_records: if collection.length > 0 then false else true
         count: @props.count
         current_page: @getCurrentPage(@props.next, @props.prev)
-        next_page: @props.next
-        prev_page: @props.prev
+        next_page: @props.next_page
+        prev_page: @props.prev_page
+        page_size: @props.page_size
 
     buildBACNetLights: ->
       @state.collection.map (bacnet_light) =>
-        React.createElement(BACNetLightUnit, {bacnet_light: bacnet_light})
+        React.createElement(BACNetLightUnit, {bacnet_light: bacnet_light, key: bacnet_light.id})
 
     loadBACNetLights: (url) ->
       @adapter = new Adapter(url)
@@ -210,6 +186,7 @@ do ->
             current_page: @getCurrentPage(data.next, data.previous)
             next_page: data.next
             prev_page: data.previous
+            page_size: data.page_size
 
     getCurrentPage: (next_page, prev_page) ->
       if next_page
@@ -237,7 +214,7 @@ do ->
           if index >= 0
             new_collection[index] = data
           else
-            if not @state.count or (@state.count % 9) == 0
+            if not @state.count or (@state.count % @state.page_size) == 0
               $('html').trigger("bacnet-light-current-page")
             else
               count += 1
@@ -252,7 +229,7 @@ do ->
         count = @state.count - 1
         if @state.next_page
           $('html').trigger("bacnet-light-current-page")
-        else if @state.prev_page and (count % 9) == 0
+        else if @state.prev_page and (count % @state.page_size) == 0
           $('html').trigger("bacnet-light-prev-page")
         else
           filtered_bacnet_lights = _.filter @state.collection, (bacnet_light) =>
@@ -289,7 +266,7 @@ do ->
           @buildBACNetLights()
         React.createElement(BACNetLightNoRecords, {output: @state.no_records})
         React.createElement(BACNetLightPagination, {
-          page: @state.current_page, pages: Math.ceil(@state.count / 9), 
+          page: @state.current_page, pages: Math.ceil(@state.count / @state.page_size),
           next: @state.next_page, prev: @state.prev_page})
         React.createElement(BACNetLightModal, {bacnet_light: {}})
 
@@ -310,8 +287,9 @@ do ->
           ReactDOM.render(React.createElement(Composer, {
             collection: data.results,
             count: data.count,
-            next: data.next,
-            prev: data.previous,
+            next_page: data.next,
+            prev_page: data.previous,
+            page_size: data.page_size,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))

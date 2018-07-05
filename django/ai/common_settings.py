@@ -5,6 +5,8 @@ PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
 
 DEBUG=False
 
+DEVICE_TIMEOUT = 15
+
 IBOOT_POWER_PASSWORD="moo"
 
 LANGUAGE_CODE = 'en-us'
@@ -36,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'compressor',
+    'django_cleanup',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -100,3 +103,6 @@ PRODUCTION = False
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'media'))

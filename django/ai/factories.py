@@ -2,7 +2,11 @@ from django.contrib.auth.models import User
 import factory
 from lighting import models as lighting_models
 from iboot import models as iboot_models
+from artwork import models as artwork_models
+from weather import models as weather_models
 
+
+# For lighting
 
 class ProjectorFactory(factory.django.DjangoModelFactory):
 
@@ -35,6 +39,8 @@ class CrestonFactory(factory.django.DjangoModelFactory):
     port = factory.Sequence(lambda n: '{}'.format(n))
 
 
+# For iboot
+
 class IBootFactory(factory.django.DjangoModelFactory):
 
     class Meta:
@@ -42,4 +48,185 @@ class IBootFactory(factory.django.DjangoModelFactory):
 
     name = factory.Sequence(lambda n: 'iBoot {}'.format(n))
     mac_address = factory.Sequence(lambda n: '00-0D-AD-01-94-6{}'.format(n))
-    ip = '127.0.0.1'
+    host = '127.0.0.1'
+    port = 8008
+
+
+# For artwork
+
+class ArtistFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = artwork_models.Artist
+
+    name = factory.Sequence(lambda n: 'Artist {}'.format(n))
+    email = factory.Sequence(lambda n: 'artist{}.example.com'.format(n))
+    phone = '111-111-111'
+    notes = factory.Sequence(lambda n: 'Notes {}'.format(n))
+
+    @factory.post_generation
+    def artist_groups(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for group in extracted:
+                self.artistgroup_set.add(group)
+
+
+class ArtistGroupFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = artwork_models.ArtistGroup
+
+    name = factory.Sequence(lambda n: 'Artist Group {}'.format(n))
+
+    @factory.post_generation
+    def artists(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for artist in extracted:
+                self.artists.add(artist)
+
+
+class EquipmentTypeFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = artwork_models.EquipmentType
+
+    name = factory.Sequence(lambda n: 'Equipment Type {}'.format(n))
+    provider = factory.Sequence(lambda n: 'Provider {}'.format(n))
+    notes = factory.Sequence(lambda n: 'Notes {}'.format(n))
+
+
+class EquipmentFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = artwork_models.Equipment
+
+    name = factory.Sequence(lambda n: 'Equipment {}'.format(n))
+    notes = factory.Sequence(lambda n: 'Notes {}'.format(n))
+    equipment_type = factory.SubFactory(EquipmentTypeFactory)
+
+
+class PhotoFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = artwork_models.Photo
+
+    image = factory.django.ImageField()
+    title = factory.Sequence(lambda n: 'Title {}'.format(n))
+    caption = factory.Sequence(lambda n: 'Caption {}'.format(n))
+    description = factory.Sequence(lambda n: 'Description {}'.format(n))
+
+
+class DocumentFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = artwork_models.Document
+
+    title = factory.Sequence(lambda n: 'Title {}'.format(n))
+    doc = factory.django.FileField()
+
+
+class InstallationSiteFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = artwork_models.InstallationSite
+
+    name = factory.Sequence(lambda n: 'Installation Site {}'.format(n))
+    location = factory.Sequence(lambda n: 'Location {}'.format(n))
+    notes = factory.Sequence(lambda n: 'Notes {}'.format(n))
+
+    @factory.post_generation
+    def photos(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for photo in extracted:
+                self.photos.add(photo)
+
+    @factory.post_generation
+    def equipment(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for equipment in extracted:
+                self.equipment.add(equipment)
+
+
+class InstallationFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = artwork_models.Installation
+
+    name = factory.Sequence(lambda n: 'Installation {}'.format(n))
+    notes = factory.Sequence(lambda n: 'Notes {}'.format(n))
+    site = factory.SubFactory(InstallationSiteFactory)
+
+    @factory.post_generation
+    def groups(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for group in extracted:
+                self.groups.add(group)
+
+    @factory.post_generation
+    def artists(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for artist in extracted:
+                self.artists.add(artist)
+
+    @factory.post_generation
+    def user(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for user in extracted:
+                self.user.add(user)
+
+    @factory.post_generation
+    def photos(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for photo in extracted:
+                self.photos.add(photo)
+
+    @factory.post_generation
+    def documents(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for document in extracted:
+                self.documents.add(document)
+
+
+class UserFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = User
+
+    username = factory.Sequence(lambda n: 'Username {}'.format(n))
+    password = "12345678"
+
+
+class LocationFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = weather_models.Location
+
+    name         = "Boeing Field King County International Airport"
+    airport_type = "large_airport"
+    latitude     = 47.529998779296875
+    longitude    = -122.302001953125
+    elevation    = 21
+    iso_country  = "US"
+    iso_region   = "US-WA"
+    municipality = "Seattle"
+    gps_code     = "KBFI"
+    iata_code    = "BFI"
+    local_code   = "BFI"

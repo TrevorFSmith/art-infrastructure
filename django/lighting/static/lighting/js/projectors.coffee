@@ -14,21 +14,7 @@ do ->
   "use strict"
 
 
-  class ProjectorUnitHeader extends React.Component
-
-    displayName: "Projector Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.projector.name
-
-
-  class ProjectorUnitBody extends React.Component
+  class ProjectorUnit extends React.Component
 
     displayName: "Projector Body"
 
@@ -43,7 +29,7 @@ do ->
 
       url        = $("#root").data("command-url")
       csrf_token = $("#root").data("csrf_token")
-      projector_id = @props.data.projector.id
+      projector_id = @props.projector.id
 
       $("[data-object='command-#{projector_id}-#{cmd}']").toggleClass("loading")
 
@@ -90,52 +76,39 @@ do ->
 
     render: ->
       scope = this
-      dom.div {className: "content"},
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.projector.name
 
-        dom.h3 null, "Host: #{@props.data.projector.pjlink_host} | Port: #{@props.data.projector.pjlink_port}"
+        dom.div {className: "content"},
+          dom.h3 null, "Host: #{@props.projector.pjlink_host} | Port: #{@props.projector.pjlink_port}"
+          @props.projector.commands.map (cmd) ->
+            dom.div
+              className: "button ui mini indent"
+              "data-object": "command-#{scope.props.projector.id}-#{cmd.command}"
+              onClick: scope.sendCommand.bind(scope, cmd.command)
+            , "",
+              dom.i {className: "cog icon"}, ""
+              cmd.title
 
-        @props.data.projector.commands.map (cmd) ->
-          dom.div
-            className: "button ui mini"
-            "data-object": "command-#{scope.props.data.projector.id}-#{cmd.command}"
-            onClick: scope.sendCommand.bind(scope, cmd.command)
-          , "",
-            dom.i {className: "cog icon"}, ""
-            cmd.title
-
-        dom.h3 null, ""
-
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editProjector.bind(this, @props.data)
+            onClick: @editProjector.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeProjector.bind(this, @props.data.projector.id)
+            onClick: @removeProjector.bind(this, @props.projector.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(ProjectorModal, {projector: @props.data.projector})
-
-
-  class ProjectorUnit extends React.Component
-
-    displayName: "Projector Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(ProjectorUnitHeader, {data: @props})
-          React.createElement(ProjectorUnitBody, {data: @props})
+        React.createElement(ProjectorModal, {projector: @props.projector})
 
 
   class ProjectorNoRecords extends React.Component
@@ -189,12 +162,13 @@ do ->
         no_records: if collection.length > 0 then false else true
         count: @props.count
         current_page: @getCurrentPage(@props.next, @props.prev)
-        next_page: @props.next
-        prev_page: @props.prev
+        next_page: @props.next_page
+        prev_page: @props.prev_page
+        page_size: @props.page_size
 
     buildProjectors: ->
       @state.collection.map (projector) =>
-        React.createElement(ProjectorUnit, {projector: projector})
+        React.createElement(ProjectorUnit, {projector: projector, key: projector.id})
 
     loadProjectors: (url) ->
       @adapter = new Adapter(url)
@@ -206,6 +180,7 @@ do ->
             current_page: @getCurrentPage(data.next, data.previous)
             next_page: data.next
             prev_page: data.previous
+            page_size: data.page_size
 
     getCurrentPage: (next_page, prev_page) ->
       if next_page
@@ -232,7 +207,7 @@ do ->
           if index >= 0
             new_collection[index] = data
           else
-            if not @state.count or (@state.count % 9) == 0
+            if not @state.count or (@state.count % @state.page_size) == 0
               $('html').trigger("projector-current-page")
             else
               count += 1
@@ -248,7 +223,7 @@ do ->
         count = @state.count - 1
         if @state.next_page
           $('html').trigger("projector-current-page")
-        else if @state.prev_page and (count % 9) == 0
+        else if @state.prev_page and (count % @state.page_size) == 0
           $('html').trigger("projector-prev-page")
         else
           filtered_projectors = _.filter @state.collection, (projector) =>
@@ -285,7 +260,7 @@ do ->
           @buildProjectors()
         React.createElement(ProjectorNoRecords, {output: @state.no_records})
         React.createElement(ProjectorPagination, {
-          page: @state.current_page, pages: Math.ceil(@state.count / 9), 
+          page: @state.current_page, pages: Math.ceil(@state.count / @state.page_size),
           next: @state.next_page, prev: @state.prev_page})
         React.createElement(ProjectorModal, {projector: {}})
 
@@ -307,8 +282,9 @@ do ->
           ReactDOM.render(React.createElement(Composer, {
             collection: data.results,
             count: data.count,
-            next: data.next,
-            prev: data.previous,
+            next_page: data.next,
+            prev_page: data.previous,
+            page_size: data.page_size,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))

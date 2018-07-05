@@ -138,5 +138,21 @@ button:active {
 .col-12 { flex: 1 100%;   }
 
 .margin-right{
-  margin-right: 5px !important;
+	margin-right: 5px !important;
+}
+
+.indent{
+	margin: 4px 8px 4px 0 !important;
+}
+
+.device-active{
+	background-color: lightgreen !important;
+}
+
+.device-pseudo-active{
+	background-color: yellow !important;
+}
+
+.device-inactive{
+	background-color: tomato !important;
 }

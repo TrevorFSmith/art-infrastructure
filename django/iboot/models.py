@@ -13,7 +13,9 @@ class IBootDevice(models.Model):
 
     name = models.CharField(max_length=1024, null=False, blank=False)
     mac_address = models.CharField(max_length=1024, null=False, blank=False, help_text="e.g. 00-0D-AD-01-94-6F")
-    ip = models.GenericIPAddressField(blank=False, null=True)
+    host = models.GenericIPAddressField(blank=False, null=False)
+    port = models.IntegerField(null=False, blank=False, default=8008)
+    status = models.BooleanField(default=False)
 
     @models.permalink
     def get_absolute_url(self):
@@ -40,7 +42,7 @@ class IBootEvent(EventModel):
 
     def execute(self):
         try:
-            control = IBootControl(settings.IBOOT_POWER_PASSWORD, self.device.ip)
+            control = IBootControl(settings.IBOOT_POWER_PASSWORD, self.device.host, self.device.port)
             print 'running ', self
             if self.command == 'cycle':
                 control.cycle_power()

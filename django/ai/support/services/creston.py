@@ -27,8 +27,9 @@ def handler(clientsocket, clientaddr):
         else:
             print("%s" % data)
 
-        # if "" == data:
-        #     clientsocket.send("\\r\n")
+        data = data.strip()
+        if data == "Update":
+            clientsocket.send("Status-Ok")
 
     clients.remove(clientsocket)
     clientsocket.close()
@@ -54,3 +55,4 @@ while True:
     except KeyboardInterrupt:
         print "Closing Creston server socket..."
         serversocket.close()
+        break

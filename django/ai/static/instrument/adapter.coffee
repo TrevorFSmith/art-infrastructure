@@ -32,6 +32,24 @@ class @Adapter
     ).complete ->
       finished() if finished
 
+  uploadData: (type, token, data, ok, failed, finished) =>
+    $.ajax({
+      url: @url
+      dataType: 'json'
+      data: data
+      type: type
+      headers: {"X-CSRFToken": token}
+      cache: false
+      contentType: false
+      processData: false
+    }).error( (data, status) ->
+      failed(data, status) if failed
+    ).done( (data, status) ->
+      if data
+        ok(data) if ok
+    ).complete ->
+      finished() if finished
+
   delete: (token, data, ok, failed, finished) =>
     $.ajax({
       url: @url

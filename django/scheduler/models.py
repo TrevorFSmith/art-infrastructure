@@ -27,7 +27,6 @@ class Scheduler:
         for task in self._tasks:
             print 'Stopping task', task
             task.stop()
-            #task.join()
             print 'Stopped'
 
 

@@ -3,6 +3,7 @@
 """
 import socket
 from socket import error as socket_error
+from django.conf import settings
 
 
 class PJLinkProtocol:
@@ -107,7 +108,7 @@ class PJLinkAuthenticationRequest:
     @classmethod
     def decode(cls, encoded_request):
         tokens = encoded_request.split(' ')
-        if tokens[1] == PJLinkProtocol.ON:
+        if len(tokens) > 1 and tokens[1] == PJLinkProtocol.ON:
             return PJLinkAuthenticationRequest(seed=tokens[2].strip())
         else:
             return PJLinkAuthenticationRequest()
@@ -188,6 +189,8 @@ class PJLinkResponse:
     @classmethod
     def decode(cls, encoded_command_line):
         """Decode the raw data and return a PJLinkResponse instance"""
+        if not encoded_command_line:
+            return PJLinkResponse("", "", "")
         if encoded_command_line[0] == '%': # It's a non-auth response
             version = int(encoded_command_line[1:2])
             command = encoded_command_line[2:6]
@@ -199,11 +202,12 @@ class PJLinkResponse:
 
 class PJLinkController:
     """A command object for projectors which are controlled using the PJLink protocol"""
-    def __init__(self, host, port=4352, password=None, version=1):
+    def __init__(self, host, port=4352, password=None, version=1, timeout=settings.DEVICE_TIMEOUT):
         self.host = host
         self.port = port
         self.password = password
         self.version = 1
+        self.timeout = timeout
 
     def power_on(self):
         response = self._send_command_line(PJLinkCommandLine(PJLinkProtocol.POWER, PJLinkProtocol.ON, self.version))
@@ -271,7 +275,7 @@ class PJLinkController:
     def _send_command_line(self, command_line):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(15)
+            sock.settimeout(self.timeout)
             sock.connect((self.host, self.port))
             encoded_auth_request = sock.recv(512)
 
@@ -300,4 +304,5 @@ class PJLinkController:
             return response
 
         except socket_error as serr:
+            sock.close()
             raise SocketException(serr)

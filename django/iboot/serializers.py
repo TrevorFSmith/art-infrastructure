@@ -13,8 +13,10 @@ class IBootSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "mac_address",
-            "ip",
+            "host",
+            "port",
             "commands",
+            "status",
             ]
 
     def get_commands(self, obj):

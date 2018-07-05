@@ -6,5 +6,6 @@
 *.sqlite3
 django/ai/local_settings.py
 static/CACHE/**/*
+media
 
 

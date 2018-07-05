@@ -1,17 +1,32 @@
 # Copyright 2009 GORBET + BANERJEE (http://www.gorbetbanerjee.com/) Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-from scripts.scheduler import Task
-import traceback
-import logging
-from datetime import datetime, timedelta
+from scheduler.models import Task
+from iboot.models import IBootEvent, IBootDevice
+from iboot.iboot_control import IBootControl, SocketException
+from django.conf import settings
 
-import sys, os, time
 
 class IBootEventTask(Task):
-	"""The task which runs scheduled events."""
-	def __init__(self, loopdelay=60, initdelay=1):
-		Task.__init__(self, self.do_it, loopdelay, initdelay)
+    """The task which runs scheduled events."""
+    def __init__(self, loopdelay=60, initdelay=1):
+        Task.__init__(self, self.do_it, loopdelay, initdelay)
 
-	def do_it(self):
-		from models import IBootEvent
-		for event in IBootEvent.objects.all():
-			if event.due_for_execution(): event.execute()
+    def do_it(self):
+        for event in IBootEvent.objects.all():
+            if event.due_for_execution(): event.execute()
+
+class IBootStatusTask(Task):
+    def __init__(self, loopdelay=5, initdelay=1):
+        Task.__init__(self, self.do_it, loopdelay, initdelay)
+
+    def do_it(self):
+        for iboot in IBootDevice.objects.all():
+            control = IBootControl(settings.IBOOT_POWER_PASSWORD, iboot.host, iboot.port)
+            try:
+                status = control.query_iboot_state()
+            except SocketException:
+                status = None
+            if status:
+                iboot.status = True
+            else:
+                iboot.status = False
+            iboot.save()

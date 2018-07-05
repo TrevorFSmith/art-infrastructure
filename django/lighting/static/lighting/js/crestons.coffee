@@ -16,21 +16,7 @@ do ->
   "use strict"
 
 
-  class CrestonUnitHeader extends React.Component
-
-    displayName: "Creston Header"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-      dom.div {className: "extra content"},
-        dom.h3 {className: "left floated"},
-          dom.i {className: "ui icon check circle"}, ""
-          dom.span null, @props.data.creston.name
-
-
-  class CrestonUnitBody extends React.Component
+  class CrestonUnit extends React.Component
 
     displayName: "Creston Body"
 
@@ -66,43 +52,32 @@ do ->
 
 
     render: ->
-      scope = this
-      dom.div {className: "content"},
+      dom.div {className: "ui card"},
+        dom.div {className: "extra content"},
+          dom.h3 {className: "left floated"},
+            dom.i {className: "ui icon check circle"}, ""
+            dom.span null, @props.creston.name
 
-        dom.h3 null, "Host: #{@props.data.creston.host} | Port: #{@props.data.creston.port}"
-        React.createElement(CrestonSelectCommand, {creston: @props.data.creston})
-        dom.h3 null, "Actions:"
-        dom.div {className: "ui buttons mini"},
+        dom.div {className: "content"},
+          dom.h3 null, "Host: #{@props.creston.host} | Port: #{@props.creston.port}"
+          React.createElement(CrestonSelectCommand, {creston: @props.creston})
+
+        dom.div {className: "ui buttons mini attached bottom"},
           dom.button
             className: "ui button"
-            onClick: @editCreston.bind(this, @props.data)
+            onClick: @editCreston.bind(this, @props)
           , "",
             dom.i {className: "pencil icon"}, ""
             "Edit"
-
           dom.div {className: "or"}
-
           dom.button
             className: "ui button negative"
-            onClick: @removeCreston.bind(this, @props.data.creston.id)
+            onClick: @removeCreston.bind(this, @props.creston.id)
           , "",
             dom.i {className: "trash icon"}, ""
             "Delete"
 
-        React.createElement(CrestonModal, {creston: @props.data.creston})
-
-
-  class CrestonUnit extends React.Component
-
-    displayName: "Creston Unit"
-
-    constructor: (props) ->
-      super(props)
-
-    render: ->
-        dom.div {className: "ui card"},
-          React.createElement(CrestonUnitHeader, {data: @props})
-          React.createElement(CrestonUnitBody, {data: @props})
+        React.createElement(CrestonModal, {creston: @props.creston})
 
 
   class CrestonNoRecords extends React.Component
@@ -155,6 +130,7 @@ do ->
       command    = @state.select_command.command
 
       $("[data-object='command-#{creston_id}-#{command}']").toggleClass("loading")
+      $("[data-object ='command-#{creston_id}']").prop("disabled", true)
 
       adapter  = new Adapter(url)
       postData =
@@ -171,6 +147,7 @@ do ->
       ), () ->
         # request finished
         $("[data-object='command-#{creston_id}-#{command}']").toggleClass("loading")
+        $("[data-object ='command-#{creston_id}']").prop("disabled", false)
 
     render: ->
       dom.div null, "",
@@ -228,12 +205,13 @@ do ->
         no_records: if collection.length > 0 then false else true
         count: @props.count
         current_page: @getCurrentPage(@props.next, @props.prev)
-        next_page: @props.next
-        prev_page: @props.prev
+        next_page: @props.next_page
+        prev_page: @props.prev_page
+        page_size: @props.page_size
 
     buildCrestons: ->
       @state.collection.map (creston) =>
-        React.createElement(CrestonUnit, {creston: creston})
+        React.createElement(CrestonUnit, {creston: creston, key: creston.id})
 
     loadCrestons: (url) ->
       @adapter = new Adapter(url)
@@ -245,6 +223,7 @@ do ->
             current_page: @getCurrentPage(data.next, data.previous)
             next_page: data.next
             prev_page: data.previous
+            page_size: data.page_size
 
     getCurrentPage: (next_page, prev_page) ->
       if next_page
@@ -272,7 +251,7 @@ do ->
           if index >= 0
             new_collection[index] = data
           else
-            if not @state.count or (@state.count % 9) == 0
+            if not @state.count or (@state.count % @state.page_size) == 0
               $('html').trigger("creston-current-page")
             else
               count += 1
@@ -287,7 +266,7 @@ do ->
         count = @state.count - 1
         if @state.next_page
           $('html').trigger("creston-current-page")
-        else if @state.prev_page and (count % 9) == 0
+        else if @state.prev_page and (count % @state.page_size) == 0
           $('html').trigger("creston-prev-page")
         else
           filtered_crestons = _.filter @state.collection, (creston) =>
@@ -324,7 +303,7 @@ do ->
           @buildCrestons()
         React.createElement(CrestonNoRecords, {output: @state.no_records})
         React.createElement(CrestonPagination, {
-          page: @state.current_page, pages: Math.ceil(@state.count / 9), 
+          page: @state.current_page, pages: Math.ceil(@state.count / @state.page_size),
           next: @state.next_page, prev: @state.prev_page})
         React.createElement(CrestonModal, {creston: {}})
 
@@ -346,8 +325,9 @@ do ->
           ReactDOM.render(React.createElement(Composer, {
             collection: data.results,
             count: data.count,
-            next: data.next,
-            prev: data.previous,
+            next_page: data.next,
+            prev_page: data.previous,
+            page_size: data.page_size,
           }), document.getElementById("root"))
         else
           ReactDOM.render(React.createElement(Composer, {}), document.getElementById("root"))

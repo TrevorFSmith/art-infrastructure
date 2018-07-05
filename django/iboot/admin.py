@@ -10,7 +10,7 @@ class StyledModelAdmin(admin.ModelAdmin):
 		css = { "all": ('admin.css', )}
 
 class IBootDeviceAdmin(StyledModelAdmin):
-	list_display = ('name', 'mac_address', 'ip')
+	list_display = ('name', 'mac_address', 'host', 'port')
 admin.site.register(IBootDevice, IBootDeviceAdmin)
 
 class IBootEventAdmin(StyledModelAdmin):

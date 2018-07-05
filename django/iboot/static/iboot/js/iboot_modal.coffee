@@ -9,25 +9,28 @@ class @IBootModal extends React.Component
   displayName: "Edit/New iBoot Modal Dialog"
 
   constructor: (props, context) ->
-    super(props, context);
-    if @props.iboot
+    super(props, context)
+    if not _.isEmpty(@props.iboot)
       this.state =
         id: @props.iboot.id
         name: @props.iboot.name
         mac_address: @props.iboot.mac_address
-        ip: @props.iboot.ip
+        host: @props.iboot.host
+        port: @props.iboot.port
     else
       this.state =
         name: ""
         mac_address: ""
-        ip: ""
+        host: ""
+        port: ""
 
   resetForm: =>
     if not @state.id
       @setState
         name: ""
         mac_address: ""
-        ip: ""
+        host: ""
+        port: ""
 
   domNode: ->
     if @state.id
@@ -72,20 +75,12 @@ class @IBootModal extends React.Component
     else
       "Add New iBoot"
 
-  componentWillReceiveProps: (nextProps) ->
-    if(@props.iboot.id != nextProps.iboot.id)
-      @setState
-        id: nextProps.iboot.id
-        name: nextProps.iboot.name
-        mac_address: nextProps.iboot.mac_address
-        ip: nextProps.iboot.ip
-
-      $('html').on "edit-iboot-dialog-#{nextProps.iboot.id}", (event, scope) =>
-        $("[data-object='iboot-#{nextProps.iboot.id}']").modal("show")
-
   componentDidMount: ->
     $('html').on "edit-iboot-dialog-#{@domNode()}", (event, scope) =>
       $("[data-object='iboot-#{@domNode()}']").modal("show")
+
+  componentWillUnmount: ->
+    $("[data-object='iboot-#{@domNode()}']").remove()
 
   render: ->
     dom.div className: "ui modal", 'data-object': "iboot-#{@domNode()}",
@@ -106,8 +101,12 @@ class @IBootModal extends React.Component
             dom.input value: @state.mac_address, onChange: @handleChange.bind(this), name: 'mac_address'
 
           dom.div className: "field",
-            dom.label null, "IP"
-            dom.input value: @state.ip, onChange: @handleChange.bind(this), name: 'ip'
+            dom.label null, "Host"
+            dom.input value: @state.host, onChange: @handleChange.bind(this), name: 'host'
+
+          dom.div className: "field",
+            dom.label null, "Port"
+            dom.input value: @state.port, onChange: @handleChange.bind(this), name: 'port'
 
       dom.div className: "actions",
         dom.div {className: "ui button", onClick: @closeDialog.bind(this)}, "Cancel"

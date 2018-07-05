@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load staticfiles compress %}
+
+{% block subtitle %} System status {% endblock %}
+
+{% block scheduler %}
+  <div id="scheduler", class="item device-inactive">Scheduler</div>
+{% endblock scheduler %}
+
+{% block content %}
+
+<div class="ui container">
+
+  <div class="ui one column relaxed grid">
+    <div class="column">
+      <div id="root" data-url="{% url 'artwork_api:system_status' %}" data-csrf_token="{{ csrf_token }}">
+        <div class="ui segment">
+          <div class="ui active inverted dimmer">
+            <div class="ui large text loader">Loading. Please wait.</div>
+          </div><br /><br /><br /><br /><br />
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script data-object="error" type="text/template-x">
+  We encounter an error processing your request.
+</script>
+
+{% compress js %}
+<script type="text/coffeescript" charset="utf-8" src="{% static 'artwork/js/system_status.coffee' %}"></script>
+{% endcompress %}
+
+{% endblock %}
+

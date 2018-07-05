@@ -5,6 +5,8 @@ from django.db import models
 from django.utils import timezone
 
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 class Artist(models.Model):
@@ -15,6 +17,9 @@ class Artist(models.Model):
     url = models.URLField(blank=True, null=True, max_length=2048)
     notes = models.TextField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
 
     def __unicode__(self):
         return self.name
@@ -36,7 +41,7 @@ class ArtistGroup(models.Model):
 
     """A group of artists who collectively create installations, perhaps also with individual artists."""
     name = models.TextField(blank=False, null=False)
-    artists = models.ManyToManyField(Artist)
+    artists = models.ManyToManyField(Artist, blank=True)
     url = models.URLField(blank=True, null=True, max_length=2048)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -105,6 +110,10 @@ class Equipment(models.Model):
     photos = models.ManyToManyField(Photo, blank=True)
     notes = models.TextField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
+
+    device_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    device_id = models.PositiveIntegerField(null=True)
+    device_object = GenericForeignKey('device_type', 'device_id')
 
     @models.permalink
     def get_absolute_url(self):

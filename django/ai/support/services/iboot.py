@@ -26,8 +26,7 @@ def handler(clientsocket, clientaddr):
             break
         else:
             print("%s" % data)
-
-        clientsocket.send("OK\n")
+            clientsocket.send("ON")
 
     clients.remove(clientsocket)
     clientsocket.close()
@@ -53,3 +52,4 @@ while True:
     except KeyboardInterrupt:
         print "Closing iBoot server socket..."
         serversocket.close()
+        break

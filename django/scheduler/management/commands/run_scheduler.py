@@ -4,11 +4,21 @@ import time
 import signal
 import logging
 
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from scheduler.models import Scheduler
 
+from lighting.tasks import CrestonStatusTask, ProjectorStatusTask
+from iboot.tasks import IBootStatusTask
+
+
+SCHEDULED_TASKS = [
+                   CrestonStatusTask(5, 0),
+                   ProjectorStatusTask(5, 0),
+                   IBootStatusTask(5, 0),
+                  ]
+
+SCHEDULED_PATH_PID = '/tmp/artserver_scheduler.pid'
 
 class Command(BaseCommand):
 
@@ -17,17 +27,17 @@ class Command(BaseCommand):
     def handle(self, *labels, **options):
         print 'Running the scheduler'
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename='/tmp/scheduler-art-server.txt', filemode = 'w')
-        write_proc('/tmp/artserver_scheduler.pid')
+        write_proc(SCHEDULED_PATH_PID)
 
         scheduler = Scheduler()
-        for task in settings.SCHEDULED_TASKS:
+        for task in SCHEDULED_TASKS:
             scheduler.add_task(task)
         scheduler.start_all_tasks()
 
         try:
             while True: time.sleep(10000000)
         except KeyboardInterrupt:
-            #scheduler.stop_all_tasks()
+            scheduler.stop_all_tasks()
             os._exit(0)
         print 'Exited'
 
@@ -48,3 +58,13 @@ def write_proc(lockfile_path):
     pidfile.write("%s" % os.getpid())
     pidfile.close
     return True
+
+
+def sceduler_status():
+    if os.access(SCHEDULED_PATH_PID, os.F_OK):
+        pidfile = open(SCHEDULED_PATH_PID, "r")
+        pidfile.seek(0)
+        pid = pidfile.readline()
+        if os.path.exists("/proc/%s" % pid):
+            return True
+    return False
