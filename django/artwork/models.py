@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -125,6 +126,17 @@ class Equipment(models.Model):
 
     def __unicode__(self):
         return "%s: %s" % (self.equipment_type.name, self.name)
+
+    @classmethod
+    def delete_device(cls, device):
+        device_type = ContentType.objects.get_for_model(device.__class__)
+        try:
+            equipment = Equipment.objects.get(device_type=device_type, device_id=device.id)
+            equipment.device_type = None
+            equipment.device_id = None
+            equipment.save()
+        except ObjectDoesNotExist:
+            pass
 
 
 class Document(models.Model):

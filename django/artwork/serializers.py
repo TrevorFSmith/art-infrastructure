@@ -122,8 +122,7 @@ class EquipmentSerializer(serializers.ModelSerializer):
             }
             return device_info
           except obj.device_type.model_class().DoesNotExist:
-            #raise ObjectDoesNotExist("%s matching query does not exist." % obj.device_type.model_class()._meta.object_name)
-            return ""
+            raise ObjectDoesNotExist("%s matching query does not exist." % obj.device_type.model_class()._meta.object_name)
         return ""
 
 

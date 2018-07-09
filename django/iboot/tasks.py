@@ -12,7 +12,7 @@ class IBootEventTask(Task):
 
     def do_it(self):
         for event in IBootEvent.objects.all():
-            if event.due_for_execution(): event.execute()
+            if event.due_for_execution(window_minutes=1): event.execute()
 
 
 class IBootStatusTask(Task):

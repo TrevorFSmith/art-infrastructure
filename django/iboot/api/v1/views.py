@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from iboot.iboot_control import IBootControl, SocketException
+from artwork.models import Equipment
 from django.conf import settings
 
 
@@ -46,8 +47,9 @@ class IBootViewSet(api_helpers.GenericApiEndpoint):
 
     def delete(self, request, format=None):
         try:
-            iboot  = models.IBootDevice.objects.get(pk=int(request.data.get("id")))
+            iboot = models.IBootDevice.objects.get(pk=int(request.data.get("id")))
             iboot_id = iboot.id
+            Equipment.delete_device(iboot)
             iboot.delete()
         except (ObjectDoesNotExist, TypeError):
             raise Http404

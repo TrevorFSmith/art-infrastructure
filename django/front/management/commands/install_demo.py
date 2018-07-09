@@ -201,13 +201,13 @@ class Command(BaseCommand):
         for i in range(0, 10):
             devices = []
             if not i % 2:
-                devices = bacnet_lights
+                devices = iboots
             elif not i % 3:
                 devices = crestons
             elif not i % 5:
-                devices = iboots
-            else:
                 devices = projectors
+            else:
+                devices = bacnet_lights
             ct = ContentType.objects.get_for_model(devices[0].__class__)
             equipment_type = equipment_types[i] if i < len(equipment_types) else equipment_types[0]
             device = devices[i] if i < len(devices) else devices[0]

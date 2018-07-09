@@ -8,12 +8,13 @@ from django.core.management.base import BaseCommand, CommandError
 
 from scheduler.models import Scheduler
 
-from lighting.tasks import ProjectorEventTask
+from lighting.tasks import ProjectorEventTask, CrestonEventTask
 from iboot.tasks import IBootEventTask
 
 
 SCHEDULED_TASKS = [
                    ProjectorEventTask(),
+                   CrestonEventTask(),
                    IBootEventTask(),
                   ]
 

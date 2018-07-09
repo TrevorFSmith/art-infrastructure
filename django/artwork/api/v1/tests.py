@@ -1,6 +1,5 @@
 from django.test import TestCase, LiveServerTestCase
 from django.core.urlresolvers import reverse
-#from django.core.files import File
 from django.contrib.contenttypes.models import ContentType
 from ai.factories import *
 from ai.test_helpers import *
@@ -567,18 +566,18 @@ class PhotoPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json.loads(response.content), {"details":{"image":["No file was submitted."]}})
 
-    # def test_update_without_errors_for_privileged_user(self):
-    #     photo = PhotoFactory()
-    #     image = open(photo.image.url, "r")
-    #     response = self.client.put(reverse('artwork_api:photos'),
-    #         {"id": photo.pk, "image": File(image), "title": "Title1", "caption": "Caption1", "description": "Desc1"})
+    def test_update_without_errors_for_privileged_user(self):
+        photo = PhotoFactory()
+        response = self.client.put(reverse('artwork_api:photos'),
+            {"id": photo.pk, "image": photo.image, "title": "Title1", "caption": "Caption1", "description": "Desc1"},
+            format="multipart")
 
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    #     response = json.loads(response.content)
-    #     self.assertEqual(response["title"], "Title1")
-    #     self.assertEqual(response["caption"], "Caption1")
-    #     self.assertEqual(response["description"], "Desc1")
+        response = json.loads(response.content)
+        self.assertEqual(response["title"], "Title1")
+        self.assertEqual(response["caption"], "Caption1")
+        self.assertEqual(response["description"], "Desc1")
 
 
 class PhotoUnpriviligedEndpointTestCase(APITestCase):
@@ -683,16 +682,15 @@ class DocumentPriviligedEndpointTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(json.loads(response.content), {"details":{"doc":["No file was submitted."]}})
 
-    # def test_update_without_errors_for_privileged_user(self):
-    #     document = DocumentFactory()
-    #     doc = open(document.doc.url, "r")
-    #     response = self.client.put(reverse('artwork_api:documents'),
-    #         {"id": document.pk, "title": "Document1", "doc": File(doc)})
+    def test_update_without_errors_for_privileged_user(self):
+        document = DocumentFactory()
+        response = self.client.put(reverse('artwork_api:documents'),
+            {"id": document.pk, "title": "Document1", "doc": document.doc}, format="multipart")
 
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    #     response = json.loads(response.content)
-    #     self.assertEqual(response["title"], "Document1")
+        response = json.loads(response.content)
+        self.assertEqual(response["title"], "Document1")
 
 
 class DocumentUnpriviligedEndpointTestCase(APITestCase):

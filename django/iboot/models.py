@@ -5,9 +5,10 @@ import traceback
 
 from django.db import models
 from django.conf import settings
-
+from django.utils import timezone
 from front.models import EventModel
 from iboot_control import IBootControl
+
 
 class IBootDevice(models.Model):
 
@@ -63,7 +64,7 @@ class IBootEvent(EventModel):
             self.save()
             return False
 
-        self.last_run = datetime.datetime.now()
+        self.last_run = datetime.datetime.now(timezone.utc)
         self.tries = 1
         self.save()
 
