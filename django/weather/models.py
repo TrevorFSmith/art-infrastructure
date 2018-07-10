@@ -39,7 +39,6 @@ class Location(models.Model):
 
 class WeatherInfo(models.Model):
     '''A weather reading, probably fetched from Yahoo Weather'''
-    location = models.ForeignKey(Location, blank=False)
     condition = models.TextField()
     temperature = models.FloatField()
     atmosphere_pressure = models.FloatField()
