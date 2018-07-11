@@ -14,17 +14,21 @@ class WeatherViewSet(APIView):
         if location is None:
             raise Http404
 
-        yahoo_data = YahooWeatherClient().query_forecast(location.municipality_and_country)
-        weather_info = models.WeatherInfo(
-            condition=yahoo_data['item']['condition']['text'],
-            temperature=float(yahoo_data['item']['condition']['temp']),
-            atmosphere_pressure=float(yahoo_data['atmosphere']['pressure']),
-            atmosphere_rising=float(yahoo_data['atmosphere']['rising']),
-            atmosphere_visibility=float(yahoo_data['atmosphere']['visibility']),
-            atmosphere_humidity=float(yahoo_data['atmosphere']['humidity']),
-            wind_direction=float(yahoo_data['wind']['direction']),
-            wind_speed=float(yahoo_data['wind']['speed']),
-            wind_chill=float(yahoo_data['wind']['chill'])
-        )
+        weather_info = models.WeatherInfo.objects.filter(location=location, created__gt=timezone.now() - timedelta(hours=1)).first()
+        if weather_info is None:
+            models.WeatherInfo.objects.all().filter(location=location).delete()
+            yahoo_data = YahooWeatherClient().query_forecast(location.municipality_and_country)
+            weather_info = models.WeatherInfo.objects.create(
+                location=location,
+                condition=yahoo_data['item']['condition']['text'],
+                temperature=float(yahoo_data['item']['condition']['temp']),
+                atmosphere_pressure=float(yahoo_data['atmosphere']['pressure']),
+                atmosphere_rising=float(yahoo_data['atmosphere']['rising']),
+                atmosphere_visibility=float(yahoo_data['atmosphere']['visibility']),
+                atmosphere_humidity=float(yahoo_data['atmosphere']['humidity']),
+                wind_direction=float(yahoo_data['wind']['direction']),
+                wind_speed=float(yahoo_data['wind']['speed']),
+                wind_chill=float(yahoo_data['wind']['chill'])
+            )
         serializer = serializers.WeatherInfoSerializer(weather_info)
         return Response(serializer.data)

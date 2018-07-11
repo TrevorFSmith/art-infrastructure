@@ -163,7 +163,6 @@ class EquipmentViewSet(api_helpers.GenericApiEndpoint):
 class InstallationSiteViewSet(api_helpers.GenericApiEndpoint):
     get_queryset_class            = models.InstallationSite
     get_queryset_serializer_class = serializers.InstallationSiteSerializer
-    page_size = 6
 
     def get(self, request, format=None, paginate="on"):
         if paginate == "on":
