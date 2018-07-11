@@ -14,5 +14,5 @@ class LocationAdmin(StyledModelAdmin):
 admin.site.register(Location, LocationAdmin)
 
 class WeatherInfoAdmin(StyledModelAdmin):
-    pass
+	raw_id_fields = ('location', )
 admin.site.register(WeatherInfo, WeatherInfoAdmin)

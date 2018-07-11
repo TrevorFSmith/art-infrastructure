@@ -1,12 +1,9 @@
 from rest_framework import serializers
 from artwork import models
 from lighting.models import BACNetLight
-from weather.models import Location
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-
-
 
 class ArtistSerializer(serializers.ModelSerializer):
     groups_info = serializers.SerializerMethodField(read_only=True)
@@ -236,7 +233,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SystemStatusSerializer(serializers.ModelSerializer):
     site_name = serializers.SerializerMethodField(read_only=True)
-    location_name = serializers.SerializerMethodField(read_only=True)
     equipment = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -246,20 +242,12 @@ class SystemStatusSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "site_name",
-            "location_name",
             "equipment",
             ]
 
     def get_site_name(self, obj):
         if obj.site:
             return obj.site.name
-        return ""
-
-    def get_location_name(self, obj):
-        if obj.site:
-            location = Location.objects.search(obj.site.location)
-            if location:
-              return location.name
         return ""
 
     def get_equipment(self, obj):

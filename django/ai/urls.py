@@ -10,7 +10,9 @@ urlpatterns = [
     url(r'^lighting/', include('lighting.urls', namespace='lighting')),
     url(r'^iboot/', include('iboot.urls', namespace='iboot')),
     url(r'^artwork/', include('artwork.urls', namespace='artwork')),
-    url(r'^$', artwork_views.SystemStatusViewSet.as_view(), name="system_status"),
+    url(r'^$', artwork_views.InstallationViewSet.as_view(), name='installations'),
+
+    #url(r'^$', artwork_views.SystemStatusViewSet.as_view(), name="system_status"),
 
     url(r'^heartbeat/', include('heartbeat.urls', namespace='heartbeat')),
 

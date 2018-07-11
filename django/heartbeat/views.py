@@ -28,10 +28,8 @@ def index(request):
 			heartbeat = Heartbeat(installation=installation, info=info)
 			heartbeat.save()
 		except:
+			print 'NO'
 			logger.exception("Received heartbeat for unknown installation id: %s from IP# %s" % (id, request.META['REMOTE_ADDR']))
 	if request.GET.has_key(CLEAN_HEARTBEATS_PARAMETER):
 		Heartbeat.objects.delete_old_heartbeats()
-	return render(request, 'heartbeat/index.html', {
-		'installations':Installation.objects.all_open(),
-		'heartbeats':Heartbeat.objects.all()
-	})
+	return HttpResponse("Ok")
