@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from lighting.models import BACNetLight, Projector, Creston
 from iboot.models import IBootDevice
-from heartbeat.management.commands.run_heartbeat import heartbeat_status
 
 
 class ArtistViewSet(api_helpers.GenericApiEndpoint):
@@ -232,7 +231,6 @@ class SystemStatusViewSet(api_helpers.GenericApiEndpoint):
         serializer = serializers.SystemStatusSerializer(installations, many=True)
         system_status = {}
         system_status["data"] = serializer.data
-        system_status["scheduler_status"] = heartbeat_status()
         return Response(system_status)
 
 

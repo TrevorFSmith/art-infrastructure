@@ -17,8 +17,5 @@ To run test, user `test_runner.sh`, eg, to run API tests for lighting module, us
 
 $ ./test_runner.sh lighting
 
-To run heartbeat
-python manage.py run_heartbeat
-
 To run scheduler
 python manage.py run_scheduler

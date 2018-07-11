@@ -5,6 +5,7 @@
 *.pid
 *.sqlite3
 django/ai/local_settings.py
+django/node_modules/
 static/CACHE/**/*
 media
 

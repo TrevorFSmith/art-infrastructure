@@ -12,6 +12,8 @@ urlpatterns = [
     url(r'^artwork/', include('artwork.urls', namespace='artwork')),
     url(r'^$', artwork_views.SystemStatusViewSet.as_view(), name="system_status"),
 
+    url(r'^heartbeat/', include('heartbeat.urls', namespace='heartbeat')),
+
     # url(r'^', include('account.api_urls', namespace='account_api')),
 
     url(r'^api/lighting/', include('lighting.api_urls', namespace='lighting_api')),
