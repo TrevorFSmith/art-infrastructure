@@ -8,30 +8,30 @@ from django.core.management.base import BaseCommand, CommandError
 
 from scheduler.models import Scheduler
 
-from lighting.tasks import ProjectorEventTask, CrestonEventTask
-from iboot.tasks import IBootEventTask
+from lighting.tasks import CrestonStatusTask, ProjectorStatusTask
+from iboot.tasks import IBootStatusTask
 
 
-SCHEDULED_TASKS = [
-                   ProjectorEventTask(),
-                   CrestonEventTask(),
-                   IBootEventTask(),
+HEARTBEAT_TASKS = [
+                   CrestonStatusTask(),
+                   ProjectorStatusTask(),
+                   IBootStatusTask(),
                   ]
 
-SCHEDULED_PATH_PID = '/tmp/artserver_scheduler.pid'
+HEARTBEAT_PATH_PID = '/tmp/artserver_heartbeat.pid'
 
 
 class Command(BaseCommand):
 
-    help = "Runs the scheduler."
+    help = "Runs the heartbeat."
 
     def handle(self, *labels, **options):
-        print 'Running the scheduler'
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename='/tmp/scheduler-art-server.txt', filemode = 'w')
-        write_proc(SCHEDULED_PATH_PID)
+        print 'Running the heartbeat'
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', filename='/tmp/heartbeat-art-server.txt', filemode = 'w')
+        write_proc(HEARTBEAT_PATH_PID)
 
         scheduler = Scheduler()
-        for task in SCHEDULED_TASKS:
+        for task in HEARTBEAT_TASKS:
             scheduler.add_task(task)
         scheduler.start_all_tasks()
 
@@ -59,3 +59,13 @@ def write_proc(lockfile_path):
     pidfile.write("%s" % os.getpid())
     pidfile.close
     return True
+
+
+def heartbeat_status():
+    if os.access(HEARTBEAT_PATH_PID, os.F_OK):
+        pidfile = open(HEARTBEAT_PATH_PID, "r")
+        pidfile.seek(0)
+        pid = pidfile.readline()
+        if os.path.exists("/proc/%s" % pid):
+            return True
+    return False

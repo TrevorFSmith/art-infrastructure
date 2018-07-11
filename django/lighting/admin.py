@@ -4,7 +4,9 @@ from django.contrib import admin
 from models import (
     BACNetLight,
     Projector,
-    ProjectorEvent
+    Creston,
+    ProjectorEvent,
+    CrestonEvent,
 )
 
 class StyledModelAdmin(admin.ModelAdmin):
@@ -20,6 +22,14 @@ class ProjectorAdmin(StyledModelAdmin):
     list_display = ('name', 'pjlink_host', 'pjlink_port')
 admin.site.register(Projector, ProjectorAdmin)
 
+class CrestonAdmin(StyledModelAdmin):
+    list_display = ('name', 'host', 'port')
+admin.site.register(Creston, CrestonAdmin)
+
 class ProjectorEventAdmin(StyledModelAdmin):
     readonly_fields = ('tries', 'last_run')
 admin.site.register(ProjectorEvent, ProjectorEventAdmin)
+
+class CrestonEventAdmin(StyledModelAdmin):
+    readonly_fields = ('tries', 'last_run')
+admin.site.register(CrestonEvent, CrestonEventAdmin)

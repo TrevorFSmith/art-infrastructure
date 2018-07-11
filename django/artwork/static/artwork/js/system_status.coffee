@@ -42,9 +42,15 @@ do ->
               dom.i {className: "ui icon circle #{icon_device}"}, ""
               equipment.name
             dom.td null,
-             "#{equipment.device_info.type}"
+              if equipment.device_info.type
+                "#{equipment.device_info.type}"
+              else
+                "None"
             dom.td null,
-             "#{equipment.device_info.name}"
+              if equipment.device_info.name
+                "#{equipment.device_info.name}"
+              else
+                "None"
 
 
   class InstallationNoRecords extends React.Component

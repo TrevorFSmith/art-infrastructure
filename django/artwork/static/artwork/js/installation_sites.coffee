@@ -22,20 +22,7 @@ do ->
 
     constructor: (props) ->
       super(props)
-      @state =
-        weather: {}
-
-      if @props.installation_site.location
-        url = $("#root").data("url-weather").replace("none", @props.installation_site.location)
-        @promiseObjects(url).then (results) =>
-          @setState
-            weather: results
-
-    promiseObjects: (url) ->
-      new Promise (resolve) -> 
-        adapter = new Adapter(url)
-        adapter.loadData (data) ->
-          resolve(data)
+      @state = @state || {}
 
     editInstallationSite: (data) =>
       $('html').trigger("edit-installation-site-dialog-#{data.installation_site.id}", data)
@@ -62,25 +49,6 @@ do ->
           # request finished
           $("[data-object='installation-site-#{installation_site_id}']").toggleClass("loading")
 
-    handleGetWeather: (location) =>
-      url = $("#root").data("url-weather").replace("none", location)
-      @promiseObjects(url).then (results) =>
-        @setState
-          weather: results
-
-    get_wind_direction: (degrees) ->
-      if +degrees > 337.5 and +degrees <= 22.5 then 'N'
-      else if +degrees > 22.5 and +degrees <= 67.5 then 'NE'
-      else if +degrees > 67.5 and +degrees <= 112.5 then 'E'
-      else if +degrees > 112.5 and +degrees <= 157.5 then 'SE'
-      else if +degrees > 157.5 and +degrees <= 202.5 then 'S'
-      else if +degrees > 202.5 and +degrees <= 247.5 then 'SW'
-      else if +degrees > 247.5 and +degrees <= 292.5 then 'W'
-      else 'NW'
-
-    f_to_c: (fahrenheit_degrees) ->
-      Math.round((fahrenheit_degrees - 32) / (9.0 / 5.0))
-
     render: ->
       date_time = @props.installation_site.created.substr(0, 10) + " " +
                   @props.installation_site.created.substr(11, 8)
@@ -92,37 +60,17 @@ do ->
             dom.span null, @props.installation_site.name
 
         dom.div {className: "content"},
-          dom.div {className: "ui two column grid"},
-            dom.div {className: "column"},
-              dom.div null, "Location:   #{@props.installation_site.location}"
-              dom.div null, "Photos:"
-              @props.installation_site.photos_info.map (photo) ->
-                dom.a {href: "/media/" + photo.image, target: "_blank"},
-                  dom.img {className: "ui tiny image indent", src: "/media/" + photo.image, alt: photo.title}
-              dom.div null, "Equipment:"
-              dom.div className: "ui list",
-                @props.installation_site.equipment_info.map (equipment) ->
-                  dom.div className: "item", equipment.name
-              dom.div null, "Notes:   #{@props.installation_site.notes}"
-              dom.div null, "Created: #{date_time}"
-            dom.div {className: "column"},
-              dom.button
-                className: "button ui mini",
-                onClick: @handleGetWeather.bind(this, @props.installation_site.location)
-              , "",
-                dom.i {className: "redo icon"}, ""
-                "Update weather"
-              if not _.isEmpty(@state.weather)
-                dom.div null,
-                  dom.div null, "Sky conditions: #{@state.weather.condition}"
-                  dom.div null, "Temperature: #{@state.weather.temperature}F, #{@f_to_c(@state.weather.temperature)}C"
-                  dom.div null, "Pressure: #{@state.weather.atmosphere_pressure} hPa"
-                  dom.div null, "Humidity: #{@state.weather.atmosphere_humidity}%"
-                  dom.div null, "Visibility: #{@state.weather.atmosphere_visibility} mile(s)"
-                  dom.div null, "Wind direction: #{@get_wind_direction(@state.weather.wind_direction)}"
-                  dom.div null, "Wind speed: #{@state.weather.wind_speed} MPH"
-              else
-                dom.div null, "No weather data available"
+          dom.div null, "Location: #{@props.installation_site.location}"
+          dom.div null, "Photos:"
+          @props.installation_site.photos_info.map (photo) ->
+            dom.a {href: "/media/" + photo.image, target: "_blank"},
+              dom.img {className: "ui tiny image indent", src: "/media/" + photo.image, alt: photo.title}
+          dom.div null, "Equipment:"
+          dom.div className: "ui list",
+            @props.installation_site.equipment_info.map (equipment) ->
+              dom.div className: "item", equipment.name
+          dom.div null, "Notes:   #{@props.installation_site.notes}"
+          dom.div null, "Created: #{date_time}"
 
         dom.div {className: "ui buttons mini attached bottom"},
           dom.button
@@ -287,7 +235,7 @@ do ->
           , "",
             dom.i {className: "plus icon"}, ""
             "New installation site"
-        dom.div {className: "ui two cards"},
+        dom.div {className: "ui three cards"},
           @buildInstallationSites()
         React.createElement(InstallationSiteNoRecords, {output: @state.no_records})
         React.createElement(InstallationSitePagination, {

@@ -7,7 +7,6 @@ import artwork.views as artwork_views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^heartbeat/', include('heartbeat.urls', namespace='heartbeat')),
     url(r'^lighting/', include('lighting.urls', namespace='lighting')),
     url(r'^iboot/', include('iboot.urls', namespace='iboot')),
     url(r'^artwork/', include('artwork.urls', namespace='artwork')),

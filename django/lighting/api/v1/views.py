@@ -7,6 +7,7 @@ from rest_framework.exceptions import PermissionDenied
 from lighting.pjlink import PJLinkController, PJLinkProtocol, SocketException as PJLinkSocketException
 from lighting.bacnet import BacnetControl
 from lighting.creston import CrestonControl, SocketException as CrestonSocketException
+from artwork.models import Equipment
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -50,8 +51,9 @@ class CrestonViewSet(api_helpers.GenericApiEndpoint):
 
     def delete(self, request, format=None):
         try:
-            creston  = models.Creston.objects.get(pk=int(request.data.get("id")))
+            creston = models.Creston.objects.get(pk=int(request.data.get("id")))
             creston_id = creston.id
+            Equipment.delete_device(creston)
             creston.delete()
         except (ObjectDoesNotExist, TypeError):
             raise Http404
@@ -128,25 +130,6 @@ class ProjectorCommandViewSet(api_helpers.GenericApiEndpoint):
             projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
             controller = PJLinkController(projector.pjlink_host, projector.pjlink_port, projector.pjlink_password)
 
-            # FIXME:
-            # This is to be decided what to do with it. Probably makes sense to move it to Scheduler a.k.a. Heartbeat.
-            #
-            # audio_mute, video_mute = controller.query_mute()
-
-            # info = ProjectorInfo(
-            #     controller.query_power(),
-            #     controller.query_name(),
-            #     controller.query_manufacture_name(),
-            #     controller.query_product_name(),
-            #     controller.query_other_info(),
-            #     audio_mute,
-            #     video_mute
-            #     )
-            # See note above
-            #
-            # for lamp in controller.query_lamps():
-            #     info.lamps.append(LampInfo(lamp[0], lamp[1]))
-
             if cmd == PJLinkProtocol.POWER_ON_STATUS:
                 controller.power_on()
 
@@ -201,8 +184,9 @@ class ProjectorViewSet(api_helpers.GenericApiEndpoint):
 
     def delete(self, request, format=None):
         try:
-            projector  = models.Projector.objects.get(pk=int(request.data.get("id")))
+            projector = models.Projector.objects.get(pk=int(request.data.get("id")))
             projector_id = projector.id
+            Equipment.delete_device(projector)
             projector.delete()
         except (ObjectDoesNotExist, TypeError):
             raise Http404
@@ -232,7 +216,6 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
             return Response({"details": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None):
-
         try:
             bacnet_light = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
             serializer = serializers.BACNetLightSerializer(bacnet_light, data=request.data)
@@ -247,8 +230,9 @@ class BACNetViewSet(api_helpers.GenericApiEndpoint):
 
     def delete(self, request, format=None):
         try:
-            bacnet_light  = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
+            bacnet_light = models.BACNetLight.objects.get(pk=int(request.data.get("id")))
             bacnet_light_id = bacnet_light.id
+            Equipment.delete_device(bacnet_light)
             bacnet_light.delete()
         except (ObjectDoesNotExist, TypeError):
             raise Http404

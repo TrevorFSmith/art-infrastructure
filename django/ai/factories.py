@@ -126,7 +126,7 @@ class DocumentFactory(factory.django.DjangoModelFactory):
         model = artwork_models.Document
 
     title = factory.Sequence(lambda n: 'Title {}'.format(n))
-    doc = factory.django.FileField()
+    doc = factory.django.FileField(data=factory.Sequence(lambda n: 'Document {}'.format(n)))
 
 
 class InstallationSiteFactory(factory.django.DjangoModelFactory):

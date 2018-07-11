@@ -3,6 +3,17 @@ from models import *
 from lighting.creston import CrestonControl, SocketException as CrestonSocketException
 from lighting.pjlink import PJLinkController, SocketException as PJLinkSocketException
 
+
+class CrestonEventTask(Task):
+    """The task which runs scheduled events for the creston."""
+    def __init__(self, loopdelay=60, initdelay=1):
+        Task.__init__(self, self.do_it, loopdelay, initdelay)
+
+    def do_it(self):
+        for event in CrestonEvent.objects.all():
+            if event.due_for_execution(window_minutes=1): event.execute()
+
+
 class ProjectorEventTask(Task):
     """The task which runs scheduled events for the projector."""
     def __init__(self, loopdelay=60, initdelay=1):
@@ -10,11 +21,11 @@ class ProjectorEventTask(Task):
 
     def do_it(self):
         for event in ProjectorEvent.objects.all():
-            if event.due_for_execution(): event.execute()
+            if event.due_for_execution(window_minutes=1): event.execute()
 
 
 class CrestonStatusTask(Task):
-    def __init__(self, loopdelay=5, initdelay=1):
+    def __init__(self, loopdelay=5, initdelay=0):
         Task.__init__(self, self.do_it, loopdelay, initdelay)
 
     def do_it(self):
@@ -32,7 +43,7 @@ class CrestonStatusTask(Task):
 
 
 class ProjectorStatusTask(Task):
-    def __init__(self, loopdelay=5, initdelay=1):
+    def __init__(self, loopdelay=5, initdelay=0):
         Task.__init__(self, self.do_it, loopdelay, initdelay)
 
     def do_it(self):

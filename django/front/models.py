@@ -10,7 +10,6 @@ import httplib
 import datetime
 import calendar
 
-import pprint
 import logging
 import traceback
 import feedparser
@@ -29,6 +28,7 @@ from django.dispatch import dispatcher
 from django.core.mail import send_mail
 from django.utils.encoding import force_unicode
 from django.db.models import Q
+
 
 class EventModel(models.Model):
     """
@@ -88,11 +88,11 @@ class EventModel(models.Model):
     def due_for_execution(self, timestamp=None, window_minutes=10):
         """Returns True if this event should be run now or using the timestamp if it is not None."""
         if not self.active: return False
-        if not timestamp: timestamp = datetime.datetime.now()
+        if not timestamp: timestamp = datetime.datetime.utcnow()
         last_time = self.latest_scheduled_time(timestamp)
         if not last_time: return False
-        if self.last_run and self.last_run > last_time: return False
-        return last_time > timestamp - datetime.timedelta(minutes=window_minutes)
+        if self.last_run and self.last_run.replace(tzinfo=None) > last_time: return False
+        return (timestamp > last_time) and ((timestamp - last_time) < datetime.timedelta(minutes=window_minutes))
 
     def save(self, *args, **kwargs):
         self.days = clean_int_field(self.days)
@@ -106,7 +106,7 @@ class EventModel(models.Model):
 
     def latest_scheduled_time(self, timestamp=None):
         """Returns a datetime for this event's scheduled time most close to but before the current time or timestamp if it's not None"""
-        if not timestamp: timestamp = datetime.datetime.now()
+        if not timestamp: timestamp = datetime.datetime.utcnow()
         days, hours, minutes = self.to_arrays()
 
         if not days and not hours and not minutes: return None

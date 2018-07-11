@@ -2,9 +2,11 @@ import datetime
 import traceback
 
 from django.db import models
+from django.utils import timezone
 
 from front.models import EventModel
 from pjlink import PJLinkController
+from creston import CrestonControl
 
 
 class BACNetLight(models.Model):
@@ -70,7 +72,7 @@ class ProjectorEvent(EventModel):
             self.save()
             return False
 
-        self.last_run = datetime.datetime.now()
+        self.last_run = datetime.datetime.now(timezone.utc)
         self.tries = 1
         self.save()
         return True
@@ -91,3 +93,70 @@ class Creston(models.Model):
 
     class Meta:
         ordering = ['name']
+
+
+class CrestonEvent(EventModel):
+
+    COMMAND_CHOICES = (
+        ('Ping', 'Ping'),
+        ('Update', 'Query system'),
+        #('Help', 'For help with list of Commands'),
+        ('EnableDim', 'Dim On/Off Toggle'),
+        ('DimLvlUp', 'To adjust the Dim sensitivity up'),
+        ('DimLvlDown', 'To adjust the Dim sensitivity down'),
+        ('EnableHigh', 'High On/Off Toggle'),
+        ('HighLvlUp', 'To adjust the high sensitivity brightness up'),
+        ('HighLvlDown', 'To adjust the high sensitivity brightness down'),
+        ('MemoryStore', 'To store a Dim and High memory preset level'),
+        ('MemoryRecall', 'To recall a Dim and High memory preset level'),
+        ('Display1On', 'To turn on the left projector'),
+        ('Display1Off', 'To turn off the left projector'),
+        ('Display1DVI', 'To view DVI Input on left projector'),
+        ('Display1HighBright', 'To adjust the image brightness of the left projector to its highest level'),
+        ('Display1LowBright', 'To adjust the image brightness of the left projector to its lowest level'),
+        ('Display2On', 'To turn on the right projector'),
+        ('Display2Off', 'To turn off the right projector'),
+        ('Display2DVI', 'To view DVI input on right projector'),
+        ('Display2HighBright', 'To adjust the image brightness of the right projector to its highest level'),
+        ('Display2LowBright', 'To adjust the image brightness of the right projector to its lowest level'),
+        ('WakeEnable', 'This is to set a specified time for projectors to power On/Off Toggle'),
+        ('WakeHrUp', 'To adjust the hour parameter up for turning on the system'),
+        ('WakeHrDown', 'To adjust the hour parameter down for turning on the system'),
+        ('WakeMinUp', 'To adjust the minute parameter up for turning on the system'),
+        ('WakeMinDown', 'To adjust the minute parameter down for turning on the system'),
+        ('SleepEnable', 'Projector power timer to set powering down of both projectors after a specified amount of time'),
+        ('SleepHrUp', 'To adjust the hour parameter up for the projector sleep function'),
+        ('SleepHrDown', 'To adjust the hour parameter down for the projector sleep function'),
+        ('SleepMinUp', 'To adjust the minute parameter up for the projector sleep function'),
+        ('SleepMinDown', 'To adjust the minute parameter down for the projector sleep function'),
+    )
+    commands = [cmd[0] for cmd in COMMAND_CHOICES]
+    command = models.CharField(max_length=20, blank=False, null=False, choices=COMMAND_CHOICES, default='off')
+    device = models.ForeignKey(Creston, blank=False, null=False)
+
+    def execute(self):
+        print 'running ', self
+        try:
+            lines = 1
+            control = CrestonControl(self.device.host, self.device.port)
+            if self.command not in self.commands:
+                self.tries = self.tries + 1
+                self.save()
+                return False
+            if self.command == 'Update':
+                lines = 9
+            control.send_command(self.command, lines)
+            print 'ran command', self.command
+        except:
+            traceback.print_exc()
+            self.tries = self.tries + 1
+            self.save()
+            return False
+
+        self.last_run = datetime.datetime.now(timezone.utc)
+        self.tries = 1
+        self.save()
+        return True
+
+    def __unicode__(self):
+        return 'Creston Event: [%s],[%s],[%s]' % (self.days, self.hours, self.minutes)
