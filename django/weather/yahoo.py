@@ -26,5 +26,6 @@ class YahooWeatherClient(object):
 
     def get_json(self, yql_query):
         yql_url = YahooWeatherClient.API_ROOT + urllib.urlencode({ 'q':yql_query.encode('utf-8') }) + '&format=json'
+        # yql_url = YahooWeatherClient.API_ROOT + urllib.urlencode({ 'q':yql_query.encode('utf-8') })
         data = urllib2.urlopen(yql_url).read()
         return simplejson.loads(data)['query']['results']['channel']
