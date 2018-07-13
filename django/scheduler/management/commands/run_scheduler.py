@@ -12,11 +12,7 @@ from lighting.tasks import ProjectorEventTask, CrestonEventTask
 from iboot.tasks import IBootEventTask
 
 
-SCHEDULED_TASKS = [
-                   ProjectorEventTask(),
-                   CrestonEventTask(),
-                   IBootEventTask(),
-                  ]
+SCHEDULED_TASKS = [ ProjectorEventTask(), IBootEventTask() ]
 
 SCHEDULED_PATH_PID = '/tmp/artserver_scheduler.pid'
 

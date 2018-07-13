@@ -7,12 +7,10 @@ DEBUG=False
 
 DEVICE_TIMEOUT = 15
 
-IBOOT_POWER_PASSWORD="moo"
-
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'America/Los_Angeles'
 
-BACNET_BIN_DIR = "./"
+BACNET_BIN_DIR = "./bacnet_bin/"
 
 SITE_ID = 1
 

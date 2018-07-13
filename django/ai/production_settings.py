@@ -3,9 +3,6 @@ from settings import *
 # FIXME: replace with real key
 SECRET_KEY = "YOUR KEY GOES HERE"
 
-# FIXME: replace with real password
-IBOOT_POWER_PASSWORD=""
-
 DEBUG=False
 
 #from scheduler import TestTask

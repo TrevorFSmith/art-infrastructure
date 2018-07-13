@@ -34,7 +34,10 @@ class IBootControl:
         result = self.send_command('q')
         if result == None or result == 'BUSY': return None
         return result == 'ON'
-    
+
+    def get_iboot_state(self):
+        """Returns True if it is on, False if it is off, None if it could not be reached"""
+        return self.send_command('q')
 
     def toggle(self):
         state = self.query_iboot_state()
@@ -72,7 +75,6 @@ class IBootControl:
             if value == '':
                 sock.close()
                 return None
-
             sock.close()
             return value
         except socket_error as serr:

@@ -121,7 +121,7 @@ class Command(BaseCommand):
         iboots = []
         for i in range(1, 11):
             iboot = IBootDevice.objects.create(name=iboot_name + str(i), mac_address='00-0D-AD-01-94-6F',
-                                               host='127.0.0.1', port=8008)
+                                               password='1234', host='127.0.0.1', port=8008)
             iboots.append(iboot)
         return iboots
 

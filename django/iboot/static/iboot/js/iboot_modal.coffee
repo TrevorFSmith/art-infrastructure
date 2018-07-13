@@ -17,12 +17,14 @@ class @IBootModal extends React.Component
         mac_address: @props.iboot.mac_address
         host: @props.iboot.host
         port: @props.iboot.port
+        password: @props.iboot.password
     else
       this.state =
         name: ""
         mac_address: ""
         host: ""
         port: ""
+        password: ""
 
   resetForm: =>
     if not @state.id
@@ -31,6 +33,7 @@ class @IBootModal extends React.Component
         mac_address: ""
         host: ""
         port: ""
+        password: ""
 
   domNode: ->
     if @state.id
@@ -107,6 +110,10 @@ class @IBootModal extends React.Component
           dom.div className: "field",
             dom.label null, "Port"
             dom.input value: @state.port, onChange: @handleChange.bind(this), name: 'port'
+
+          dom.div className: "field",
+            dom.label null, "Password"
+            dom.input value: @state.password, onChange: @handleChange.bind(this), name: 'password'
 
       dom.div className: "actions",
         dom.div {className: "ui button", onClick: @closeDialog.bind(this)}, "Cancel"

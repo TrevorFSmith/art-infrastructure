@@ -62,7 +62,7 @@ class IBootCommandViewSet(api_helpers.GenericApiEndpoint):
     def get(self, request, format=None):
         try:
             iboot = models.IBootDevice.objects.get(pk=int(request.data.get("id")))
-            control = IBootControl(settings.IBOOT_POWER_PASSWORD, iboot.host, iboot.port)
+            control = IBootControl(iboot.password, iboot.host, iboot.port)
             control_status = control.query_iboot_state()
         except ObjectDoesNotExist:
             raise Http404
@@ -78,7 +78,7 @@ class IBootCommandViewSet(api_helpers.GenericApiEndpoint):
                 return Response({"details": "Command '%s' not supported." % command}, status=status.HTTP_400_BAD_REQUEST)
 
             iboot = models.IBootDevice.objects.get(pk=int(request.data.get("id")))
-            control = IBootControl(settings.IBOOT_POWER_PASSWORD, iboot.host, iboot.port)
+            control = IBootControl(iboot.password, iboot.host, iboot.port)
             if command == 'cycle':
                 control.cycle_power()
             elif command == 'on':

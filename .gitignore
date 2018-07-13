@@ -4,6 +4,7 @@
 *.log
 *.pid
 *.sqlite3
+django/bacnet_bins/
 django/ai/local_settings.py
 django/node_modules/
 static/CACHE/**/*

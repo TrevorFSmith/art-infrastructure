@@ -38,7 +38,7 @@ class BacnetControl:
         return self.run_command(args)
 
     def write_analog_output_int(self, device_id, property_id, value):
-        """Returns the Present-Value of an Analog Output property"""
+        """Writes the Value of an Analog Input property"""
         bin_path = self.get_bin_path('bacwp')
         # bacwp device-instance object-type object-instance property priority index tag value [tag value...]
         # bacwp 77000 2 1 85 0 -1 4 99.0

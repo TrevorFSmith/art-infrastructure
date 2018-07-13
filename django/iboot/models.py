@@ -16,6 +16,7 @@ class IBootDevice(models.Model):
     mac_address = models.CharField(max_length=1024, null=False, blank=False, help_text="e.g. 00-0D-AD-01-94-6F")
     host = models.GenericIPAddressField(blank=False, null=False)
     port = models.IntegerField(null=False, blank=False, default=8008)
+    password = models.CharField(max_length=1024, null=True, blank=True)
     status = models.BooleanField(default=False)
 
     @models.permalink
@@ -30,9 +31,6 @@ class IBootDevice(models.Model):
         verbose_name = 'iBoot Device'
         verbose_name_plural = 'iBoot Devices'
 
-    class HydrationMeta:
-        attributes = ['id', 'name', 'mac_address']
-
 
 class IBootEvent(EventModel):
 
@@ -43,7 +41,7 @@ class IBootEvent(EventModel):
 
     def execute(self):
         try:
-            control = IBootControl(settings.IBOOT_POWER_PASSWORD, self.device.host, self.device.port)
+            control = IBootControl(self.device.password, self.device.host, self.device.port)
             print 'running ', self
             if self.command == 'cycle':
                 control.cycle_power()

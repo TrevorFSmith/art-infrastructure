@@ -15,6 +15,7 @@ class IBootSerializer(serializers.HyperlinkedModelSerializer):
             "mac_address",
             "host",
             "port",
+            "password",
             "commands",
             "status",
             ]

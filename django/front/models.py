@@ -94,6 +94,12 @@ class EventModel(models.Model):
         if self.last_run and self.last_run.replace(tzinfo=None) > last_time: return False
         return (timestamp > last_time) and ((timestamp - last_time) < datetime.timedelta(minutes=window_minutes))
 
+    def current_time(self):
+        """Returns the current day, hour, and minute"""
+        timestamp = datetime.datetime.utcnow()
+        print 'timestamp', timestamp
+        return 'day:%s hour:%s minute:%s' % (timestamp.weekday(), timestamp.hour, timestamp.minute)
+
     def save(self, *args, **kwargs):
         self.days = clean_int_field(self.days)
         self.hours = clean_int_field(self.hours)

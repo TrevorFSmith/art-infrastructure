@@ -41,19 +41,6 @@ class Task(threading.Thread):
         self.last_alert_datetime = None
         threading.Thread.__init__(self)
 
-    def send_alert(self, subject, message):
-        try:
-            if self.last_alert_datetime and self.last_alert_datetime > datetime.datetime.now() - datetime.timedelta(minutes=10):
-                print 'Not sending an alert because there was one sent in the last 10 minutes: %s' % subject
-                return
-            from front.management.commands.send_alert import Command as SendAlertCommand
-            alert_command = SendAlertCommand()
-            alert_command.handle(subject, message)
-            self.last_alert_datetime = datetime.datetime.now()
-        except:
-            traceback.print_exc()
-            logging.exception('Could not send an alert')
-
     def run(self):
         """There's no need to override this.  Pass your action in as a function to the __init__."""
         if self._initdelay:
