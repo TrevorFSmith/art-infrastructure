@@ -90,14 +90,14 @@ do ->
           dom.p
             className: "ui input margin-right"
             , "",
-              dom.input placeholder: "Enter command ...", "data-object": "command-#{scope.props.bacnet_light.id}"
+              dom.input placeholder: "Enter value ...", "data-object": "command-#{scope.props.bacnet_light.id}"
           dom.div
             className: "button ui mini"
             "data-object": "command-send-#{scope.props.bacnet_light.id}"
             onClick: scope.sendCommand.bind(scope)
           , "",
             dom.i {className: "cog icon"}, ""
-            "Send command"
+            "Send"
 
         dom.div {className: "ui buttons mini attached bottom"},
           dom.button
